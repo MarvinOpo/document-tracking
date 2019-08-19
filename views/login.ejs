@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Login Page</title>
+
+  <!-- Fontfaces CSS-->
+  <link href="css/font-face.css" rel="stylesheet" media="all">
+  <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+  <link href="vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all">
+  <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+
+  <!-- Bootstrap CSS-->
+  <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+
+  <!-- Toastr CSS-->
+  <link href="css/toastr.min.css" rel="stylesheet" />
+
+  <!--Custom styles-->
+  <link rel="stylesheet" type="text/css" href="css/login.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="d-flex justify-content-center h-100">
+      <div class="card">
+        <div class="card-header">
+          <h3>Sign In</h3>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="/login">
+            <div class="input-group form-group">
+              <% if(show_error) {%>
+              <span class='input-error error-text'>Invalid Credential</span>
+              <% } %>
+            </div>
+
+            <div class="input-group form-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-user"></i></span>
+              </div>
+              <input name="username" type="text" class="form-control" placeholder="username" value="mvopo" required>
+
+            </div>
+            <div class="input-group form-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-key"></i></span>
+              </div>
+              <input name="password" type="password" class="form-control" placeholder="password" value="123" required>
+            </div>
+            <div class="form-group">
+              <button id="login_btn" type="submit" class="btn float-right login_btn">Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jquery JS-->
+  <script src="vendor/jquery.min.js"></script>
+
+  <!-- Bootstrap JS-->
+  <script src="vendor/bootstrap-4.1/bootstrap.min.js"></script>
+
+  <!-- Toastr JS -->
+  <script src="js/toastr.min.js"></script>
+
+  <script src="js/login.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="au theme template">
+    <meta name="author" content="Hau Nguyen">
+    <meta name="keywords" content="au theme template">
+
+    <!-- Title Page-->
+    <title>Documents</title>
+
+    <!-- Fontfaces CSS-->
+    <link href="css/font-face.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all">
+    <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+
+    <!-- Bootstrap CSS-->
+    <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+
+    <!-- Vendor CSS-->
+    <link href="vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
+    <link href="vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" media="all">
+    <link href="vendor/wow/animate.css" rel="stylesheet" media="all">
+    <link href="vendor/css-hamburgers/hamburgers.min.css" rel="stylesheet" media="all">
+    <link href="vendor/slick/slick.css" rel="stylesheet" media="all">
+    <link href="vendor/select2/select2.min.css" rel="stylesheet" media="all">
+    <link href="vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
+
+    <!-- Main CSS-->
+    <link href="css/theme.css" rel="stylesheet" media="all">
+
+    <!-- Selectize CSS-->
+    <link href="css/selectize.css" type="text/css" rel="stylesheet">
+
+    <!-- Pagination CSS-->
+    <link href="css/pagination.css" type="text/css" rel="stylesheet">
+
+    <!-- Toastr CSS-->
+    <link href="css/toastr.min.css" rel="stylesheet" />
+
+    <!-- PrintJS CSS-->
+    <link href="css/print.min.css" rel="stylesheet" media="all">
+
+</head>
+
+<body class="animsition">
+    <div class="page-wrapper">
+        <%- include navigation.ejs %>
+        <!-- PAGE CONTAINER-->
+        <div class="page-container">
+            <%- include header.ejs %>
+
+            <!-- MAIN CONTENT-->
+            <div class="main-content">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- DATA TABLE -->
+                                <h3 class="title-5 m-b-35">Documents</h3>
+
+                                <div class="table-data__tool">
+                                    <div class="table-data__tool-left">
+                                        <div class="rs-select2--light rs-select2--md">
+                                            <select id="document_filter" class="demo-default">
+                                                <option value="">All Documents</option>
+                                            </select>
+                                        </div>
+                                        <div class="rs-select2--light rs-select2--lg">
+                                            <select id="type_filter" class="demo-default">
+                                                <option value="">Any Type</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="rs-select2--light rs-select2--lg">
+                                            <select id="docno_filter" class="demo-default">
+                                                <option value="">Document No.</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="rs-select2--light rs-select2--300">
+                                            <select id="general_filter" class="demo-default">
+                                                <option value="">General Search</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="table-data__tool-right">
+                                        <!-- <i class="zmdi zmdi-refresh au-btn au-btn-icon au-btn--green au-btn--small"></i> -->
+
+                                        <a class="js-arrow au-btn au-btn-icon au-btn--green au-btn--small" href="#">
+                                            Manage Document
+                                        </a>
+
+                                        <ul class="navbar-mobile-sub__list list-unstyled js-sub-list border border-success"
+                                            style="position: absolute; width: 178px;">
+                                            <li class="border-bottom border-success text-center">
+                                                <label class="w-100 m-t-10" data-toggle="modal"
+                                                    data-target="#modal_recieve">
+                                                    Recieve Docs </label>
+                                            </li>
+                                            <li class="text-center">
+                                                <label class="w-100 m-t-10" data-toggle="modal"
+                                                    data-target="#modal_release">
+                                                    Release Docs </label>
+                                            </li>
+                                        </ul>
+
+                                        <button class="au-btn au-btn-icon au-btn--green au-btn--small"
+                                            data-toggle="modal" data-target="#modal_document">
+                                            <i class="zmdi zmdi-plus"></i>Add Document</button>
+                                        <!-- <a class="js-arrow au-btn au-btn-icon au-btn--green au-btn--small" href="#">
+                                            <i class="zmdi zmdi-plus"></i> Add Document</a>
+
+                                        <ul class="navbar-mobile-sub__list list-unstyled js-sub-list"
+                                            style="position: absolute; width: 166px;">
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Hospital Order </label>
+                                            </li>
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Memorandum </label>
+                                            </li>
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Disbursement </label>
+                                            </li>
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Purchase Order </label>
+                                            </li>
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Purchase Request </label>
+                                            </li>
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Abstract </label>
+                                            </li>
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Contracts </label>
+                                            </li>
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Communication </label>
+                                            </li>
+                                            <li>
+                                                <label class="w-100" data-toggle="modal" data-target="#modal_tev">
+                                                    Disbursement </label>
+                                            </li>
+                                        </ul> -->
+                                    </div>
+                                </div>
+                                <div class="table-responsive table-responsive-data2 m-b-35">
+                                    <table class="table table-data2">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Barcode</th>
+                                                <th>Document No.</th>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                                <th>Type</th>
+                                                <th>Priority</th>
+                                                <th>Duration</th>
+                                                <th>Remarks</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table_data">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div id="printable_div2" class="row d-none">
+                                    <div id="printable_div" class="col-lg-12 text-center">
+                                        <h3>Vicente Sotto Memorial Medical Center</h3>
+                                        <h5>B. Rodriguez St., Cebu City</h5>
+                                        <hr>
+                                        <h4 id="printable_title">Send Out Report</h4>
+                                        <br>
+                                        <div class="w-100 text-left">
+                                            <h6 id="printed_by">Printed by: Mark Vincent B. Opo</h6>
+                                        </div>
+                                        <hr>
+
+                                        <div id="tblContainer">
+                                            <table id="tblSendOut">
+                                                <thead class="text-white m-b-50">
+                                                    <tr>
+                                                        <th>Barcode</th>
+                                                        <th>Name</th>
+                                                        <th>Type</th>
+                                                        <th>Recieve By</th>
+                                                        <th>Date/Time</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="sendout_doc_tbody" class="text-size-12">
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- END DATA TABLE -->
+                                <!-- Printed Barcode Container -->
+                                <div id="barcode_container" class="d-none">
+                                    <img id="barcode" style="float: bottom;" />
+                                </div>
+                                <!-- Pager Container -->
+                                <div class="pager_container d-flex justify-content-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%- include footer.ejs %>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal_document" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Document</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="error_container"></div>
+
+                    <div class="row">
+                        <div class="col-md-7">
+                            <label>Name <span class="color-red">*</span></label>
+                            <input id="modal_name" type="text" class="au-input au-input--full m-b-10 text-capitalize"
+                                style="height: 36px;" />
+                        </div>
+
+                        <div class="col-md-5">
+                            <label>Document No. <span class="color-red">*</span></label>
+                            <input id="modal_docno" type="text" class="au-input au-input--full m-b-10 text-capitalize"
+                                style="height: 36px;" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Priority <span class="color-red">*</span></label>
+                            <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                                <select id="modal_priority" class="demo-default w-100">
+                                    <option value="">Select Priority Level</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Type <span class="color-red">*</span></label>
+                            <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                                <select id="modal_type" class="demo-default w-100">
+                                    <option value="">Select Type</option>
+                                    <option value="Abstract">Abstract</option>
+                                    <option value="Account Recievable">Account Recievable</option>
+                                    <option value="ACIC">ACIC</option>
+                                    <option value="Application Bill">Application Bill</option>
+                                    <option value="Applicants">Applicants</option>
+                                    <option value="Application for Leave">Application for Leave</option>
+                                    <option value="Appointment">Appointment</option>
+                                    <option value="Bill Number">Bill Number</option>
+                                    <option value="Canvass">Canvass</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Communication">Communication</option>
+                                    <option value="Consigment Order">Consigment Order</option>
+                                    <option value="Contracts">Contracts</option>
+                                    <option value="Daily Consolidated Reports">Daily Consolidated Reports</option>
+                                    <option value="DBM">DBM</option>
+                                    <option value="DHL">DHL</option>
+                                    <option value="Disbursement Voucher">Disbursement Voucher</option>
+                                    <option value="DTR">DTR</option>
+                                    <option value="Fund Utilization Report">Fund Utilization Report</option>
+                                    <option value="HEMS">HEMS</option>
+                                    <option value="Hospital Memo">Hospital Memo</option>
+                                    <option value="Hospital Order">Hospital Order</option>
+                                    <option value="House Keeping">House Keeping</option>
+                                    <option value="Internal Medicine Department">Internal Medicine Department</option>
+                                    <option value="Liquidation Report">Liquidation Report</option>
+                                    <option value="NOA">NOA</option>
+                                    <option value="Notices">Notices</option>
+                                    <option value="Oncology Dept.">Oncology Dept.</option>
+                                    <option value="Other Reports">Other Reports</option>
+                                    <option value="Pass Slip">Pass Slip</option>
+                                    <option value="Patient's Referral">Patient's Referral</option>
+                                    <option value="Pediatrics Dept.">Pediatrics Dept.</option>
+                                    <option value="Personal Data Sheet">Personal Data Sheet</option>
+                                    <option value="Petty Cash Voucher">Petty Cash Voucher</option>
+                                    <option value="PHIC Cheque">PHIC Cheque</option>
+                                    <option value="Procurement Office">Procurement Office</option>
+                                    <option value="Purchase Order">Purchase Order</option>
+                                    <option value="Purchase Request">Purchase Request</option>
+                                    <option value="Requisition and Issue Slip">Requisition and Issue Slip</option>
+                                    <option value="Resolution">Resolution</option>
+                                    <option value="SLCI">SLCI</option>
+                                    <option value="Social Worker">Social Worker</option>
+                                    <option value="Sub-allotment">Sub-allotment</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <label>Description <span class="color-red">*</span></label>
+                    <textarea id="modal_description" class="au-input au-input--full m-b-10 text-capitalize"
+                        placeholder="Write something here..."></textarea>
+
+                    <label>Remarks </label>
+                    <textarea id="modal_remarks" class="au-input au-input--full m-b-10 text-capitalize"
+                        placeholder="Write something here..."></textarea>
+
+                    <div class="modal-footer" style="justify-content: center;">
+                        <button id="modal_add" type="button" class="au-btn au-btn-icon au-btn--green au-btn--small"
+                            style="width: 82.88px">Add</button>
+                        <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_release" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Release Document To</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="release_error_container"></div>
+
+                    <label>Department <span class="color-red">*</span></label>
+                    <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                        <select id="modal_dept" class="demo-default w-100">
+                            <option value="">Select Department</option>
+                            <option value="Administrative Office">Administrative Office</option>
+                            <option value="IT Office">IT Office</option>
+                            <option value="Medical Center Chief">Medical Center Chief</option>
+                            <option value="Chief of Clinic">Chief of Clinic</option>
+                            <option value="Chief of Nursing">Chief of Nursing</option>
+                            <option value="Accounting Department">Accounting Department</option>
+                            <option value="Property Department">Property Department</option>
+                            <option value="Cashier & Disbursing Department">Cashier & Disbursing Department</option>
+                            <option value="Training Department">Training Department</option>
+                            <option value="Pharmacy Department">Pharmacy Department</option>
+                            <option value="Medical Department">Medical Department</option>
+                            <option value="Out Patient Department">Out Patient Department</option>
+                            <option value="Budget Department">Budget Department</option>
+                            <option value="Internal Control Office">Internal Control Office</option>
+                            <option value="Personel Department">Personnel Department</option>
+                            <option value="Laboratory Department">Laboratory Department</option>
+                            <option value="Billing Section">Billing Section</option>
+                            <option value="Engineering Department">Engineering Department</option>
+                            <option value="Health Maintenance Information System">Health Maintenance Information System
+                            </option>
+                            <option value="Region VII Blood Center">Region VII Blood Center</option>
+                            <option value="DOH VII">DOH VII</option>
+                            <option value="Medical Records">Medical Records</option>
+                            <option value="Procurement Department">Procurement Department</option>
+                            <option value="Social Worker">Social Worker</option>
+                            <option value="Central Supply">Central Supply</option>
+                            <option value="Orthopedics Department">Orthopedics Department</option>
+                        </select>
+                    </div>
+
+                    <label>Barcode <span class="color-red">*</span></label>
+                    <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                        <select id="modal_release_barcode" class="demo-default w-100">
+                            <option value="">Select Barcode</option>
+                        </select>
+                    </div>
+
+                    <div id="modal_release_doc_info" class="au-input au-input--full m-t-20 m-b-20">
+                        <span>Name</span>
+                        <input id="modal_release_name" type="text"
+                            class="au-input au-input--full m-b-10 text-capitalize" style="height: 36px;" />
+
+                        <span>Description</span>
+                        <textarea id="modal_release_desc" type="text"
+                            class="au-input au-input--full m-b-10 text-capitalize"></textarea>
+                    </div>
+
+                    <label>Remarks <span class="color-red">*</span></label>
+                    <textarea id="modal_release_remarks" class="au-input au-input--full m-b-10 text-capitalize"
+                        placeholder="Write something here..."></textarea>
+
+                    <div class="modal-footer" style="justify-content: center;">
+                        <button id="modal_add_release" type="button"
+                            class="au-btn au-btn-icon au-btn--green au-btn--small"
+                            style="width: 82.88px">Release</button>
+                        <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_track" class="modal fade" role="dialog">
+        <div class="modal-dialog mxw-1200">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Document Tracking</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive table-responsive-data2 m-b-35">
+                        <table class="table table-data2">
+                            <thead>
+                                <tr>
+                                    <th>Released To</th>
+                                    <th>Recieved By</th>
+                                    <th>IN</th>
+                                    <th>Released By</th>
+                                    <th>OUT</th>
+                                    <th>Duration</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="track_data">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_recieve" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Recieve Document</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="recieve_error_container"></div>
+
+                    <label>Barcode <span class="color-red">*</span></label>
+                    <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                        <select id="modal_recieve_barcode" class="demo-default w-100">
+                            <option value="">Select Barcode</option>
+                        </select>
+                    </div>
+
+                    <div id="modal_recieve_doc_info" class="au-input au-input--full m-t-20">
+                        <span>Name</span>
+                        <input id="modal_recieve_name" type="text"
+                            class="au-input au-input--full m-b-10 text-capitalize" style="height: 36px;" />
+
+                        <span>Description</span>
+                        <textarea id="modal_recieve_desc" type="text"
+                            class="au-input au-input--full m-b-10 text-capitalize"></textarea>
+                    </div>
+                    <!-- <label>Remarks </label>
+                    <textarea id="modal_remarks_recieve" class="au-input au-input--full m-b-10 text-capitalize"
+                        placeholder="Write something here..."></textarea> -->
+
+                    <div class="modal-footer" style="justify-content: center;">
+                        <button id="modal_add_recieve" type="button"
+                            class="au-btn au-btn-icon au-btn--green au-btn--small"
+                            style="width: 82.88px">Recieve</button>
+                        <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Jquery JS-->
+    <script src="vendor/jquery.min.js"></script>
+    <!-- Bootstrap JS-->
+    <script src="vendor/bootstrap-4.1/popper.min.js"></script>
+    <script src="vendor/bootstrap-4.1/bootstrap.min.js"></script>
+    <!-- Vendor JS       -->
+    <script src="vendor/slick/slick.min.js">
+    </script>
+    <script src="vendor/wow/wow.min.js"></script>
+    <script src="vendor/animsition/animsition.min.js"></script>
+    <script src="vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">
+    </script>
+    <script src="vendor/counter-up/jquery.waypoints.min.js"></script>
+    <script src="vendor/counter-up/jquery.counterup.min.js">
+    </script>
+    <script src="vendor/circle-progress/circle-progress.min.js"></script>
+    <script src="vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="vendor/select2/select2.min.js">
+    </script>
+
+    <!-- Toastr JS -->
+    <script src="js/toastr.min.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/barcode.min.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/print.min.js"></script>
+    <script src="js/selectize.min.js"></script>
+    <script src="js/pagination.js"></script>
+    <script src="js/documents.js"></script>
+</body>
+
+</html>
+<!-- end document-->

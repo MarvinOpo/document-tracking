@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="au theme template">
+    <meta name="author" content="Hau Nguyen">
+    <meta name="keywords" content="au theme template">
+
+    <!-- Title Page-->
+    <title>Dashboard</title>
+
+    <!-- Fontfaces CSS-->
+    <link href="css/font-face.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all">
+    <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+
+    <!-- Bootstrap CSS-->
+    <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+
+    <!-- Vendor CSS-->
+    <link href="vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
+    <link href="vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" media="all">
+    <link href="vendor/wow/animate.css" rel="stylesheet" media="all">
+    <link href="vendor/css-hamburgers/hamburgers.min.css" rel="stylesheet" media="all">
+    <link href="vendor/slick/slick.css" rel="stylesheet" media="all">
+    <link href="vendor/select2/select2.min.css" rel="stylesheet" media="all">
+    <link href="vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
+
+    <!-- Main CSS-->
+    <link href="css/theme.css" rel="stylesheet" media="all">
+
+    <!-- Datepicker CSS-->
+    <link href="css/datepicker.css" rel="stylesheet" media="all">
+
+    <!-- Toastr CSS-->
+    <link href="css/toastr.min.css" rel="stylesheet" />
+
+    <!-- PrintJS CSS-->
+    <link href="css/print.min.css" rel="stylesheet" media="all">
+</head>
+
+<body class="animsition">
+    <div class="page-wrapper">
+        <%- include navigation.ejs %>
+        <!-- PAGE CONTAINER-->
+        <div class="page-container">
+
+            <%- include header.ejs %>
+
+            <!-- MAIN CONTENT-->
+            <div class="main-content">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="row m-t-25">
+                            <div class="col-sm-6 col-md-6 col-lg-3">
+                                <div class="overview-item overview-item--c4">
+                                    <div class="overview__inner">
+                                        <!-- <label class="more-info" data-toggle="modal" data-target="#modal_pending">
+                                            More info <i class="fa fa-arrow-circle-right"></i>
+                                        </label> -->
+                                        <a href="/documents?filter=pending" class="more-info">
+                                            More info <i class="fa fa-arrow-circle-right"></i>
+                                        </a>
+
+                                        <div class="overview-box clearfix">
+                                            <div class="icon">
+                                                <i class="zmdi zmdi-file"></i>
+                                            </div>
+                                            <div class="text">
+                                                <h2 id="pending_total">0</h2>
+                                                <span>Pending</span>
+                                            </div>
+                                        </div>
+                                        <div class="pending_total align-bottom">
+                                            <canvas id="pending_chart" class="align-bottom"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-md-6 col-lg-3">
+                                <div class="overview-item overview-item--c2">
+                                    <div class="overview__inner">
+
+                                        <div class="overview-box clearfix">
+                                            <div class="icon">
+                                                <i class="zmdi zmdi-file-plus"></i>
+                                            </div>
+                                            <div class="text">
+                                                <h2 id="recieve_total">0</h2>
+                                                <span>Recieved</span>
+                                            </div>
+                                        </div>
+                                        <div class="recieve_overview_chart">
+                                            <canvas id="recieve_chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-md-6 col-lg-3">
+                                <div class="overview-item overview-item--c3">
+                                    <div class="overview__inner">
+                                        <div class="overview-box clearfix">
+                                            <div class="icon">
+                                                <i class="zmdi zmdi-file-text"></i>
+                                            </div>
+                                            <div class="text">
+                                                <h2 id="release_total">0</h2>
+                                                <span>Send Out</span>
+                                            </div>
+                                        </div>
+                                        <div class="release_overview_chart">
+                                            <canvas id="release_chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-md-6 col-lg-3">
+                                <div class="overview-item overview-item--c1">
+                                    <div class="overview__inner">
+                                        <div class="overview-box clearfix">
+                                            <div class="icon">
+                                                <i class="zmdi zmdi-collection-text"></i>
+                                            </div>
+                                            <div class="text">
+                                                <h2 id="total_total">0</h2>
+                                                <span>Total</span>
+                                            </div>
+                                        </div>
+                                        <div class="total_overview_chart">
+                                            <canvas id="total_chart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 col-lg-7">
+                                <h2 class="title-1 m-b-25">Recent Documents</h2>
+                                <div>
+                                    <div class="rs-select2--light rs-select2--300 m-b-20">
+                                        <span class="text-size-12">Date</span>
+                                        <input type="text" id="recent_daterange" class="form-control text-size-12">
+                                    </div>
+
+                                    <div id="print_recent" class="input-group-addon d-inline-block height-32 {
+                                                        height: 32px;}">
+                                        <i class="zmdi zmdi-print"></i>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive table--no-card m-b-40">
+                                    <table id="tblRecentDocs"
+                                        class="match-parent table table-data3 table-borderless table-striped table-earning text-size-12">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Barcode</th>
+                                                <th>Recieve By</th>
+                                                <th>IN</th>
+                                                <th>OUT</th>
+                                                <th>Release To</th>
+                                                <th>Remarks</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="recent_doc_tbody" class="text-size-12">
+
+                                        </tbody>
+                                    </table>
+
+                                    <div class="table-load-more">
+                                        <button id="load_more_btn" class="au-btn au-btn-load js-load-btn">load
+                                            more</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-4">
+                                <h2 class="title-1 m-b-25">Send Out</h2>
+
+                                <div>
+                                    <div class="rs-select2--light rs-select2--300 m-b-20">
+                                        <span class="text-size-12">Date</span>
+                                        <input type="text" id="sendout_daterange" class="form-control text-size-12">
+                                    </div>
+
+                                    <div id="print_sendout" class="input-group-addon d-inline-block height-32 {
+                                                        height: 32px;}">
+                                        <i class="zmdi zmdi-print"></i>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive table--no-card m-b-40">
+                                    <table id="tblSendOut" class="match-parent table table-data3 table-borderless table-striped table-earning">
+                                        <thead>
+                                            <tr>
+                                                <th>Barcode</th>
+                                                <th>Send To</th>
+                                                <th class="mnw-120">Name</th>
+                                                <th>Type</th>
+                                                <th class="mnw-100">Date</th>
+                                                <th>Recieve By</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="sendout_doc_tbody" class="text-size-8">
+                                            
+                                        </tbody>
+                                    </table>
+
+                                    <div class="table-load-more-sendout">
+                                        <button id="load_more_sendout" class="au-btn au-btn-load js-load-btn">load
+                                            more</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+
+                            <div class="col-md-12 col-lg-5">
+                                <h2 class="title-1 m-b-25">Send Out</h2>
+
+                                <div>
+                                    <div class="rs-select2--light rs-select2--300 m-b-20">
+                                        <span class="text-size-12">Date</span>
+                                        <input type="text" id="sendout_daterange" class="form-control text-size-12">
+                                    </div>
+
+                                    <div id="print_sendout" class="input-group-addon d-inline-block height-32 {
+                                                        height: 32px;}">
+                                        <i class="zmdi zmdi-print"></i>
+                                    </div>
+                                </div>
+
+                                <div class="sendout-card au-card--bg-blue m-b-40">
+                                    <div class="au-card-inner">
+                                        <div class="table-responsive">
+                                            <table id="tblSendOut" class="table table-top-countries">
+                                                <thead class="text-white m-b-50">
+                                                    <tr>
+                                                        <th>Barcode</th>
+                                                        <th>Name</th>
+                                                        <th>Type</th>
+                                                        <th>OUT</th>
+                                                        <th>Recieve By</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="sendout_doc_tbody" class="text-size-12">
+
+                                                </tbody>
+                                            </table>
+
+                                            <div class="table-load-more-sendout">
+                                                <button id="load_more_sendout"
+                                                    class="au-btn au-btn-load au-btn--submit js-load-btn">load
+                                                    more</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="printable_div2" class="row d-none">
+                                <div id="printable_div" class="col-lg-12 text-center">
+                                    <h3>Vicente Sotto Memorial Medical Center</h3>
+                                    <h5>B. Rodriguez St., Cebu City</h5>
+                                    <hr>
+                                    <h4 id="printable_title">Recent Documents</h4>
+                                    <span id="printable_date">08/01/2019 - 08/01/2019</span>
+                                    <br><br>
+                                    <div class="w-100 text-left">
+                                        <h6 id="printed_by">Printed By:</h6>
+                                        <h6 id="printed_date">Printed Date:</h6>
+                                    </div>
+                                    <hr>
+
+                                    <div id="tblContainer" class="table table-data3">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END MAIN CONTENT-->
+                <%- include footer.ejs %>
+            </div>
+            <!-- END PAGE CONTAINER-->
+
+        </div>
+    </div>
+
+    <div id="modal_pending" class="modal fade" role="dialog">
+        <div class="modal-dialog mxw-1400">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Pending Documents</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="rs-select2--light rs-select2--300">
+                        <select id="pending_filter" class="demo-default">
+                            <option value="">General Search</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive table-responsive-data2 m-b-35">
+                        <table class="table table-data2">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Barcode</th>
+                                    <th>Document No.</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Type</th>
+                                    <th>Priority</th>
+                                    <th>Duration</th>
+                                    <th class='mnw-200'>Remarks</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="pending_data">
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pager_container d-flex justify-content-center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_release" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Release Document To</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="release_error_container"></div>
+
+                    <label>Department <span class="color-red">*</span></label>
+                    <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                        <select id="modal_dept" class="demo-default w-100">
+                            <option value="">Select Department</option>
+                            <option value="Administrative Office">Administrative Office</option>
+                            <option value="IT Office">IT Office</option>
+                            <option value="Medical Center Chief">Medical Center Chief</option>
+                            <option value="Chief of Clinic">Chief of Clinic</option>
+                            <option value="Chief of Nursing">Chief of Nursing</option>
+                            <option value="Accounting Department">Accounting Department</option>
+                            <option value="Property Department">Property Department</option>
+                            <option value="Cashier & Disbursing Department">Cashier & Disbursing Department</option>
+                            <option value="Training Department">Training Department</option>
+                            <option value="Pharmacy Department">Pharmacy Department</option>
+                            <option value="Medical Department">Medical Department</option>
+                            <option value="Out Patient Department">Out Patient Department</option>
+                            <option value="Budget Department">Budget Department</option>
+                            <option value="Internal Control Office">Internal Control Office</option>
+                            <option value="Personel Department">Personnel Department</option>
+                            <option value="Laboratory Department">Laboratory Department</option>
+                            <option value="Billing Section">Billing Section</option>
+                            <option value="Engineering Department">Engineering Department</option>
+                            <option value="Health Maintenance Information System">Health Maintenance Information System
+                            </option>
+                            <option value="Region VII Blood Center">Region VII Blood Center</option>
+                            <option value="DOH VII">DOH VII</option>
+                            <option value="Medical Records">Medical Records</option>
+                            <option value="Procurement Department">Procurement Department</option>
+                            <option value="Social Worker">Social Worker</option>
+                            <option value="Central Supply">Central Supply</option>
+                            <option value="Orthopedics Department">Orthopedics Department</option>
+                        </select>
+                    </div>
+
+                    <label>Barcode <span class="color-red">*</span></label>
+                    <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                        <select id="modal_release_barcode" class="demo-default w-100">
+                            <option value="">Select Barcode</option>
+                        </select>
+                    </div>
+
+                    <div id="modal_release_doc_info" class="au-input au-input--full m-t-20 m-b-20">
+                        <span>Name</span>
+                        <input id="modal_release_name" type="text"
+                            class="au-input au-input--full m-b-10 text-capitalize" style="height: 36px;" />
+
+                        <span>Description</span>
+                        <textarea id="modal_release_desc" type="text"
+                            class="au-input au-input--full m-b-10 text-capitalize"></textarea>
+                    </div>
+
+                    <label>Remarks <span class="color-red">*</span></label>
+                    <textarea id="modal_release_remarks" class="au-input au-input--full m-b-10 text-capitalize"
+                        placeholder="Write something here..."></textarea>
+
+                    <div class="modal-footer" style="justify-content: center;">
+                        <button id="modal_add_release" type="button"
+                            class="au-btn au-btn-icon au-btn--green au-btn--small"
+                            style="width: 82.88px">Release</button>
+                        <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_track" class="modal fade" role="dialog">
+        <div class="modal-dialog mxw-1200">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Document Tracking</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive table-responsive-data2 m-b-35">
+                        <table class="table table-data2">
+                            <thead>
+                                <tr>
+                                    <th>Released To</th>
+                                    <th>Recieved By</th>
+                                    <th>IN</th>
+                                    <th>Released By</th>
+                                    <th>OUT</th>
+                                    <th>Duration</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="track_data">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_recieve" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Recieve Document</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="recieve_error_container"></div>
+
+                    <label>Barcode <span class="color-red">*</span></label>
+                    <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                        <select id="modal_recieve_barcode" class="demo-default w-100">
+                            <option value="">Select Barcode</option>
+                        </select>
+                    </div>
+
+                    <div id="modal_recieve_doc_info" class="au-input au-input--full m-t-20">
+                        <span>Name</span>
+                        <input id="modal_recieve_name" type="text"
+                            class="au-input au-input--full m-b-10 text-capitalize" style="height: 36px;" />
+
+                        <span>Description</span>
+                        <textarea id="modal_recieve_desc" type="text"
+                            class="au-input au-input--full m-b-10 text-capitalize"></textarea>
+                    </div>
+                    <!-- <label>Remarks </label>
+                        <textarea id="modal_remarks_recieve" class="au-input au-input--full m-b-10 text-capitalize"
+                            placeholder="Write something here..."></textarea> -->
+
+                    <div class="modal-footer" style="justify-content: center;">
+                        <button id="modal_add_recieve" type="button"
+                            class="au-btn au-btn-icon au-btn--green au-btn--small"
+                            style="width: 82.88px">Recieve</button>
+                        <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Jquery JS-->
+    <script src="vendor/jquery.min.js"></script>
+    <!-- Bootstrap JS-->
+    <script src="vendor/bootstrap-4.1/popper.min.js"></script>
+    <script src="vendor/bootstrap-4.1/bootstrap.min.js"></script>
+    <!-- Vendor JS       -->
+    <script src="vendor/slick/slick.min.js">
+    </script>
+    <script src="vendor/wow/wow.min.js"></script>
+    <script src="vendor/animsition/animsition.min.js"></script>
+    <script src="vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">
+    </script>
+    <script src="vendor/counter-up/jquery.waypoints.min.js"></script>
+    <script src="vendor/counter-up/jquery.counterup.min.js">
+    </script>
+    <script src="vendor/circle-progress/circle-progress.min.js"></script>
+    <script src="vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="vendor/chartjs/Chart.bundle.min.js"></script>
+    <script src="vendor/select2/select2.min.js">
+    </script>
+
+    <!-- Toastr JS -->
+    <script src="js/toastr.min.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/pagination.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/datepicker.js"></script>
+    <script src="js/print.min.js"></script>
+    <script src="js/selectize.min.js"></script>
+    <script src="js/dashboard.js"></script>
+
+</body>
+
+</html>
+<!-- end document-->

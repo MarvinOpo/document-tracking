@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="au theme template">
+    <meta name="author" content="Hau Nguyen">
+    <meta name="keywords" content="au theme template">
+
+    <!-- Title Page-->
+    <title>Documents</title>
+
+    <!-- Fontfaces CSS-->
+    <link href="css/font-face.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all">
+    <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+
+    <!-- Bootstrap CSS-->
+    <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+
+    <!-- Vendor CSS-->
+    <link href="vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
+    <link href="vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" media="all">
+    <link href="vendor/wow/animate.css" rel="stylesheet" media="all">
+    <link href="vendor/css-hamburgers/hamburgers.min.css" rel="stylesheet" media="all">
+    <link href="vendor/slick/slick.css" rel="stylesheet" media="all">
+    <link href="vendor/select2/select2.min.css" rel="stylesheet" media="all">
+    <link href="vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
+
+    <!-- Main CSS-->
+    <link href="css/theme.css" rel="stylesheet" media="all">
+
+    <!-- Selectize CSS-->
+    <link href="css/selectize.css" type="text/css" rel="stylesheet">
+
+    <!-- Pagination CSS-->
+    <link href="css/pagination.css" type="text/css" rel="stylesheet">
+
+    <!-- Toastr CSS-->
+    <link href="css/toastr.min.css" rel="stylesheet" />
+
+    <!-- PrintJS CSS-->
+    <link href="css/print.min.css" rel="stylesheet" media="all">
+
+</head>
+
+<body class="animsition">
+    <div class="page-wrapper">
+        <%- include navigation.ejs %>
+        <!-- PAGE CONTAINER-->
+        <div class="page-container">
+            <%- include header.ejs %>
+
+            <!-- MAIN CONTENT-->
+            <div class="main-content">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- DATA TABLE -->
+                                <h3 class="title-5 m-b-35">Documents</h3>
+
+                                <div class="table-data__tool">
+                                    <div class="table-data__tool-left">
+                                        <div class="rs-select2--light rs-select2--md">
+                                            <select id="document_filter" class="demo-default">
+                                                <option value="">All Documents</option>
+                                            </select>
+                                        </div>
+                                        <div class="rs-select2--light rs-select2--lg">
+                                            <select id="type_filter" class="demo-default">
+                                                <option value="">Any Type</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="rs-select2--light rs-select2--lg">
+                                            <select id="docno_filter" class="demo-default">
+                                                <option value="">Document No.</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="rs-select2--light rs-select2--300">
+                                            <select id="general_filter" class="demo-default">
+                                                <option value="">General Search</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- <div class="table-data__tool-right">
+                                        <i class="zmdi zmdi-refresh au-btn au-btn-icon au-btn--green au-btn--small"></i>
+
+                                        <a class="js-arrow au-btn au-btn-icon au-btn--green au-btn--small" href="#">
+                                            Manage Document
+                                        </a>
+
+                                        <ul class="navbar-mobile-sub__list list-unstyled js-sub-list border border-success"
+                                            style="position: absolute; width: 178px;">
+                                            <li class="border-bottom border-success text-center">
+                                                <label class="w-100 m-t-10" data-toggle="modal"
+                                                    data-target="#modal_recieve">
+                                                    Recieve Docs </label>
+                                            </li>
+                                            <li class="text-center">
+                                                <label class="w-100 m-t-10" data-toggle="modal"
+                                                    data-target="#modal_release">
+                                                    Release Docs </label>
+                                            </li>
+                                        </ul>
+
+                                        <button class="au-btn au-btn-icon au-btn--green au-btn--small"
+                                            data-toggle="modal" data-target="#modal_document">
+                                            <i class="zmdi zmdi-plus"></i>Add Document</button>
+                                    </div> -->
+                                </div>
+                                <div class="table-responsive table-responsive-data2 m-b-35">
+                                    <table class="table table-data2">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Barcode</th>
+                                                <th>Document No.</th>
+                                                <th>Name</th>
+                                                <th>Description</th>
+                                                <th>Type</th>
+                                                <th>Priority</th>
+                                                <th>Duration</th>
+                                                <th>Remarks</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table_data">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div id="printable_div2" class="row d-none">
+                                    <div id="printable_div" class="col-lg-12 text-center">
+                                        <h3>Vicente Sotto Memorial Medical Center</h3>
+                                        <h5>B. Rodriguez St., Cebu City</h5>
+                                        <hr>
+                                        <h4 id="printable_title">Send Out Report</h4>
+                                        <br>
+                                        <div class="w-100 text-left">
+                                            <h6 id="printed_by">Printed by: Mark Vincent B. Opo</h6>
+                                        </div>
+                                        <hr>
+
+                                        <div id="tblContainer">
+                                            <table id="tblSendOut">
+                                                <thead class="text-white m-b-50">
+                                                    <tr>
+                                                        <th>Barcode</th>
+                                                        <th>Name</th>
+                                                        <th>Type</th>
+                                                        <th>Recieve By</th>
+                                                        <th>Date/Time</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="sendout_doc_tbody" class="text-size-12">
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- END DATA TABLE -->
+                                <!-- Printed Barcode Container -->
+                                <div id="barcode_container" class="d-none">
+                                    <img id="barcode" style="float: bottom;" />
+                                </div>
+                                <!-- Pager Container -->
+                                <div class="pager_container d-flex justify-content-center"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%- include footer.ejs %>
+        </div>
+    </div>
+
+    <div id="modal_track" class="modal fade" role="dialog">
+        <div class="modal-dialog mxw-1200">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Document Tracking</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive table-responsive-data2 m-b-35">
+                        <table class="table table-data2">
+                            <thead>
+                                <tr>
+                                    <th>Released To</th>
+                                    <th>Recieved By</th>
+                                    <th>IN</th>
+                                    <th>Released By</th>
+                                    <th>OUT</th>
+                                    <th>Duration</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="track_data">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jquery JS-->
+    <script src="vendor/jquery.min.js"></script>
+    <!-- Bootstrap JS-->
+    <script src="vendor/bootstrap-4.1/popper.min.js"></script>
+    <script src="vendor/bootstrap-4.1/bootstrap.min.js"></script>
+    <!-- Vendor JS       -->
+    <script src="vendor/slick/slick.min.js">
+    </script>
+    <script src="vendor/wow/wow.min.js"></script>
+    <script src="vendor/animsition/animsition.min.js"></script>
+    <script src="vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">
+    </script>
+    <script src="vendor/counter-up/jquery.waypoints.min.js"></script>
+    <script src="vendor/counter-up/jquery.counterup.min.js">
+    </script>
+    <script src="vendor/circle-progress/circle-progress.min.js"></script>
+    <script src="vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="vendor/select2/select2.min.js">
+    </script>
+
+    <!-- Toastr JS -->
+    <script src="js/toastr.min.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/barcode.min.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/print.min.js"></script>
+    <script src="js/selectize.min.js"></script>
+    <script src="js/pagination.js"></script>
+    <script src="js/all_documents.js"></script>
+</body>
+
+</html>
+<!-- end document-->
