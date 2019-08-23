@@ -49,14 +49,43 @@ exports.post_login = async function (req, res) {
         req.session.DESIGNATION = user[0].designation;
         req.session.DEPARTMENT = user[0].department;
 
-        req.session.HAS_LOGGED_IN = true;
-
-        res.redirect('/dashboard');
+        if (password == '123') {
+            res.redirect('/update_info')
+        } else {
+            req.session.HAS_LOGGED_IN = true;
+            res.redirect('/dashboard');
+        }
     } catch (err) {
-        console.log(err);
         res.render('login', {
             show_error: true
         });
+    }
+}
+
+exports.update_info = function (req, res) {
+    if (req.session.ID) {
+        res.render("update_info");
+    }else{
+        res.redirect('/login');
+    }
+}
+
+exports.post_update = async function (req, res) {
+    let result = {};
+    console.log(req.body);
+    try {
+        await mainAPI.update_user(req.body, req.session.ID);
+
+        req.session.DESIGNATION = req.body.designation;
+        req.session.DEPARTMENT = req.body.department;
+
+        req.session.HAS_LOGGED_IN = true;
+
+        result['status'] = 'success';
+        res.send(result);
+    } catch (err) {
+        result['status'] = 'error';
+        res.send(result);
     }
 }
 

@@ -12,6 +12,12 @@ router.get('/login', mainController.login);
 // Perform Login
 router.post('/login', mainController.post_login);
 
+// Show Update info Page
+router.get('/update_info', mainController.update_info);
+
+// Update info
+router.post('/update_info', mainController.post_update);
+
 // Perform Logout
 router.get('/logout', mainController.logout);
 

@@ -115,6 +115,13 @@ let mgensearch_selectize;
         $('#printed_date').html("Printed date: " + moment().format('MM/DD/YY HH:mm a'));
     });
 
+    const adm_access = 'Administrative Office, Medical Chief Center';
+
+    if(!adm_access.includes($('.department').text()) ){
+        $('#nav_all_docs').remove();
+        $('#nav_all_docs_mobile').remove();
+    }
+
 })(jQuery);
 function getRecentDocuments(offset, limit) {
 
@@ -124,6 +131,17 @@ function getRecentDocuments(offset, limit) {
     fetch('/API/logs/get_log_history' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
+            if(!data.length && $('#tblRecentDocs tr').length < 1) {
+                $('#recent_table_container').addClass('d-none');
+                $('.table-load-more').addClass('d-none');
+                $('#recent_no_see_container').removeClass('d-none');
+                return;
+            }else{
+                $('#recent_table_container').removeClass('d-none');
+                $('.table-load-more').removeClass('d-none');
+                $('#recent_no_see_container').addClass('d-none');
+            }
+
             if (limit) {
                 should_print = false;
             } else {
@@ -153,6 +171,17 @@ function getSendOutDocuments(offset, limit) {
     fetch('/API/document/get_sendout' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
+            if(!data.length && $('#tblSendOut tr').length < 1) {
+                $('#sendout_table_container').addClass('d-none');
+                $('.table-load-more-sendout').addClass('d-none');
+                $('#sendout_no_see_container').removeClass('d-none');
+                return;
+            }else{
+                $('#sendout_table_container').removeClass('d-none');
+                $('.table-load-more-sendout').removeClass('d-none');
+                $('#sendout_no_see_container').addClass('d-none');
+            }
+
             if (limit) {
                 should_print = false;
             } else {

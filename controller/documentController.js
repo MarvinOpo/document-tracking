@@ -20,7 +20,6 @@ exports.insert = async function (req, res) {
         result['status'] = 'success';
         res.send(result);
     } catch (err) {
-        console.log(err);
         result['status'] = 'error';
         res.send(result);
     }
@@ -29,6 +28,17 @@ exports.insert = async function (req, res) {
 exports.get_documents = async function (req, res) {
     try {
         const documents = await docAPI.get_documents(req.query);
+        res.send(documents);
+    } catch (err) {
+        let result = {};
+        result['status'] = 'error';
+        res.send(result);
+    }
+};
+
+exports.get_all_documents = async function (req, res) {
+    try {
+        const documents = await docAPI.get_all_documents(req.query);
         res.send(documents);
     } catch (err) {
         let result = {};
@@ -51,6 +61,17 @@ exports.get_pending_documents = async function (req, res) {
 exports.get_count = async function (req, res) {
     try {
         const count = await docAPI.get_count(req.query);
+        res.send(count);
+    } catch (err) {
+        let result = {};
+        result['status'] = 'error';
+        res.send(result);
+    }
+};
+
+exports.get_all_count = async function (req, res) {
+    try {
+        const count = await docAPI.get_all_count(req.query);
         res.send(count);
     } catch (err) {
         let result = {};

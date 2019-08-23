@@ -172,6 +172,13 @@ let mdept_selectize, mbcode_release_selectize;
     $('#modal_release_barcode-selectized').focusout(function () {
         $('#modal_release_doc_info').hide();
     });
+
+    const adm_access = 'Administrative Office, Medical Chief Center';
+
+    if(!adm_access.includes($('.department').text()) ){
+        $('#nav_all_docs').remove();
+        $('#nav_all_docs_mobile').remove();
+    }
 })(jQuery);
 
 function selectizeFilter(filter) {
@@ -183,6 +190,10 @@ function selectizeFilter(filter) {
         searchField: ['barcode'],
         onChange: function (value) {
             refreshSelectize();
+
+            if (value) {
+                general_selectize.setValue('');
+            }
         }
     });
 
@@ -201,15 +212,20 @@ function selectizeFilter(filter) {
         searchField: ['document_no'],
         onChange: function (value) {
             document_selectize.trigger("change");
+
+            if (value) {
+                general_selectize.setValue('');
+            }
         }
     });
 
     $general = $('#general_filter').selectize({
         create: true,
         onChange: function (value) {
-            document_selectize.setValue("");
-            type_selectize.setValue("");
-            docno_selectize.setValue("");
+            if (value) {
+                document_selectize.setValue("");
+                docno_selectize.setValue("");
+            }
 
             getDocCount();
         }
@@ -226,13 +242,49 @@ function selectizeFilter(filter) {
 function selectizeModal() {
     let $mtype, $mpriority, $mdept, $mbcodeRecieve, $mbcodeRelease;
 
-    $mtype = $('#modal_type').selectize();
+    $mtype = $('#modal_type').selectize({
+        onChange: function (value) {
+            if (value) {
+                let abbr = '';
+
+                switch (value) {
+                    case 'Purchase Order': abbr = 'PO'; break;
+                    case 'Purchase Request': abbr = 'PR'; break;
+                    case 'Cheque':
+                    case 'PHIC Cheque':
+                        abbr = 'CN';
+                        break;
+                    case 'Bill Number':
+                    case 'Application Bill':
+                        abbr = 'BN';
+                        break;
+                    case 'Petty Cash Voucher':
+                    case 'Disbursement Voucher':
+                        abbr = 'VO';
+                        break;
+                }
+
+                if(!abbr){
+                    $('#modal_docno').val('N/A');
+                    return;
+                } 
+
+                if (!($('#modal_docno').val()).toUpperCase().includes(abbr)) {
+                    $('#modal_docno').val(abbr);
+                    $('#modal_docno').focus();
+                }
+            } else {
+                $('#modal_docno').val('');
+            }
+        }
+    });
+
     $mpriority = $('#modal_priority').selectize();
     $mdept = $('#modal_dept').selectize();
     $mbcodeRecieve = $('#modal_recieve_barcode').selectize({
         create: true,
         maxOptions: 1,
-        maxItems: 10,
+        maxItems: 100,
         valueField: 'barcode',
         labelField: 'barcode',
         searchField: ['barcode'],
@@ -254,7 +306,7 @@ function selectizeModal() {
     $mbcodeRelease = $('#modal_release_barcode').selectize({
         create: true,
         maxOptions: 1,
-        maxItems: 10,
+        maxItems: 100,
         valueField: 'barcode',
         labelField: 'barcode',
         searchField: ['barcode'],
@@ -422,7 +474,7 @@ function getDocuments(offset) {
             '&offset=' + offset + '&limit=' + 5 + '&department=' + $('.department').text() +
             '&user_id=' + $('.department').attr('id');
     } else {
-        param = '?general=' + $('#general_filter').val() +
+        param = '?general=' + $('#general_filter').val() + '&type=' + $('#type_filter').val() +
             '&offset=' + offset + '&limit=' + 5 + '&department=' + $('.department').text() +
             '&user_id=' + $('.department').attr('id');
     }
@@ -430,6 +482,17 @@ function getDocuments(offset) {
     fetch('/API/document/get_documents' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
+
+            if(data.length) {
+                $('#document_container').removeClass('d-none');
+                $('#pager_parent_container').removeClass('d-none');
+                $('#no_document_container').addClass('d-none');
+            }else{
+                $('#document_container').addClass('d-none');
+                $('#pager_parent_container').addClass('d-none');
+                $('#no_document_container').removeClass('d-none');
+            }
+
             populate_table(data);
         })
         .catch(err => {
@@ -459,15 +522,16 @@ function getPrintableSentout() {
 }
 
 function getDocCount() {
+    $('#loader_container').show();
+
     let param = "";
     if (!$('#general_filter').val()) {
         param = '?barcode=' + $('#document_filter').val() +
             '&type=' + $('#type_filter').val() + '&docno=' + $('#docno_filter').val() +
             '&department=' + $('.department').text() + '&user_id=' + $('.department').attr('id');
     } else {
-        param = '?general=' + $('#general_filter').val() +
-            '&department=' + $('.department').text() +
-            '&user_id=' + $('.department').attr('id');
+        param = '?general=' + $('#general_filter').val() + '&type=' + $('#type_filter').val() +
+            '&department=' + $('.department').text() + '&user_id=' + $('.department').attr('id');
     }
 
     fetch('/API/document/get_count' + param, { method: 'GET' })
@@ -783,15 +847,12 @@ function populate_table(data) {
 
         let priority_duration = 0;
 
-        if (data[i].priority == "Low") {
+        if (data[i].priority == "Regular") {
             priority_duration = 8;
-            table_data += "<td><button id='priority_view' class='btn btn-primary mnw-90'>" + data[i].priority + "</button></td>";
-        } else if (data[i].priority == "Medium") {
+            table_data += "<td><button id='priority_view' class='btn btn-primary mnw-116'>" + data[i].priority + "</button></td>";
+        } else if (data[i].priority == "Emergency") {
             priority_duration = 4;
-            table_data += "<td><button id='priority_view' class='btn btn-warning mnw-90'>" + data[i].priority + "</button></td>";
-        } else if (data[i].priority == "High") {
-            priority_duration = 2;
-            table_data += "<td><button id='priority_view' class='btn btn-danger mnw-90'>" + data[i].priority + "</button></td>";
+            table_data += "<td><button id='priority_view' class='btn btn-danger mnw-116'>" + data[i].priority + "</button></td>";
         }
 
         let now = new Date();
@@ -861,6 +922,9 @@ function populate_table(data) {
         $(id).addClass("background-due");
         // $(id + ' td').addClass("text-white");
     }
+
+    
+    $('#loader_container').hide();
 }
 
 function populate_pager(numItems) {

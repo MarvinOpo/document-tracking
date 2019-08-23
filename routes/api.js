@@ -71,15 +71,20 @@ router.get('/document/delete', documentController.delete);
 
 //------------------ ALL DOCS -----------------//
 
-// Get barcodes
+// Get All barcodes
 router.get('/all_document/get_barcodes', documentController.get_all_barcodes);
 
-// Get Types
+// Get All Types
 router.get('/all_document/get_types', documentController.get_all_types);
 
-// Get document no
+// Get All document no
 router.get('/all_document/get_docno', documentController.get_all_docno);
 
+// Get All documents count
+router.get('/all_document/get_count', documentController.get_all_count);
+
+// Get All documents
+router.get('/all_document/get_documents', documentController.get_all_documents);
 
 //------------------ LOGS -----------------//
 

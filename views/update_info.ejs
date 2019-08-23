@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Login Page</title>
+
+  <!-- Fontfaces CSS-->
+  <link href="css/font-face.css" rel="stylesheet" media="all">
+  <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+  <link href="vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all">
+  <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+
+  <!-- Bootstrap CSS-->
+  <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+
+  <!-- Toastr CSS-->
+  <link href="css/toastr.min.css" rel="stylesheet" />
+
+  <link href="css/selectize.css" rel="stylesheet" />
+
+  <!--Custom styles-->
+  <link rel="stylesheet" type="text/css" href="css/update_info.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="d-flex justify-content-center h-100">
+      <div class="card">
+        <div class="card-header">
+          <h3>Update Info</h3>
+        </div>
+        <div class="card-body">
+          <div id="error_container"></div>
+
+          <div>
+            <label>New Password</label> <span class="color-red">*</span>
+            <input id="new_password" type="password" class="form-control">
+          </div>
+
+          <div>
+            <label>Confirm Password</label> <span class="color-red">*</span>
+            <input id="confirm_password" type="password" class="form-control">
+          </div>
+
+          <div>
+            <label>Designation</label> <span class="color-red">*</span>
+            <input id="designation" type="text" class="form-control" placeholder="e.g ADOF III, ADAS II, CMT II, ...">
+          </div>
+
+          <label>Department</label> <span class="color-red">*</span>
+          <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+            <select id="department" class="demo-default w-100">
+              <option value="">Select Department</option>
+              <option value="Administrative Office">Administrative Office</option>
+              <option value="IT Office">IT Office</option>
+              <option value="Medical Center Chief">Medical Center Chief</option>
+              <option value="Chief of Clinic">Chief of Clinic</option>
+              <option value="Chief of Nursing">Chief of Nursing</option>
+              <option value="Accounting Department">Accounting Department</option>
+              <option value="Property Department">Property Department</option>
+              <option value="Cashier & Disbursing Department">Cashier & Disbursing Department</option>
+              <option value="Training Department">Training Department</option>
+              <option value="Pharmacy Department">Pharmacy Department</option>
+              <option value="Medical Department">Medical Department</option>
+              <option value="Out Patient Department">Out Patient Department</option>
+              <option value="Budget Department">Budget Department</option>
+              <option value="Internal Control Office">Internal Control Office</option>
+              <option value="Personel Department">Personnel Department</option>
+              <option value="Laboratory Department">Laboratory Department</option>
+              <option value="Billing Section">Billing Section</option>
+              <option value="Engineering Department">Engineering Department</option>
+              <option value="Health Maintenance Information System">Health Maintenance Information System</option>
+              <option value="Region VII Blood Center">Region VII Blood Center</option>
+              <option value="DOH VII">DOH VII</option>
+              <option value="Medical Records">Medical Records</option>
+              <option value="Procurement Department">Procurement Department</option>
+              <option value="Social Worker">Social Worker</option>
+              <option value="Central Supply">Central Supply</option>
+              <option value="Orthopedics Department">Orthopedics Department</option>
+            </select>
+          </div>
+
+          <div>
+            <button id="update_btn" class="btn float-right login_btn">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jquery JS-->
+  <script src="vendor/jquery.min.js"></script>
+
+  <!-- Bootstrap JS-->
+  <script src="vendor/bootstrap-4.1/bootstrap.min.js"></script>
+
+  <!-- Toastr JS -->
+  <script src="js/toastr.min.js"></script>
+
+  <script src="js/selectize.min.js"></script>
+  <script src="js/update_info.js"></script>
+</body>
+
+</html>

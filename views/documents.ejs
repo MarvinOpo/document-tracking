@@ -10,7 +10,7 @@
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Documents</title>
+    <title>My Documents</title>
 
     <!-- Fontfaces CSS-->
     <link href="css/font-face.css" rel="stylesheet" media="all">
@@ -61,7 +61,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <!-- DATA TABLE -->
-                                <h3 class="title-5 m-b-35">Documents</h3>
+                                <h3 class="title-5 m-b-35">My Documents</h3>
 
                                 <div class="table-data__tool">
                                     <div class="table-data__tool-left">
@@ -91,7 +91,8 @@
                                     <div class="table-data__tool-right">
                                         <!-- <i class="zmdi zmdi-refresh au-btn au-btn-icon au-btn--green au-btn--small"></i> -->
 
-                                        <a class="js-arrow au-btn au-btn-icon au-btn--green au-btn--small" href="#">
+                                        <a class="js-arrow au-btn au-btn-icon au-btn--green au-btn--small m-b-5"
+                                            href="#">
                                             Manage Document
                                         </a>
 
@@ -156,27 +157,49 @@
                                         </ul> -->
                                     </div>
                                 </div>
-                                <div class="table-responsive table-responsive-data2 m-b-35">
-                                    <table class="table table-data2">
-                                        <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>Barcode</th>
-                                                <th>Document No.</th>
-                                                <th>Name</th>
-                                                <th>Description</th>
-                                                <th>Type</th>
-                                                <th>Priority</th>
-                                                <th>Duration</th>
-                                                <th>Remarks</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="table_data">
 
-                                        </tbody>
-                                    </table>
+                                <div id="loader_container" class="w-100 h-100 text-center">
+                                    <div class="loader"></div>
                                 </div>
+
+                                <div id="document_container" class="table-responsive table-responsive-data2 m-b-35">
+                                    <div class="mnh-500">
+                                        <table class="table table-data2">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Barcode</th>
+                                                    <th>Document No.</th>
+                                                    <th>Name</th>
+                                                    <th>Description</th>
+                                                    <th>Type</th>
+                                                    <th>Urgency</th>
+                                                    <th>Duration</th>
+                                                    <th>Remarks</th>
+                                                    <th></th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="table_data">
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Pager Container -->
+                                <div id='pager_parent_container'>
+                                    <div class="pager_container d-flex justify-content-center m-t-20"></div>
+                                </div>
+
+                                <div id="no_document_container" class="w-100 h-100 m-t-100 text-center d-none">
+                                    <img src="images/no_document_icon.png" />
+                                </div>
+
+                                <!-- Copyright Container -->
+                                <%- include footer.ejs %>
 
                                 <div id="printable_div2" class="row d-none">
                                     <div id="printable_div" class="col-lg-12 text-center">
@@ -214,14 +237,11 @@
                                 <div id="barcode_container" class="d-none">
                                     <img id="barcode" style="float: bottom;" />
                                 </div>
-                                <!-- Pager Container -->
-                                <div class="pager_container d-flex justify-content-center"></div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <%- include footer.ejs %>
         </div>
     </div>
 
@@ -240,31 +260,12 @@
                     <div id="error_container"></div>
 
                     <div class="row">
-                        <div class="col-md-7">
+                        <div class="col-md-6">
                             <label>Name <span class="color-red">*</span></label>
                             <input id="modal_name" type="text" class="au-input au-input--full m-b-10 text-capitalize"
                                 style="height: 36px;" />
                         </div>
 
-                        <div class="col-md-5">
-                            <label>Document No. <span class="color-red">*</span></label>
-                            <input id="modal_docno" type="text" class="au-input au-input--full m-b-10 text-capitalize"
-                                style="height: 36px;" />
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label>Priority <span class="color-red">*</span></label>
-                            <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
-                                <select id="modal_priority" class="demo-default w-100">
-                                    <option value="">Select Priority Level</option>
-                                    <option value="Low">Low</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="High">High</option>
-                                </select>
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <label>Type <span class="color-red">*</span></label>
                             <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
@@ -313,6 +314,24 @@
                                     <option value="SLCI">SLCI</option>
                                     <option value="Social Worker">Social Worker</option>
                                     <option value="Sub-allotment">Sub-allotment</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Document No. <span class="color-red">*</span></label>
+                            <input id="modal_docno" type="text" class="au-input au-input--full m-b-10 text-uppercase"
+                                style="height: 36px;" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Urgency <span class="color-red">*</span></label>
+                            <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                                <select id="modal_priority" class="demo-default w-100">
+                                    <option value="Regular">Regular</option>
+                                    <option value="Emergency">Emergency</option>
                                 </select>
                             </div>
                         </div>

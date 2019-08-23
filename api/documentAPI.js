@@ -7,6 +7,8 @@ const conn = mysql.createConnection({
     database: 'document_tracking'
 });
 
+const mssql = require('mssql');
+
 exports.insert_document = function (document) {
     return new Promise(function (resolve, reject) {
         let sql = "INSERT INTO documents(document_no, barcode, name, description, remarks, type, priority, created_by, updated_by, created_at, updated_at, location, status) "
@@ -48,6 +50,11 @@ exports.get_documents = function (param) {
                                 AND release_date IS NULL) `;
 
             values = [param.department];
+
+            if (param.type) {
+                sql += "AND d.type = ? "
+                values[values.length] = param.type;
+            }
         } else {
             sql = "SELECT d.* from documents d "
                 + "WHERE ((created_by = ? OR (location = ? "
@@ -65,7 +72,13 @@ exports.get_documents = function (param) {
                 INSTR(d.description, '`+ param.general + `') OR
                 INSTR(d.remarks, '`+ param.general + `') OR
                 INSTR(d.priority, '`+ param.general + `') OR
-                INSTR(d.type, '`+ param.general + `'))`;
+                INSTR(d.type, '`+ param.general + `')) `;
+
+
+                if (param.type) {
+                    sql += "AND d.type = ? "
+                    values[values.length] = param.type;
+                }
             } else {
 
                 if (param.barcode) {
@@ -86,7 +99,7 @@ exports.get_documents = function (param) {
             }
         }
 
-        sql += "ORDER BY ID DESC "
+        sql += "ORDER BY priority DESC, id DESC "
 
         if (param.limit) {
             sql += " LIMIT ? OFFSET ?";
@@ -96,6 +109,62 @@ exports.get_documents = function (param) {
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET document failed"));
+
+            resolve(result);
+        });
+    });
+}
+
+exports.get_all_documents = function (param) {
+    return new Promise(function (resolve, reject) {
+        let sql = "SELECT d.* from documents d WHERE barcode IS NOT NULL "
+        let values = [];
+
+        if (param.general) {
+            sql += `AND (
+                INSTR(d.document_no, '`+ param.general + `') OR
+                INSTR(d.barcode, '`+ param.general + `') OR
+                INSTR(d.name, '`+ param.general + `') OR
+                INSTR(d.description, '`+ param.general + `') OR
+                INSTR(d.remarks, '`+ param.general + `') OR
+                INSTR(d.priority, '`+ param.general + `') OR
+                INSTR(d.type, '`+ param.general + `')) `;
+
+
+            if (param.type) {
+                sql += "AND d.type = ? "
+                values[values.length] = param.type;
+            }
+        } else {
+
+            if (param.barcode) {
+                sql += "AND barcode = ? "
+                values[values.length] = param.barcode;
+
+            }
+
+            if (param.type) {
+                sql += "AND type = ? "
+                values[values.length] = param.type;
+            }
+
+            if (param.docno) {
+                sql += "AND document_no = ? "
+                values[values.length] = param.docno;
+            }
+        }
+
+
+        sql += "ORDER BY id DESC "
+
+        if (param.limit) {
+            sql += " LIMIT ? OFFSET ?";
+            values[values.length] = parseInt(param.limit);
+            values[values.length] = parseInt(param.offset);
+        }
+
+        conn.query(sql, values, function (err, result) {
+            if (err) reject(new Error("GET all document failed"));
 
             resolve(result);
         });
@@ -122,7 +191,12 @@ exports.get_pending_documents = function (param) {
                 INSTR(d.description, '`+ param.general + `') OR
                 INSTR(d.remarks, '`+ param.general + `') OR
                 INSTR(d.priority, '`+ param.general + `') OR
-                INSTR(d.type, '`+ param.general + `'))`;
+                INSTR(d.type, '`+ param.general + `')) `;
+
+            if (param.type) {
+                sql += "AND d.type = ? "
+                values[values.length] = param.type;
+            }
         }
 
         sql += "ORDER BY d.ID DESC "
@@ -205,7 +279,13 @@ exports.get_count = function (param) {
                 INSTR(d.description, '`+ param.general + `') OR
                 INSTR(d.remarks, '`+ param.general + `') OR
                 INSTR(d.priority, '`+ param.general + `') OR
-                INSTR(d.type, '`+ param.general + `'))`;
+                INSTR(d.type, '`+ param.general + `')) `;
+
+
+            if (param.type) {
+                sql += "AND d.type = ? "
+                values[values.length] = param.type;
+            }
         } else {
             if (param.barcode) {
                 sql += "AND barcode = ? "
@@ -226,6 +306,52 @@ exports.get_count = function (param) {
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET count document failed"));
+
+            resolve(result);
+        });
+    });
+}
+
+exports.get_all_count = function (param) {
+    return new Promise(function (resolve, reject) {
+        let sql = "SELECT count(id) AS count from documents d WHERE barcode IS NOT NULL "
+        let values = [];
+
+        if (param.general) {
+            sql += `AND (
+                INSTR(d.document_no, '`+ param.general + `') OR
+                INSTR(d.barcode, '`+ param.general + `') OR
+                INSTR(d.name, '`+ param.general + `') OR
+                INSTR(d.description, '`+ param.general + `') OR
+                INSTR(d.remarks, '`+ param.general + `') OR
+                INSTR(d.priority, '`+ param.general + `') OR
+                INSTR(d.type, '`+ param.general + `')) `;
+
+
+            if (param.type) {
+                sql += "AND d.type = ? "
+                values[values.length] = param.type;
+            }
+        } else {
+            if (param.barcode) {
+                sql += "AND barcode = ? "
+                values[values.length] = param.barcode;
+
+            }
+
+            if (param.type) {
+                sql += "AND type = ? "
+                values[values.length] = param.type;
+            }
+
+            if (param.docno) {
+                sql += "AND document_no = ? "
+                values[values.length] = param.docno;
+            }
+        }
+
+        conn.query(sql, values, function (err, result) {
+            if (err) reject(new Error("GET count all document failed"));
 
             resolve(result);
         });
@@ -253,6 +379,11 @@ exports.get_pending_count = function (param) {
                 INSTR(d.remarks, '`+ param.general + `') OR
                 INSTR(d.priority, '`+ param.general + `') OR
                 INSTR(d.type, '`+ param.general + `')) `;
+
+            if (param.type) {
+                sql += "AND d.type = ? "
+                values[values.length] = param.type;
+            }
         }
 
         conn.query(sql, values, function (err, result) {
@@ -371,7 +502,6 @@ exports.get_barcodes = function (param) {
 exports.get_all_barcodes = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = "SELECT barcode from documents WHERE barcode IS NOT NULL "
-
         let values = [];
 
         if (param.type) {
@@ -774,3 +904,39 @@ exports.delete_document = function (id) {
         });
     })
 }
+
+// mssql.connect({
+//     user: 'mvopo',
+//     password: '1234',
+//     server: 'localhost',
+//     port: 57315,
+//     database: 'AMPS_VICENTE_SOTTO'
+// }, function (err) {
+//     const request = new mssql.Request();
+
+//     const sql = `SELECT FirstName, MiddleInitial, LastName, Position
+//             FROM [AMPS_VICENTE_SOTTO].[dbo].[Employees] WHERE position is null`;
+
+//     request.query(sql, function (err, result) {
+//         if (err) return;
+
+//         for(let i = 0; i < result.recordset.length; i++){
+//             const employee = result.recordset[i];
+//             const fname = employee.FirstName;
+//             const minit = employee.MiddleInitial;
+//             const lname = employee.LastName;
+//             // const designation = employee.Position;
+//             const username = fname.split(/\s/).reduce((response,word)=> response+=word.slice(0,1),'') + lname;
+            
+//             let insertSql = "INSERT INTO users(username, password, fname, mname, lname, designation, department) "
+//                     + "values(?, '123', ?, ?, ?, 'nd', 'nd')";
+
+//             const values = [username, fname, minit, lname];
+
+//             conn.query(insertSql, values, function (err, result) {
+//                 console.log(result);
+//                 if (err) console.log(err);
+//             });
+//         }
+//     });
+// });
