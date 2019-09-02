@@ -7,8 +7,6 @@ const conn = mysql.createConnection({
     database: 'document_tracking'
 });
 
-const mssql = require('mssql');
-
 exports.insert_document = function (document) {
     return new Promise(function (resolve, reject) {
         let sql = "INSERT INTO documents(document_no, barcode, name, description, remarks, type, priority, created_by, updated_by, created_at, updated_at, location, status) "
@@ -905,6 +903,7 @@ exports.delete_document = function (id) {
     })
 }
 
+// const mssql = require('mssql');
 // mssql.connect({
 //     user: 'mvopo',
 //     password: '1234',
@@ -927,7 +926,7 @@ exports.delete_document = function (id) {
 //             const lname = employee.LastName;
 //             // const designation = employee.Position;
 //             const username = fname.split(/\s/).reduce((response,word)=> response+=word.slice(0,1),'') + lname;
-            
+
 //             let insertSql = "INSERT INTO users(username, password, fname, mname, lname, designation, department) "
 //                     + "values(?, '123', ?, ?, ?, 'nd', 'nd')";
 

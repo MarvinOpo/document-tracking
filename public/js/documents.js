@@ -1036,8 +1036,8 @@ function populate_sendout(data) {
                             <td class="p-l-20 text-left">` + (i + 1) + `. ` + data[i].barcode + `</td>
                             <td>` + data[i].name + `</td>
                             <td>` + data[i].type + `</td>
-                            <td class="align-bottom">______________________</td>
-                            <td class="align-bottom">______________________</td>
+                            <td class="align-bottom">____________</td>
+                            <td class="align-bottom">____________</td>
                         </tr>`;
     }
 
@@ -1078,6 +1078,7 @@ function printBarcode(code) {
         lineColor: "#000",
         width: 2,
         height: 30,
+        marginBottom: 30,
         displayValue: true
     });
 

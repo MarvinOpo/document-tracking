@@ -14954,6 +14954,13 @@ table .match-parent {
     100% { transform: rotate(360deg); }
 }
 
+.banner {
+    position:fixed;
+    z-index: 4;
+    max-height: 150px;
+    min-height: 150px;
+    width: 100%;
+}
 /* img {
     object-fit: cover;
     width: 100%;
