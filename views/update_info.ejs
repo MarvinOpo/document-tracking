@@ -44,39 +44,13 @@
 
           <div>
             <label>Designation</label> <span class="color-red">*</span>
-            <input id="designation" type="text" class="form-control" placeholder="e.g ADOF III, ADAS II, CMT II, ..." value='<%= session.DESIGNATION %>'>
+            <input id="designation" type="text" class="form-control" placeholder="e.g ADOF III, ADAS II, CMT II, ..." value="<%= session.DESIGNATION %>">
           </div>
 
-          <label>Department</label> <span class="color-red">*</span>
+          <label id="<%= session.DEPARTMENT %>" class="department">Department</label> <span class="color-red">*</span>
           <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
             <select id="department" class="demo-default w-100">
               <option value="">Select Department</option>
-              <option value="Administrative Office">Administrative Office</option>
-              <option value="IT Office">IT Office</option>
-              <option value="Medical Center Chief">Medical Center Chief</option>
-              <option value="Chief of Clinic">Chief of Clinic</option>
-              <option value="Chief of Nursing">Chief of Nursing</option>
-              <option value="Accounting Department">Accounting Department</option>
-              <option value="Property Department">Property Department</option>
-              <option value="Cashier & Disbursing Department">Cashier & Disbursing Department</option>
-              <option value="Training Department">Training Department</option>
-              <option value="Pharmacy Department">Pharmacy Department</option>
-              <option value="Medical Department">Medical Department</option>
-              <option value="Out Patient Department">Out Patient Department</option>
-              <option value="Budget Department">Budget Department</option>
-              <option value="Internal Control Office">Internal Control Office</option>
-              <option value="Personel Department">Personnel Department</option>
-              <option value="Laboratory Department">Laboratory Department</option>
-              <option value="Billing Section">Billing Section</option>
-              <option value="Engineering Department">Engineering Department</option>
-              <option value="Health Maintenance Information System">Health Maintenance Information System</option>
-              <option value="Region VII Blood Center">Region VII Blood Center</option>
-              <option value="DOH VII">DOH VII</option>
-              <option value="Medical Records">Medical Records</option>
-              <option value="Procurement Department">Procurement Department</option>
-              <option value="Social Worker">Social Worker</option>
-              <option value="Central Supply">Central Supply</option>
-              <option value="Orthopedics Department">Orthopedics Department</option>
             </select>
           </div>
 

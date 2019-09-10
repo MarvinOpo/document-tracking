@@ -173,9 +173,9 @@ let mdept_selectize, mbcode_release_selectize;
         $('#modal_release_doc_info').hide();
     });
 
-    const adm_access = 'Administrative Office, Medical Chief Center';
+    const adm_access = 'ADMINISTRATIVE OFFICE, MEDICAL CHIEF CENTER';
 
-    if(!adm_access.includes($('.department').text()) ){
+    if (!adm_access.includes($('.department').text())) {
         $('#nav_all_docs').remove();
         $('#nav_all_docs_mobile').remove();
     }
@@ -264,10 +264,10 @@ function selectizeModal() {
                         break;
                 }
 
-                if(!abbr){
+                if (!abbr) {
                     $('#modal_docno').val('N/A');
                     return;
-                } 
+                }
 
                 if (!($('#modal_docno').val()).toUpperCase().includes(abbr)) {
                     $('#modal_docno').val(abbr);
@@ -280,7 +280,13 @@ function selectizeModal() {
     });
 
     $mpriority = $('#modal_priority').selectize();
-    $mdept = $('#modal_dept').selectize();
+
+    $mdept = $('#modal_dept').selectize({
+        valueField: 'department',
+        labelField: 'department',
+        searchField: ['department']
+    });
+
     $mbcodeRecieve = $('#modal_recieve_barcode').selectize({
         create: true,
         maxOptions: 1,
@@ -331,6 +337,9 @@ function selectizeModal() {
 
     refreshModalSelectize();
     document_selectize.trigger('change');
+
+    const deptRoute = '/API/user/get_departments';
+    loadFilter(mdept_selectize, deptRoute);
 }
 
 function refreshSelectize() {
@@ -365,6 +374,7 @@ function refreshModalSelectize() {
 
     const releaseRoute = '/API/document/get_releasable_bcodes?' + param;
     loadFilter(mbcode_release_selectize, releaseRoute);
+
 }
 
 function insertDocument(body) {
@@ -483,11 +493,11 @@ function getDocuments(offset) {
         .then(res => res.json())
         .then(data => {
 
-            if(data.length) {
+            if (data.length) {
                 $('#document_container').removeClass('d-none');
                 $('#pager_parent_container').removeClass('d-none');
                 $('#no_document_container').addClass('d-none');
-            }else{
+            } else {
                 $('#document_container').addClass('d-none');
                 $('#pager_parent_container').addClass('d-none');
                 $('#no_document_container').removeClass('d-none');
@@ -848,10 +858,10 @@ function populate_table(data) {
         let priority_duration = 0;
 
         if (data[i].priority == "Regular") {
-            priority_duration = 8;
+            priority_duration = 10;
             table_data += "<td><button id='priority_view' class='btn btn-primary mnw-116'>" + data[i].priority + "</button></td>";
-        } else if (data[i].priority == "Emergency") {
-            priority_duration = 4;
+        } else if (data[i].priority == "Urgent") {
+            priority_duration = 5;
             table_data += "<td><button id='priority_view' class='btn btn-danger mnw-116'>" + data[i].priority + "</button></td>";
         }
 
@@ -860,7 +870,7 @@ function populate_table(data) {
 
         const hours_diff = Math.abs(now - created_date) / 36e5;
 
-        if (hours_diff > priority_duration) {
+        if (hours_diff > priority_duration && data[i].location == $(".department").text()) {
             if (data[i].status != "Cycle End") {
                 due_documents.push(data[i].barcode);
             } else {
@@ -900,9 +910,11 @@ function populate_table(data) {
                     + " </button>";
             }
 
-            table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
-                + "<i class='zmdi zmdi-refresh-sync-off'></i>"
-                + " </button>";
+            if (data[i].location == $(".department").text()) {
+                table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
+                    + "<i class='zmdi zmdi-refresh-sync-off'></i>"
+                    + " </button>";
+            }
         } else if ($('.department').attr('id') == data[i].updated_by) {
             table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Recycle' onclick='endDocument(" + data[i].id + ")'>"
                 + "<i class='zmdi zmdi-refresh-sync-alert'></i>"
@@ -923,7 +935,7 @@ function populate_table(data) {
         // $(id + ' td').addClass("text-white");
     }
 
-    
+
     $('#loader_container').hide();
 }
 
@@ -1078,7 +1090,7 @@ function printBarcode(code) {
         lineColor: "#000",
         width: 2,
         height: 30,
-        marginBottom: 30,
+        marginBottom: 10,
         displayValue: true
     });
 

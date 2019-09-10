@@ -84,6 +84,7 @@ exports.update_recieve = function (body) {
         const values = [body.recieve_by, body.department, body.barcodes];
 
         conn.query(sql, values, function (err, result) {
+            console.log(err);
             if (err) reject(new Error("Update recieve logs failed"));
 
             resolve(result);

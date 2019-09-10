@@ -3,6 +3,7 @@ const router = express.Router();
 
 const documentController = require('../controller/documentController');
 const logController = require('../controller/logController');
+const userController = require('../controller/userController');
 
 //------------------ DOCS -----------------//
 
@@ -102,5 +103,25 @@ router.post('/logs/update_recieve', logController.update_recieve);
 
 // Update released log
 router.post('/logs/update_release', logController.update_release);
+
+//------------------ USER -----------------//
+
+// Insert user
+router.post('/user/insert', userController.insert);
+
+// Get departments
+router.get('/user/get_departments', userController.get_departments);
+
+// Get users
+router.get('/user/get_users', userController.get_users);
+
+// Update user
+router.post('/user/update', userController.update);
+
+// Delete user
+router.get('/user/delete', userController.delete);
+
+// Get users count
+router.get('/user/get_count', userController.get_count);
 
 module.exports = router;

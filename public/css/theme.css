@@ -14780,6 +14780,10 @@ label {
     table-layout: fixed !important;
 }
 
+.background-due {
+    background-color: #f8b4b7;
+}
+
 .carousel-indicators li {
     position: relative;
     -ms-flex: 0 1 auto;
@@ -14797,6 +14801,10 @@ label {
     height: 12px;
     margin: 0 3px;
     background-color: #fff;
+}
+
+.department {
+    font-size: 15px;
 }
 
 .selectize-input > input[placeholder] {
@@ -14858,6 +14866,10 @@ table .match-parent {
     max-width: 1200px !important;
 }
 
+.mxw-1300 {
+    max-width: 1300px !important;
+}
+
 .mxw-1400 {
     max-width: 1400px !important;
 }
@@ -14887,10 +14899,6 @@ table .match-parent {
     padding-top: 10px;
     padding-bottom: 10px;
     border-top: 1px solid #f5f5f5
-}
-
-.background-due {
-    background-color: #f8b4b7;
 }
 
 .text-white {

@@ -849,7 +849,6 @@ exports.recieve_document = function (barcode) {
         const values = [barcode];
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
             if (err || result.affectedRows == 0) reject(new Error("Recieve failed"));
 
             resolve();
@@ -913,8 +912,8 @@ exports.delete_document = function (id) {
 // }, function (err) {
 //     const request = new mssql.Request();
 
-//     const sql = `SELECT FirstName, MiddleInitial, LastName, Position
-//             FROM [AMPS_VICENTE_SOTTO].[dbo].[Employees] WHERE position is null`;
+//     const sql = `SELECT PIN, FirstName, MiddleInitial, LastName, Position
+//             FROM [AMPS_VICENTE_SOTTO].[dbo].[Employees] WHERE LastDateEmployed is null`;
 
 //     request.query(sql, function (err, result) {
 //         if (err) return;
@@ -922,18 +921,23 @@ exports.delete_document = function (id) {
 //         for(let i = 0; i < result.recordset.length; i++){
 //             const employee = result.recordset[i];
 //             const fname = employee.FirstName;
-//             const minit = employee.MiddleInitial;
+//             const minit = employee.MiddleInitial + ".";
 //             const lname = employee.LastName;
-//             // const designation = employee.Position;
-//             const username = fname.split(/\s/).reduce((response,word)=> response+=word.slice(0,1),'') + lname;
+//             let designation = employee.Position;
+//             // const username = fname.split(/\s/)[0].substring(0,2) + lname;
+//             const username = employee.PIN;
 
-//             let insertSql = "INSERT INTO users(username, password, fname, mname, lname, designation, department) "
-//                     + "values(?, '123', ?, ?, ?, 'nd', 'nd')";
+//             if(!designation) designation = 'nd';
 
-//             const values = [username, fname, minit, lname];
+//             let sql = "INSERT INTO users(username, password, fname, mname, lname, designation, department) "
+//                     + "values(?, '123', ?, ?, ?, ?, 'nd')";
 
-//             conn.query(insertSql, values, function (err, result) {
-//                 console.log(result);
+//             // let sql = `UPDATE users SET designation = ? WHERE username = ?`
+
+//             const values = [username, fname, minit, lname, designation];
+
+//             conn.query(sql, values, function (err, result) {
+//                 console.log(result.insertId);
 //                 if (err) console.log(err);
 //             });
 //         }

@@ -123,6 +123,7 @@ let mgensearch_selectize;
     }
 
 })(jQuery);
+
 function getRecentDocuments(offset, limit) {
 
     const param = '?department=' + $('.department').text() + "&offset=" + offset +
@@ -131,7 +132,7 @@ function getRecentDocuments(offset, limit) {
     fetch('/API/logs/get_log_history' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
-            if(!data.length && $('#tblRecentDocs tr').length < 1) {
+            if(!data.length && $('#recent_doc_tbody tr').length < 1) {
                 $('#recent_table_container').addClass('d-none');
                 $('.table-load-more').addClass('d-none');
                 $('#recent_no_see_container').removeClass('d-none');
@@ -156,7 +157,7 @@ function getRecentDocuments(offset, limit) {
             if (data.length) {
                 populateRecentDocs(data);
             } else {
-                toastr.error("Nothing more to load.");
+                if(offset) toastr.error("Nothing more to load.");
             }
         })
         .catch(err => {
@@ -171,7 +172,7 @@ function getSendOutDocuments(offset, limit) {
     fetch('/API/document/get_sendout' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
-            if(!data.length && $('#tblSendOut tr').length < 1) {
+            if(!data.length && $('#sendout_doc_tbody tr').length < 1) {
                 $('#sendout_table_container').addClass('d-none');
                 $('.table-load-more-sendout').addClass('d-none');
                 $('#sendout_no_see_container').removeClass('d-none');
@@ -206,7 +207,7 @@ function getSendOutDocuments(offset, limit) {
                 populateSendOutDocs(data);
             } else {
                 hideSendOutInfo();
-                toastr.error("Nothing more to load.");
+                if(offset) toastr.error("Nothing more to load.");
             }
         })
         .catch(err => {

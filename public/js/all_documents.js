@@ -172,10 +172,10 @@ function populate_table(data) {
         let priority_duration = 0;
 
         if (data[i].priority == "Regular") {
-            priority_duration = 8;
+            priority_duration = 10;
             table_data += "<td><button id='priority_view' class='btn btn-primary mnw-116'>" + data[i].priority + "</button></td>";
-        } else if (data[i].priority == "Emergency") {
-            priority_duration = 4;
+        } else if (data[i].priority == "Urgent") {
+            priority_duration = 5;
             table_data += "<td><button id='priority_view' class='btn btn-danger mnw-116'>" + data[i].priority + "</button></td>";
         }
 

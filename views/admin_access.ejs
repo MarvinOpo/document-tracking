@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="au theme template">
+    <meta name="author" content="Hau Nguyen">
+    <meta name="keywords" content="au theme template">
+
+    <!-- Title Page-->
+    <title>Admin Access</title>
+
+    <!-- Fontfaces CSS-->
+    <link href="css/font-face.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+    <link href="vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all">
+    <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+
+    <!-- Bootstrap CSS-->
+    <link href="vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+
+    <!-- Vendor CSS-->
+    <link href="vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
+    <link href="vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" media="all">
+    <link href="vendor/wow/animate.css" rel="stylesheet" media="all">
+    <link href="vendor/css-hamburgers/hamburgers.min.css" rel="stylesheet" media="all">
+    <link href="vendor/slick/slick.css" rel="stylesheet" media="all">
+    <link href="vendor/select2/select2.min.css" rel="stylesheet" media="all">
+    <link href="vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
+
+    <!-- Main CSS-->
+    <link href="css/theme.css" rel="stylesheet" media="all">
+
+    <!-- Selectize CSS-->
+    <link href="css/selectize.css" type="text/css" rel="stylesheet">
+
+    <!-- Pagination CSS-->
+    <link href="css/pagination.css" type="text/css" rel="stylesheet">
+
+    <!-- Toastr CSS-->
+    <link href="css/toastr.min.css" rel="stylesheet" />
+
+    <!-- PrintJS CSS-->
+    <link href="css/print.min.css" rel="stylesheet" media="all">
+
+</head>
+
+<body class="animsition">
+    <div class="page-wrapper">
+        <%- include navigation.ejs %>
+        <!-- PAGE CONTAINER-->
+        <div class="page-container">
+            <%- include header.ejs %>
+
+            <!-- MAIN CONTENT-->
+            <div class="main-content">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- DATA TABLE -->
+                                <h3 class="title-5 m-b-35">User Management</h3>
+
+                                <div class="table-data__tool">
+                                    <div class="table-data__tool-left">
+
+                                        <div class="rs-select2--light rs-select2--lg">
+                                            <select id="name_filter" class="demo-default">
+                                                <option value="">Firstname / Lastname</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="rs-select2--light rs-select2--md d-none">
+                                            <select id="designation_filter" class="demo-default">
+                                                <option value="">Designation</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="rs-select2--light rs-select2--300">
+                                            <select id="department_filter" class="demo-default">
+                                                <option value="">Department</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                    <div class="table-data__tool-right">
+                                        <!-- <i class="zmdi zmdi-refresh au-btn au-btn-icon au-btn--green au-btn--small"></i> -->
+
+                                        <button class="au-btn au-btn-icon au-btn--green au-btn--small"
+                                            data-toggle="modal" data-target="#modal_user">
+                                            <i class="zmdi zmdi-plus"></i>Add User</button>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="loader_container" class="w-100 h-100 text-center">
+                                <div class="loader"></div>
+                            </div>
+
+                            <div id="user_container" class="table-responsive table-responsive-data2 m-b-35">
+                                <div>
+                                    <table class="table table-data2">
+                                        <thead>
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Name</th>
+                                                <th>Designation</th>
+                                                <th>Department</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="user_data">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                            <!-- Pager Container -->
+                            <div id='pager_parent_container' class="w-100">
+                                <div class="pager_container d-flex justify-content-center m-t-20"></div>
+                            </div>
+
+                            <div id="no_document_container" class="w-100 h-100 m-t-100 text-center d-none">
+                                <img src="images/no_document_icon.png" />
+                            </div>
+
+                            <!-- Copyright Container -->
+                            <%- include footer.ejs %>
+
+                            <!-- END DATA TABLE -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal_user" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add User</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="error_container"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Firstname <span class="color-red">*</span></label>
+                            <input id="modal_fname" type="text" class="au-input au-input--full m-b-10 text-uppercase"
+                                style="height: 36px;" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Lastname <span class="color-red">*</span></label>
+                            <input id="modal_lname" type="text" class="au-input au-input--full m-b-10 text-uppercase"
+                                style="height: 36px;" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label>M.I <span class="color-red">*</span></label>
+                            <input id="modal_minit" type="text" class="au-input au-input--full m-b-10 text-uppercase"
+                                style="height: 36px;" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Designation</label> <span class="color-red">*</span>
+                            <input id="modal_designation" type="text" class="form-control text-uppercase"
+                                placeholder="e.g ADOF III, ADAS II, CMT II, ..." style="height: 36px;">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Department</label> <span class="color-red">*</span>
+                            <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                                <select id="modal_department" class="demo-default w-100">
+                                    <option value="">Select Department</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="justify-content: center;">
+                        <button id="modal_add" type="button" class="au-btn au-btn-icon au-btn--green au-btn--small"
+                            style="width: 82.88px">Add</button>
+                        <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Jquery JS-->
+    <script src="vendor/jquery.min.js"></script>
+    <!-- Bootstrap JS-->
+    <script src="vendor/bootstrap-4.1/popper.min.js"></script>
+    <script src="vendor/bootstrap-4.1/bootstrap.min.js"></script>
+    <!-- Vendor JS       -->
+    <script src="vendor/slick/slick.min.js">
+    </script>
+    <script src="vendor/wow/wow.min.js"></script>
+    <script src="vendor/animsition/animsition.min.js"></script>
+    <script src="vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">
+    </script>
+    <script src="vendor/counter-up/jquery.waypoints.min.js"></script>
+    <script src="vendor/counter-up/jquery.counterup.min.js">
+    </script>
+    <script src="vendor/circle-progress/circle-progress.min.js"></script>
+    <script src="vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
+    <script src="vendor/select2/select2.min.js">
+    </script>
+
+    <!-- Toastr JS -->
+    <script src="js/toastr.min.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/moment.js"></script>
+    <script src="js/selectize.min.js"></script>
+    <script src="js/pagination.js"></script>
+    <script src="js/admin_access.js"></script>
+</body>
+
+</html>
+<!-- end document-->

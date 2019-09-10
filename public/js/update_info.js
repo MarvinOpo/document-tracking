@@ -17,7 +17,29 @@
         "hideMethod": "fadeOut"
     };
 
-    $('#department').selectize();
+    if ($('#designation').val().toUpperCase() == 'ND') $('#designation').val("");
+
+    const $depts = $('#department').selectize({
+        valueField: 'department',
+        labelField: 'department',
+        searchField: ['department'],
+        onLoad: function(data){
+            dept_selectize.setValue($('.department').attr('id'));
+        }
+    });
+
+    let dept_selectize = $depts[0].selectize;
+
+    dept_selectize.load(function (callback) {
+        fetch('/API/user/get_departments', { method: 'GET' })
+            .then(res => res.json())
+            .then(data => {
+                callback(data);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    });
 
     $('#update_btn').click(function () {
         if (!$('#new_password').val() || !$('#confirm_password').val() ||
@@ -54,7 +76,7 @@
 function update_info() {
     const body = {
         password: $('#new_password').val(),
-        designation: $('#designation').val(),
+        designation: $('#designation').val().toUpperCase(),
         department: $('#department').val()
     };
 

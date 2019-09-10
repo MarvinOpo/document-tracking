@@ -30,4 +30,7 @@ router.get('/documents', mainController.documents);
 // Show ALL Document Page
 router.get('/all_documents', mainController.all_documents);
 
+// Show Admin Page
+router.get('/admin_access', mainController.admin_access);
+
 module.exports = router;

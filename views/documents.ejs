@@ -235,7 +235,8 @@
                                 <!-- END DATA TABLE -->
                                 <!-- Printed Barcode Container -->
                                 <div id="barcode_container" class="d-none">
-                                    <img id="barcode" style="float: bottom;" />
+                                    <svg id="barcode" style="float: bottom;"></svg>
+                                    <!-- <img id="barcode" style="float: bottom;" /> -->
                                 </div>
                             </div>
                         </div>
@@ -331,7 +332,7 @@
                             <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
                                 <select id="modal_priority" class="demo-default w-100">
                                     <option value="Regular">Regular</option>
-                                    <option value="Emergency">Emergency</option>
+                                    <option value="Urgent">Urgent</option>
                                 </select>
                             </div>
                         </div>
@@ -374,33 +375,6 @@
                     <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
                         <select id="modal_dept" class="demo-default w-100">
                             <option value="">Select Department</option>
-                            <option value="Administrative Office">Administrative Office</option>
-                            <option value="IT Office">IT Office</option>
-                            <option value="Medical Center Chief">Medical Center Chief</option>
-                            <option value="Chief of Clinic">Chief of Clinic</option>
-                            <option value="Chief of Nursing">Chief of Nursing</option>
-                            <option value="Accounting Department">Accounting Department</option>
-                            <option value="Property Department">Property Department</option>
-                            <option value="Cashier & Disbursing Department">Cashier & Disbursing Department</option>
-                            <option value="Training Department">Training Department</option>
-                            <option value="Pharmacy Department">Pharmacy Department</option>
-                            <option value="Medical Department">Medical Department</option>
-                            <option value="Out Patient Department">Out Patient Department</option>
-                            <option value="Budget Department">Budget Department</option>
-                            <option value="Internal Control Office">Internal Control Office</option>
-                            <option value="Personel Department">Personnel Department</option>
-                            <option value="Laboratory Department">Laboratory Department</option>
-                            <option value="Billing Section">Billing Section</option>
-                            <option value="Engineering Department">Engineering Department</option>
-                            <option value="Health Maintenance Information System">Health Maintenance Information System
-                            </option>
-                            <option value="Region VII Blood Center">Region VII Blood Center</option>
-                            <option value="DOH VII">DOH VII</option>
-                            <option value="Medical Records">Medical Records</option>
-                            <option value="Procurement Department">Procurement Department</option>
-                            <option value="Social Worker">Social Worker</option>
-                            <option value="Central Supply">Central Supply</option>
-                            <option value="Orthopedics Department">Orthopedics Department</option>
                         </select>
                     </div>
 
@@ -439,7 +413,7 @@
     </div>
 
     <div id="modal_track" class="modal fade" role="dialog">
-        <div class="modal-dialog mxw-1200">
+        <div class="modal-dialog mxw-1300">
 
             <!-- Modal content-->
             <div class="modal-content">

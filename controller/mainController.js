@@ -1,7 +1,7 @@
 const mainAPI = require('../api/mainAPI');
 
 exports.index = function (req, res) {
-    // res.redirect('/dashboard');
+    // res.redirect('/admin_access');
     res.redirect('/login');
 }
 
@@ -41,16 +41,21 @@ exports.post_login = async function (req, res) {
     const username = req.body.username;
     const password = req.body.password;
 
+    if (username == "admin" && password == "document_tracking") {
+        req.session.NAME = 'Administrator Access';
+        res.redirect('/admin_access');
+    }
+
     try {
         const user = await mainAPI.get_user(username, password);
 
         req.session.ID = user[0].id;
-        req.session.NAME = user[0].fname + " " + user[0].mname + ". " + user[0].lname;
+        req.session.NAME = user[0].fname + " " + user[0].mname + " " + user[0].lname;
         req.session.DESIGNATION = user[0].designation;
         req.session.DEPARTMENT = user[0].department;
 
         if (password == '123') {
-            res.redirect('/update_info')
+            res.redirect('/update_info');
         } else {
             req.session.HAS_LOGGED_IN = true;
             res.redirect('/dashboard');
@@ -65,14 +70,13 @@ exports.post_login = async function (req, res) {
 exports.update_info = function (req, res) {
     if (req.session.ID) {
         res.render("update_info");
-    }else{
+    } else {
         res.redirect('/login');
     }
 }
 
 exports.post_update = async function (req, res) {
     let result = {};
-    console.log(req.body);
     try {
         await mainAPI.update_user(req.body, req.session.ID);
 
@@ -121,6 +125,14 @@ exports.documents = function (req, res) {
 exports.all_documents = function (req, res) {
     if (req.session.HAS_LOGGED_IN) {
         res.render('all_documents');
+    } else {
+        res.redirect('/login');
+    }
+}
+
+exports.admin_access = function (req, res) {
+    if (req.session.NAME == 'Administrator Access') {
+        res.render('admin_access');
     } else {
         res.redirect('/login');
     }
