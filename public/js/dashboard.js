@@ -26,11 +26,19 @@ let mgensearch_selectize;
     const currentYear = (new Date()).getFullYear();
     const startdate = new Date("1/1/" + currentYear);
 
-    recent_date_from = moment(startdate.valueOf()).format('YYYY-MM-DD hh:mm:ss');
-    recent_date_to = moment().format('YYYY-MM-DD hh:mm:ss');
+    recent_date_from = moment(startdate.valueOf()).format('YYYY-MM-DD HH:mm:ss');
+    recent_date_to = moment().format('YYYY-MM-DD HH:mm:ss');
 
     sendout_date_from = recent_date_from;
     sendout_date_to = recent_date_to;
+
+    let options = '';
+    for (let i = new Date().getFullYear() - 1; i > 2019; i--) {
+        options += `<option value="` + i + `">` + i + `</option>`;
+    }
+
+    $('#year_filter').append(options);
+    $('#year_filter').selectize();
 
     getRecentDocuments(0, 5);
     getSendOutDocuments(0, 5);
@@ -115,9 +123,9 @@ let mgensearch_selectize;
         $('#printed_date').html("Printed date: " + moment().format('MM/DD/YY HH:mm a'));
     });
 
-    const adm_access = 'Administrative Office, Medical Chief Center';
+    const adm_access = 'ADMINISTRATIVE OFFICE, MEDICAL CHIEF CENTER';
 
-    if(!adm_access.includes($('.department').text()) ){
+    if (!adm_access.includes($('.department').text())) {
         $('#nav_all_docs').remove();
         $('#nav_all_docs_mobile').remove();
     }
@@ -125,19 +133,22 @@ let mgensearch_selectize;
 })(jQuery);
 
 function getRecentDocuments(offset, limit) {
+    let year = $('#year_filter').val();
 
-    const param = '?department=' + $('.department').text() + "&offset=" + offset +
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&department=' + $('.department').text() + "&offset=" + offset +
         "&limit=" + limit + "&date_from=" + recent_date_from + "&date_to=" + recent_date_to;
 
     fetch('/API/logs/get_log_history' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
-            if(!data.length && $('#recent_doc_tbody tr').length < 1) {
+            if (!data.length && $('#recent_doc_tbody tr').length < 1) {
                 $('#recent_table_container').addClass('d-none');
                 $('.table-load-more').addClass('d-none');
                 $('#recent_no_see_container').removeClass('d-none');
                 return;
-            }else{
+            } else {
                 $('#recent_table_container').removeClass('d-none');
                 $('.table-load-more').removeClass('d-none');
                 $('#recent_no_see_container').addClass('d-none');
@@ -157,7 +168,7 @@ function getRecentDocuments(offset, limit) {
             if (data.length) {
                 populateRecentDocs(data);
             } else {
-                if(offset) toastr.error("Nothing more to load.");
+                if (offset) toastr.error("Nothing more to load.");
             }
         })
         .catch(err => {
@@ -166,18 +177,22 @@ function getRecentDocuments(offset, limit) {
 }
 
 function getSendOutDocuments(offset, limit) {
-    const param = '?department=' + $('.department').text() + "&offset=" + offset +
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&department=' + $('.department').text() + "&offset=" + offset +
         "&limit=" + limit + "&date_from=" + sendout_date_from + "&date_to=" + sendout_date_to;
 
     fetch('/API/document/get_sendout' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
-            if(!data.length && $('#sendout_doc_tbody tr').length < 1) {
+            if (!data.length && $('#sendout_doc_tbody tr').length < 1) {
                 $('#sendout_table_container').addClass('d-none');
                 $('.table-load-more-sendout').addClass('d-none');
                 $('#sendout_no_see_container').removeClass('d-none');
                 return;
-            }else{
+            } else {
                 $('#sendout_table_container').removeClass('d-none');
                 $('.table-load-more-sendout').removeClass('d-none');
                 $('#sendout_no_see_container').addClass('d-none');
@@ -207,7 +222,7 @@ function getSendOutDocuments(offset, limit) {
                 populateSendOutDocs(data);
             } else {
                 hideSendOutInfo();
-                if(offset) toastr.error("Nothing more to load.");
+                if (offset) toastr.error("Nothing more to load.");
             }
         })
         .catch(err => {
@@ -216,7 +231,11 @@ function getSendOutDocuments(offset, limit) {
 }
 
 function getPendingGraphData() {
-    const param = '?department=' + $('.department').text();
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&department=' + $('.department').text();
 
     fetch('/API/document/get_pending_graph_data' + param, { method: 'GET' })
         .then(res => res.json())
@@ -231,7 +250,11 @@ function getPendingGraphData() {
 }
 
 function getRecieveGraphData() {
-    const param = '?department=' + $('.department').text();
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&department=' + $('.department').text();
 
     fetch('/API/document/get_recieve_graph_data' + param, { method: 'GET' })
         .then(res => res.json())
@@ -247,7 +270,11 @@ function getRecieveGraphData() {
 }
 
 function getReleaseGraphData() {
-    const param = '?department=' + $('.department').text();
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&department=' + $('.department').text();
 
     fetch('/API/document/get_release_graph_data' + param, { method: 'GET' })
         .then(res => res.json())
@@ -439,7 +466,7 @@ function populatePendingGraph() {
                 type: 'line',
                 datasets: [{
                     data: pending_count,
-                    label: 'Dataset',
+                    label: 'Pending',
                     backgroundColor: 'rgba(255,255,255,.1)',
                     borderColor: 'rgba(255,255,255,.55)',
                 },]
@@ -509,7 +536,7 @@ function populateRecieveGraph() {
                 type: 'line',
                 datasets: [{
                     data: recieve_count,
-                    label: 'Dataset',
+                    label: 'Recieved',
                     backgroundColor: 'rgba(255,255,255,.1)',
                     borderColor: 'rgba(255,255,255,.55)',
                 },]
@@ -579,7 +606,7 @@ function populateReleaseGraph(data) {
                 type: 'line',
                 datasets: [{
                     data: data,
-                    label: 'Dataset',
+                    label: 'Sent Out',
                     backgroundColor: 'rgba(255,255,255,.1)',
                     borderColor: 'rgba(255,255,255,.55)',
                 },]
@@ -648,7 +675,7 @@ function populateTotalGraph(total) {
                 type: 'line',
                 datasets: [{
                     data: total,
-                    label: 'Dataset',
+                    label: 'Total',
                     backgroundColor: 'rgba(255,255,255,.1)',
                     borderColor: 'rgba(255,255,255,.55)',
                 },]

@@ -16,7 +16,7 @@ exports.insert = async function (req, res) {
 
     let result = {};
     try {
-        await docAPI.insert_document(document);
+        await docAPI.insert_document(document, req.body.year);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {
@@ -93,7 +93,7 @@ exports.get_pending_count = async function (req, res) {
 
 exports.check_document = async function (req, res) {
     try {
-        const document = await docAPI.check_document(req.query.barcode);
+        const document = await docAPI.check_document(req.query);
         res.send(document);
     } catch (err) {
         let result = {};
@@ -159,7 +159,7 @@ exports.get_sendout = async function (req, res) {
 
 exports.get_release_sendout = async function (req, res) {
     try {
-        const sendouts = await docAPI.get_release_sendout(req.body.barcodes);
+        const sendouts = await docAPI.get_release_sendout(req.body);
         res.send(sendouts);
     } catch (err) {
         let result = {};
@@ -192,7 +192,7 @@ exports.get_all_types = async function (req, res) {
 
 exports.get_pending_graph_data = async function (req, res) {
     try {
-        const reports = await docAPI.get_pending_graph_data(req.query.department);
+        const reports = await docAPI.get_pending_graph_data(req.query);
         res.send(reports);
     } catch (err) {
         let result = {};
@@ -203,7 +203,7 @@ exports.get_pending_graph_data = async function (req, res) {
 
 exports.get_recieve_graph_data = async function (req, res) {
     try {
-        const reports = await docAPI.get_recieve_graph_data(req.query.department);
+        const reports = await docAPI.get_recieve_graph_data(req.query);
         res.send(reports);
     } catch (err) {
         let result = {};
@@ -214,7 +214,7 @@ exports.get_recieve_graph_data = async function (req, res) {
 
 exports.get_release_graph_data = async function (req, res) {
     try {
-        const reports = await docAPI.get_release_graph_data(req.query.department);
+        const reports = await docAPI.get_release_graph_data(req.query);
         res.send(reports);
     } catch (err) {
         let result = {};
@@ -225,7 +225,7 @@ exports.get_release_graph_data = async function (req, res) {
 
 exports.get_recievable_bcodes = async function (req, res) {
     try {
-        const bcodes = await docAPI.get_recievable_bcodes(req.query.id, req.query.department);
+        const bcodes = await docAPI.get_recievable_bcodes(req.query);
         res.send(bcodes);
     } catch (err) {
         let result = {};
@@ -236,7 +236,7 @@ exports.get_recievable_bcodes = async function (req, res) {
 
 exports.get_releasable_bcodes = async function (req, res) {
     try {
-        const bcodes = await docAPI.get_releasable_bcodes(req.query.id, req.query.department);
+        const bcodes = await docAPI.get_releasable_bcodes(req.query);
         res.send(bcodes);
     } catch (err) {
         let result = {};
@@ -258,7 +258,7 @@ exports.update = async function (req, res) {
 
     let result = {};
     try {
-        await docAPI.update_document(document);
+        await docAPI.update_document(document, req.body.year);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {
@@ -271,7 +271,7 @@ exports.recieve = async function (req, res) {
     let result = {};
 
     try {
-        await docAPI.recieve_document(req.body.barcodes);
+        await docAPI.recieve_document(req.body);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {
@@ -296,7 +296,7 @@ exports.end_cycle = async function (req, res) {
 exports.update_location = async function (req, res) {
     let result = {};
     try {
-        await docAPI.update_location(req.body.barcodes, req.body.department);
+        await docAPI.update_location(req.body);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {
@@ -309,7 +309,7 @@ exports.delete = async function (req, res) {
 
     let result = {};
     try {
-        await docAPI.delete_document(req.query.id);
+        await docAPI.delete_document(req.query);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {

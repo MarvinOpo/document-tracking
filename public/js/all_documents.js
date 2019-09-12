@@ -7,6 +7,14 @@ let document_selectize, type_selectize, docno_selectize, general_selectize;
 function selectizeFilter() {
     let $documents, $type, $docno, $general;
 
+    let options = '';
+    for (let i = new Date().getFullYear() - 1; i > 2019; i--) {
+        options += `<option value="` + i + `">` + i + `</option>`;
+    }
+
+    $('#year_filter').append(options);
+    $('#year_filter').selectize();
+    
     $documents = $('#document_filter').selectize({
         valueField: 'barcode',
         labelField: 'barcode',
@@ -67,16 +75,20 @@ function refreshSelectize() {
     type_selectize.clearOptions();
     docno_selectize.clearOptions();
 
-    const param = 'barcode=' + $('#document_filter').val() +
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&barcode=' + $('#document_filter').val() +
         '&type=' + $('#type_filter').val() + '&docno=' + $('#docno_filter').val();
 
-    const bcodeRoute = '/API/all_document/get_barcodes?' + param;
+    const bcodeRoute = '/API/all_document/get_barcodes' + param;
     loadFilter(document_selectize, bcodeRoute);
 
-    const typeRoute = '/API/all_document/get_types?' + param;
+    const typeRoute = '/API/all_document/get_types' + param;
     loadFilter(type_selectize, typeRoute);
 
-    const docnoRoute = '/API/all_document/get_docno?' + param;
+    const docnoRoute = '/API/all_document/get_docno' + param;
     loadFilter(docno_selectize, docnoRoute);
 
     getDocCount();
@@ -98,7 +110,11 @@ function loadFilter(selectize, route) {
 function getDocCount() {
     $('#loader_container').show();
 
-    let param = '?barcode=' + $('#document_filter').val() +
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&barcode=' + $('#document_filter').val() +
         '&type=' + $('#type_filter').val() + '&docno=' + $('#docno_filter').val() +
         '&general=' + $('#general_filter').val();
 
@@ -113,19 +129,23 @@ function getDocCount() {
 }
 
 function getDocuments(offset) {
-    let param = '?barcode=' + $('#document_filter').val() +
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&barcode=' + $('#document_filter').val() +
         '&type=' + $('#type_filter').val() + '&docno=' + $('#docno_filter').val() +
         '&general=' + $('#general_filter').val() + '&offset=' + offset + '&limit=5';
 
     fetch('/API/all_document/get_documents' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
-            
-            if(data.length) {
+
+            if (data.length) {
                 $('#document_container').removeClass('d-none');
                 $('#pager_parent_container').removeClass('d-none');
                 $('#no_document_container').addClass('d-none');
-            }else{
+            } else {
                 $('#document_container').addClass('d-none');
                 $('#pager_parent_container').addClass('d-none');
                 $('#no_document_container').removeClass('d-none');
@@ -139,13 +159,17 @@ function getDocuments(offset) {
 
 }
 
-function trackDocument(id) {
-    const param = '?id=' + id;
+function trackDocument(id, status) {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&id=' + id;
 
     fetch('/API/logs/get_logs' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
-            populate_tracking(data);
+            populate_tracking(data, status);
         })
         .catch(err => {
             console.log(err);
@@ -158,7 +182,7 @@ function populate_table(data) {
     for (let i = 0; i < data.length; i++) {
         table_data += "<tr id='" + data[i].barcode + "' class='tr-shadow'>"
             + "<td> "
-            + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + ")'> Track </button>";
+            + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + ")'> Track </button>";
 
         table_data += "</td>"
             + "<td>"
@@ -258,7 +282,7 @@ function populate_pager(numItems) {
     }
 }
 
-function populate_tracking(data) {
+function populate_tracking(data, status) {
     let table_data = '';
     for (let i = 0; i < data.length; i++) {
         table_data += "<tr class='tr-shadow'>"
@@ -318,6 +342,18 @@ function populate_tracking(data) {
             + "<td>" + data[i].remarks + "</td>"
             + " </tr>"
             + "<tr class='spacer'></tr>";
+
+        if (i == data.length - 1 && status == 'Cycle End') {
+            table_data += `<tr class="tr-shadow">
+                                <td style='color: red; font-weight: bold;'>CYCLE END</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>`;
+        }
     }
 
     $('#track_data').html(table_data);

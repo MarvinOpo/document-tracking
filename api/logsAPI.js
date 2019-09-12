@@ -7,15 +7,15 @@ const conn = mysql.createConnection({
     database: 'document_tracking'
 });
 
-exports.insert_log = function (log, barcodes) {
+exports.insert_log = function (log, barcodes, year) {
     return new Promise(function (resolve, reject) {
-        let sql = "INSERT INTO logs(document_id, release_to, remarks) ";
+        let sql = "INSERT INTO logs_" + year + "(document_id, release_to, remarks) ";
 
         let values = [];
 
         sql += "values";
         for (let i = 0; i < barcodes.length; i++) {
-            sql += "((SELECT id from documents WHERE barcode = ?),?,?) "
+            sql += "((SELECT id from documents_" + year + " WHERE barcode = ?),?,?) "
             values.push(barcodes[i]);
             values.push(log.getReleaseTo());
             values.push(log.getRemarks());
@@ -33,11 +33,11 @@ exports.insert_log = function (log, barcodes) {
     });
 }
 
-exports.get_logs = function (id) {
+exports.get_logs = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT * FROM logs WHERE document_id = ? ORDER BY id";
+        let sql = "SELECT * FROM logs_" + param.year + " WHERE document_id = ? ORDER BY id";
 
-        const values = [id];
+        const values = [param.id];
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET logs failed"));
@@ -51,10 +51,10 @@ exports.get_log_history = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = `SELECT l.*, d.barcode, 
                     (SELECT release_to 
-                        FROM logs rl 
+                        FROM logs_` + param.year + ` rl 
                         WHERE rl.id > l.id AND  rl.document_id = l.document_id
                         limit 1) AS release_to 
-                    FROM logs l, documents d
+                    FROM logs_` + param.year + ` l, documents_` + param.year + ` d
                     WHERE release_to = ? && d.id = l.document_id &&
                           (l.recieve_date >= ? && l.release_date <= ? ||
                             (l.recieve_date IS NULL && l.release_date IS NULL))
@@ -76,12 +76,12 @@ exports.get_log_history = function (param) {
     });
 }
 
-exports.update_recieve = function (body) {
+exports.update_recieve = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "UPDATE logs SET recieve_by = ?, recieve_date = NOW() "
-            + "WHERE release_to = ? AND recieve_by IS NULL AND document_id IN (SELECT id from documents WHERE barcode IN (?)) ";
+        let sql = "UPDATE logs_" + param.year + " SET recieve_by = ?, recieve_date = NOW() "
+            + "WHERE release_to = ? AND recieve_by IS NULL AND document_id IN (SELECT id from documents_" + param.year + " WHERE barcode IN (?)) ";
 
-        const values = [body.recieve_by, body.department, body.barcodes];
+        const values = [param.recieve_by, param.department, param.barcodes];
 
         conn.query(sql, values, function (err, result) {
             console.log(err);
@@ -92,12 +92,12 @@ exports.update_recieve = function (body) {
     });
 }
 
-exports.update_release = function (body) {
+exports.update_release = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "UPDATE logs SET release_by = ?, release_date = NOW() "
-            + "WHERE release_date IS NULL AND document_id IN (SELECT id from documents WHERE barcode IN (?)) "
+        let sql = "UPDATE logs_" + param.year + " SET release_by = ?, release_date = NOW() "
+            + "WHERE release_date IS NULL AND document_id IN (SELECT id from documents_" + param.year + " WHERE barcode IN (?)) "
 
-        const values = [body.release_by, body.barcodes];
+        const values = [param.release_by, param.barcodes];
 
         conn.query(sql, values, function (err, result) {
             console.log(result);

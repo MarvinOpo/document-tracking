@@ -8,7 +8,7 @@ exports.insert = async function (req, res) {
 
     let result = {};
     try {
-        await logAPI.insert_log(log, req.body.barcodes);
+        await logAPI.insert_log(log, req.body.barcodes, req.body.year);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {
@@ -44,7 +44,7 @@ exports.update_release = async function (req, res) {
 
 exports.get_logs = async function (req, res) {
     try {
-        const logs = await logAPI.get_logs(req.query.id);
+        const logs = await logAPI.get_logs(req.query);
         res.send(logs);
     } catch (err) {
         let result = {};

@@ -32,7 +32,9 @@ conn.connect(function (err) {
 });
 
 function createDocumentTbl() {
-    let docTbl = `create table if not exists documents(
+    const year = (new Date()).getFullYear();
+
+    let docTbl = `create table if not exists documents_` + year + `(
                                 id int primary key auto_increment,
                                 document_no varchar(50) not null,
                                 barcode varchar(50) not null,
@@ -52,14 +54,16 @@ function createDocumentTbl() {
     conn.query(docTbl, function (err, results, fields) {
         if (err) throw err;
 
-        console.log("Document Table created");
+        console.log("Document_" + year + " Table created");
 
         createLogsTbl();
     });
 }
 
 function createLogsTbl() {
-    let logsTbl = `create table if not exists logs(
+    const year = (new Date()).getFullYear();
+    
+    let logsTbl = `create table if not exists logs_` + year + `(
         id int primary key auto_increment,
         document_id varchar(25) not null,
         release_to varchar(100) not null,
@@ -73,7 +77,7 @@ function createLogsTbl() {
     conn.query(logsTbl, function (err, results, fields) {
         if (err) throw err;
 
-        console.log("Logs Table created");
+        console.log("Logs_" + year + " Table created");
     });
 
     conn.end(function (err) {

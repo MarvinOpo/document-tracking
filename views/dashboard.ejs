@@ -36,6 +36,9 @@
     <!-- Datepicker CSS-->
     <link href="css/datepicker.css" rel="stylesheet" media="all">
 
+    <!-- Selectize CSS-->
+    <link href="css/selectize.css" rel="stylesheet" media="all">
+
     <!-- Toastr CSS-->
     <link href="css/toastr.min.css" rel="stylesheet" />
 
@@ -58,6 +61,15 @@
             <div class="main-content">
                 <div class="section__content section__content--p30">
                     <div class="container-fluid">
+                        <div>
+                            <h3 class="title-5 m-b-10">Dashboard</h3>
+                            <div class="rs-select2--light rs-select2--md">
+                                <select id="year_filter" class="demo-default">
+                                    <option value="">Current Year</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- <div class="row m-t-25" style="margin-top: 150px;"> -->
                         <div class="row m-t-25">
                             <div class="col-sm-6 col-md-6 col-lg-3">
@@ -147,7 +159,7 @@
 
                         <div class="row">
                             <div class="col-md-12 col-lg-7">
-                                <h2 class="title-1 m-b-25">Recent Documents</h2>
+                                <h3 class="title-5 m-b-25">Recent Documents</h3>
                                 <div>
                                     <div class="rs-select2--light rs-select2--300 m-b-20">
                                         <span class="text-size-12">Date</span>
@@ -232,7 +244,7 @@
                         </div> -->
 
                             <div class="col-md-12 col-lg-5">
-                                <h2 class="title-1 m-b-25">Send Out</h2>
+                                <h3 class="title-5 m-b-25">Send Out</h3>
 
                                 <div>
                                     <div class="rs-select2--light rs-select2--300 m-b-20">
@@ -554,7 +566,7 @@
     <script src="js/print.min.js"></script>
     <script src="js/selectize.min.js"></script>
     <script src="js/dashboard.js"></script>
-    
+
 </body>
 
 </html>

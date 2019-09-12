@@ -51,7 +51,12 @@ let mdept_selectize, mbcode_release_selectize;
             getTwoDigitFormat(date.getDate()) + "" + getTwoDigitFormat(date.getHours()) + "" +
             getTwoDigitFormat(date.getMinutes()) + "" + getTwoDigitFormat(date.getSeconds());
 
+        let year = $('#year_filter').val();
+
+        if (!year) year = (new Date()).getFullYear();
+
         const body = {
+            year: year,
             document_no: $('#modal_docno').val(),
             barcode: barcode,
             name: $('#modal_name').val(),
@@ -153,7 +158,7 @@ let mdept_selectize, mbcode_release_selectize;
         $('.modal-title').text('Add Document');
 
         mtype_selectize.setValue('');
-        mpriority_selectize.setValue('');
+        mpriority_selectize.setValue('Regular');
         refreshModalSelectize();
     });
 
@@ -183,6 +188,14 @@ let mdept_selectize, mbcode_release_selectize;
 
 function selectizeFilter(filter) {
     let $documents, $type, $docno, $general;
+
+    let options = '';
+    for (let i = new Date().getFullYear() - 1; i > 2019; i--) {
+        options += `<option value="` + i + `">` + i + `</option>`;
+    }
+
+    $('#year_filter').append(options);
+    $('#year_filter').selectize();
 
     $documents = $('#document_filter').selectize({
         valueField: 'barcode',
@@ -288,7 +301,7 @@ function selectizeModal() {
     });
 
     $mbcodeRecieve = $('#modal_recieve_barcode').selectize({
-        create: true,
+        // create: true,
         maxOptions: 1,
         maxItems: 100,
         valueField: 'barcode',
@@ -310,7 +323,7 @@ function selectizeModal() {
 
     $('#modal_release_doc_info').hide();
     $mbcodeRelease = $('#modal_release_barcode').selectize({
-        create: true,
+        // create: true,
         maxOptions: 1,
         maxItems: 100,
         valueField: 'barcode',
@@ -347,17 +360,21 @@ function refreshSelectize() {
     type_selectize.clearOptions();
     docno_selectize.clearOptions();
 
-    const param = 'barcode=' + $('#document_filter').val() +
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&barcode=' + $('#document_filter').val() +
         '&type=' + $('#type_filter').val() + '&docno=' + $('#docno_filter').val() +
         '&department=' + $('.department').text() + '&user_id=' + $('.department').attr('id');
 
-    const bcodeRoute = '/API/document/get_barcodes?' + param;
+    const bcodeRoute = '/API/document/get_barcodes' + param;
     loadFilter(document_selectize, bcodeRoute);
 
-    const typeRoute = '/API/document/get_types?' + param;
+    const typeRoute = '/API/document/get_types' + param;
     loadFilter(type_selectize, typeRoute);
 
-    const docnoRoute = '/API/document/get_docno?' + param;
+    const docnoRoute = '/API/document/get_docno' + param;
     loadFilter(docno_selectize, docnoRoute);
 
     getDocCount();
@@ -367,12 +384,16 @@ function refreshModalSelectize() {
     mbcode_recieve_selectize.clearOptions();
     mbcode_release_selectize.clearOptions();
 
-    const param = 'id=' + $('.department').attr('id') + '&department=' + $('.department').text();
+    let year = $('#year_filter').val();
 
-    const recieveRoute = '/API/document/get_recievable_bcodes?' + param;
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&id=' + $('.department').attr('id') + '&department=' + $('.department').text();
+
+    const recieveRoute = '/API/document/get_recievable_bcodes' + param;
     loadFilter(mbcode_recieve_selectize, recieveRoute);
 
-    const releaseRoute = '/API/document/get_releasable_bcodes?' + param;
+    const releaseRoute = '/API/document/get_releasable_bcodes' + param;
     loadFilter(mbcode_release_selectize, releaseRoute);
 
 }
@@ -394,6 +415,7 @@ function insertDocument(body) {
                 barcodes.push(body.barcode);
 
                 const log = {
+                    year: body.year,
                     barcodes: barcodes,
                     department: $('.department').text(),
                     remarks: "Origin"
@@ -409,13 +431,17 @@ function insertDocument(body) {
         });
 }
 
-function trackDocument(id) {
-    const param = '?id=' + id;
+function trackDocument(id, status) {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&id=' + id;
 
     fetch('/API/logs/get_logs' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
-            populate_tracking(data);
+            populate_tracking(data, status);
         })
         .catch(err => {
             console.log(err);
@@ -423,7 +449,11 @@ function trackDocument(id) {
 }
 
 function checkDocForRecieve(barcode) {
-    const param = '?barcode=' + barcode;
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&barcode=' + barcode;
 
     fetch('/API/document/check_document' + param, { method: 'GET' })
         .then(res => res.json())
@@ -450,7 +480,11 @@ function checkDocForRecieve(barcode) {
 }
 
 function checkDocForRelease(barcode) {
-    const param = '?barcode=' + barcode;
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&barcode=' + barcode;
 
     fetch('/API/document/check_document' + param, { method: 'GET' })
         .then(res => res.json())
@@ -477,14 +511,19 @@ function checkDocForRelease(barcode) {
 }
 
 function getDocuments(offset) {
-    let param = "";
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    let param = '?year=' + year;
+
     if (!$('#general_filter').val()) {
-        param = '?barcode=' + $('#document_filter').val() +
+        param += '&barcode=' + $('#document_filter').val() +
             '&type=' + $('#type_filter').val() + '&docno=' + $('#docno_filter').val() +
             '&offset=' + offset + '&limit=' + 5 + '&department=' + $('.department').text() +
             '&user_id=' + $('.department').attr('id');
     } else {
-        param = '?general=' + $('#general_filter').val() + '&type=' + $('#type_filter').val() +
+        param += '&general=' + $('#general_filter').val() + '&type=' + $('#type_filter').val() +
             '&offset=' + offset + '&limit=' + 5 + '&department=' + $('.department').text() +
             '&user_id=' + $('.department').attr('id');
     }
@@ -512,7 +551,12 @@ function getDocuments(offset) {
 }
 
 function getPrintableSentout() {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
     const body = {
+        year: year,
         barcodes: $('#modal_release_barcode').val()
     };
 
@@ -534,13 +578,18 @@ function getPrintableSentout() {
 function getDocCount() {
     $('#loader_container').show();
 
-    let param = "";
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    let param = '?year=' + year;
+
     if (!$('#general_filter').val()) {
-        param = '?barcode=' + $('#document_filter').val() +
+        param += '&barcode=' + $('#document_filter').val() +
             '&type=' + $('#type_filter').val() + '&docno=' + $('#docno_filter').val() +
             '&department=' + $('.department').text() + '&user_id=' + $('.department').attr('id');
     } else {
-        param = '?general=' + $('#general_filter').val() + '&type=' + $('#type_filter').val() +
+        param += '&general=' + $('#general_filter').val() + '&type=' + $('#type_filter').val() +
             '&department=' + $('.department').text() + '&user_id=' + $('.department').attr('id');
     }
 
@@ -598,11 +647,14 @@ function updateDocument(body) {
 }
 
 function recieveDocument(barcodes) {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
     const body = {
+        year: year,
         barcodes: barcodes
     };
-
-    console.log(body);
 
     fetch('/API/document/recieve', {
         method: 'POST',
@@ -623,12 +675,17 @@ function recieveDocument(barcodes) {
 }
 
 function endDocument(id) {
-    const param = "?id=" + id + "&user_id=" + $('.department').attr('id');
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + "&id=" + id + "&user_id=" + $('.department').attr('id')
+        + "&status=Cycle End";
 
     toastr.options.timeOut = 0;
     toastr.options.extendedTimeOut = 0;
     toastr.options.positionClass = "toast-top-center";
-    toastr.warning('<div class="text-center"><label>Are you sure you want to cycle end this item?</label>'
+    toastr.warning('<div class="text-center"><label>Are you sure you want to CYCLE END this item?</label>'
         + '<button type="button" id="okBtn" class="btn btn-danger" value="yes">Yes</button>'
         + '<button type="button" id="surpriseBtn" class="btn btn-secondary" style="margin: 0 8px 0 8px" value="no">No</button></div>',
         "",
@@ -644,7 +701,50 @@ function endDocument(id) {
                         .then(res => res.json())
                         .then(data => {
                             if (data.status == 'success') {
-                                toastr.success("Documents cycle end.");
+                                toastr.success("Document cycle ended.");
+                                $('#modal_recieve').modal('hide');
+                                document_selectize.trigger("change");
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+                }
+
+                toastr.remove();
+            }
+
+        });
+}
+
+function recycleDocument(id) {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + "&id=" + id + "&user_id=" + $('.department').attr('id')
+        + "&status=Recieved";
+
+    toastr.options.timeOut = 0;
+    toastr.options.extendedTimeOut = 0;
+    toastr.options.positionClass = "toast-top-center";
+    toastr.warning('<div class="text-center"><label>Are you sure you want to RECYCLE this item?</label>'
+        + '<button type="button" id="okBtn" class="btn btn-danger" value="yes">Yes</button>'
+        + '<button type="button" id="surpriseBtn" class="btn btn-secondary" style="margin: 0 8px 0 8px" value="no">No</button></div>',
+        "",
+        {
+            allowHtml: true,
+            onclick: function (toast) {
+                toastr.options.timeOut = 2000;
+                toastr.options.extendedTimeOut = 1000;
+                toastr.options.positionClass = "toast-bottom-right";
+                value = toast.target.value
+                if (value == 'yes') {
+                    fetch('/API/document/end_cycle' + param, { method: 'GET' })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status == 'success') {
+                                toastr.success("Document recycled.");
                                 $('#modal_recieve').modal('hide');
                                 document_selectize.trigger("change");
                             }
@@ -661,7 +761,12 @@ function endDocument(id) {
 }
 
 function updateDocRecieveLog(barcodes) {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
     const body = {
+        year: year,
         barcodes: barcodes,
         recieve_by: $('.name').attr('id'),
         department: $('.department').text()
@@ -684,7 +789,12 @@ function updateDocRecieveLog(barcodes) {
 }
 
 function updateDocReleaseLog() {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
     const body = {
+        year: year,
         release_by: $('.name').attr('id'),
         barcodes: $('#modal_release_barcode').val()
     };
@@ -727,7 +837,11 @@ function updateDocLocation(body) {
 }
 
 function deleteDocument(id) {
-    const param = '?id=' + id;
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    let param = '?year=' + year + '&id=' + id;
 
     toastr.options.timeOut = 0;
     toastr.options.extendedTimeOut = 0;
@@ -781,7 +895,12 @@ function insertLogs(body) {
     let triggerRecieve = false;
 
     if (!body) {
+        let year = $('#year_filter').val();
+
+        if (!year) year = (new Date()).getFullYear();
+
         body = {
+            year: year,
             barcodes: $('#modal_release_barcode').val(),
             department: $('#modal_dept').val(),
             remarks: $('#modal_release_remarks').val()
@@ -809,27 +928,27 @@ function insertLogs(body) {
         });
 }
 
-function updateLogs() {
-    const body = {
-        recieve_by: "Mark Vincent Opo",
-        department: "IT Office"
-    };
+// function updateLogs() {
+//     const body = {
+//         recieve_by: "Mark Vincent Opo",
+//         department: "IT Office"
+//     };
 
-    fetch('/API/logs/update', {
-        method: 'POST',
-        body: JSON.stringify(body),
-        headers: { 'Content-Type': 'application/json' }
-    })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status == 'success') {
-                updateDocLocation(body);
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        });
-}
+//     fetch('/API/logs/update', {
+//         method: 'POST',
+//         body: JSON.stringify(body),
+//         headers: { 'Content-Type': 'application/json' }
+//     })
+//         .then(res => res.json())
+//         .then(data => {
+//             if (data.status == 'success') {
+//                 updateDocLocation(body);
+//             }
+//         })
+//         .catch(err => {
+//             console.log(err);
+//         });
+// }
 
 function populate_table(data) {
     let due_documents = [];
@@ -837,7 +956,7 @@ function populate_table(data) {
     for (let i = 0; i < data.length; i++) {
         table_data += "<tr id='" + data[i].barcode + "' class='tr-shadow'>"
             + "<td> "
-            + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + ")'> Track </button>";
+            + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + " )'> Track </button>";
 
         if ((!data[i].location || data[i].location == $(".department").text()) && data[i].status != "Cycle End") {
             if (data[i].status == 'Recieved' || !data[i].location)
@@ -910,13 +1029,13 @@ function populate_table(data) {
                     + " </button>";
             }
 
-            if (data[i].location == $(".department").text()) {
+            if (data[i].location == $(".department").text() && data[i].status == "Recieved") {
                 table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
                     + "<i class='zmdi zmdi-refresh-sync-off'></i>"
                     + " </button>";
             }
         } else if ($('.department').attr('id') == data[i].updated_by) {
-            table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Recycle' onclick='endDocument(" + data[i].id + ")'>"
+            table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Recycle' onclick='recycleDocument(" + data[i].id + ")'>"
                 + "<i class='zmdi zmdi-refresh-sync-alert'></i>"
                 + " </button>";
         }
@@ -968,7 +1087,7 @@ function populate_pager(numItems) {
     }
 }
 
-function populate_tracking(data) {
+function populate_tracking(data, status) {
     let table_data = '';
     for (let i = 0; i < data.length; i++) {
         table_data += "<tr class='tr-shadow'>"
@@ -1028,6 +1147,18 @@ function populate_tracking(data) {
             + "<td>" + data[i].remarks + "</td>"
             + " </tr>"
             + "<tr class='spacer'></tr>";
+
+        if(i == data.length - 1 && status == 'Cycle End'){
+            table_data += `<tr class="tr-shadow">
+                                <td style='color: red; font-weight: bold;'>CYCLE END</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>`;
+        }
     }
 
     $('#track_data').html(table_data);
