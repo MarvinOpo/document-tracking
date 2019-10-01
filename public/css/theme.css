@@ -307,7 +307,7 @@ section {
 }
 
 .main-content {
-    padding-top: 116px;
+    padding-top: 266px;
     min-height: 100vh;
 }
 
@@ -1189,7 +1189,7 @@ section {
     -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
     position: fixed;
-    top: 0;
+    top: 150px;
     right: 0;
     left: 300px;
     height: 75px;
@@ -1582,10 +1582,10 @@ section {
     width: 300px;
     position: fixed;
     left: 0;
-    top: 0;
+    top: 150px;
     bottom: 0;
     background: #fff;
-    overflow-y: auto;
+    overflow-y: false;
 }
 
 .menu-sidebar .logo {
@@ -14748,19 +14748,17 @@ td:not([name="duration"]), th {
     white-space:nowrap;
 }
 
-#tblSendOut td:last-child,
-#tblSendOut td:nth-last-child(2) {
-    vertical-align: bottom;
+#track_data td:nth-last-child(2),
+#track_data th:nth-last-child(2) {
+    min-width: 300px;
 }
 
-/* #tblSendOut td {
+#track_data td:last-child span{
+    background: red;
+    color: white;
     padding-left: 5px;
     padding-right: 5px;
-} */
-
-#track_data td:last-child,
-#track_data th:last-child {
-    min-width: 300px;
+    cursor: pointer;
 }
 
 #table_data tr td:first-child {
@@ -14771,6 +14769,17 @@ td:not([name="duration"]), th {
 #track_data tr td:first-child {
     vertical-align: top;
 }
+
+
+#tblSendOut td:last-child,
+#tblSendOut td:nth-last-child(2) {
+    vertical-align: bottom;
+}
+
+/* #tblSendOut td {
+    padding-left: 5px;
+    padding-right: 5px;
+} */
 
 label {
     color: #7ec0ee;
@@ -14854,6 +14863,10 @@ table .match-parent {
     min-width: 200px;
 }
 
+.mnh-300 {
+    min-height: 300px !important;
+}
+
 .mnh-500 {
     min-height: 500px !important;
 }
@@ -14917,6 +14930,10 @@ table .match-parent {
     font-size: 14px;
 }
 
+.text-size-16 {
+    font-size: 16px;
+}
+
 .color-555 {
     color: #555
 }
@@ -14968,7 +14985,29 @@ table .match-parent {
     max-height: 150px;
     min-height: 150px;
     width: 100%;
+    min-width: 1500px;
 }
+
+#modalTblSendOut {
+    cursor: pointer;
+}
+
+#sendout_table_container table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.ml-100 {
+    margin-left: 100px !important;
+}
+
+#modal_print_sendout {
+    z-index: 1999; 
+}
+#modal_release {
+    z-index: 2000; 
+}
+
 /* img {
     object-fit: cover;
     width: 100%;

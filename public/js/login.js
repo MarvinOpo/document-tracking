@@ -17,6 +17,9 @@
         "hideMethod": "fadeOut"
     };
 
+    if (!$('.input-error').html()) {
+        $('#modal_notification').modal('show');
+    }
     // $('#login_btn').click(function () {
     //     if (!$('#username').val() || !$('#password').val()) {
 
@@ -24,7 +27,7 @@
 
     //         return;
     //     }
- 
+
     //     checkUser();
     // });
 })(jQuery);
@@ -38,15 +41,15 @@ function checkUser() {
     fetch('http://172.16.2.31:3000/login', {
         method: 'POST',
         body: JSON.stringify(body),
-        headers: { 
+        headers: {
             'Content-Type': 'application/json'
         }
     })
         .then(res => res.json())
         .then(data => {
-            if(!data.status){
+            if (!data.status) {
                 login(data[0]);
-            }else {
+            } else {
                 toastr.error("Invalid Credentials");
             }
         })
@@ -55,7 +58,7 @@ function checkUser() {
         });
 }
 
-function login(data){
+function login(data) {
     fetch('/login', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -63,9 +66,9 @@ function login(data){
     })
         .then(res => res.json())
         .then(data => {
-             if(data.status == "success"){
+            if (data.status == "success") {
                 window.location.href = "http://172.16.2.30:3000/dashboard"
-             }
+            }
         })
         .catch(err => {
             console.log(err);

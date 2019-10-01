@@ -82,6 +82,7 @@ function update_info() {
 
     fetch('/update_info', {
         method: 'POST',
+        credentials:"include",
         body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' }
     })
@@ -89,7 +90,7 @@ function update_info() {
         .then(data => {
             console.log(status);
             if (data.status == "success") {
-                window.location.href = "http://172.16.2.30:3000/dashboard"
+                window.location.href = "http://172.16.1.12:3000/dashboard"
             } else {
                 const text_error = "<div class='input-error'>"
                     + "<span class='error-text'>"

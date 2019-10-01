@@ -60,12 +60,12 @@ let mdept_selectize;
         const lname = $('#modal_lname').val().toUpperCase().trim();
 
         const body = {
-            username : fname.substring(0,2) + lname,
-            fname : fname,
-            minit : $('#modal_minit').val().toUpperCase().trim(),
-            lname : lname,
-            designation : $('#modal_designation').val().toUpperCase().trim(),
-            department : $('#modal_department').val().toUpperCase().trim()
+            username: fname.substring(0, 2) + lname,
+            fname: fname,
+            minit: $('#modal_minit').val().toUpperCase().trim(),
+            lname: lname,
+            designation: $('#modal_designation').val().toUpperCase().trim(),
+            department: $('#modal_department').val().toUpperCase().trim()
         };
 
         if ($('#modal_add').text() == 'Add') {
@@ -214,7 +214,7 @@ function editUser(data) {
     }
 }
 
-function updateUser(body){
+function updateUser(body) {
     fetch('/API/user/update', {
         method: 'POST',
         body: JSON.stringify(body),
@@ -289,7 +289,8 @@ function populate_pager(numItems) {
         cssStyle: "light-theme",
         currentPage: page,
 
-        onPageClick: function (pageNumber) {
+        onPageClick: function (pageNumber, event) {
+            event.preventDefault();
             getUsers((pageNumber - 1) * 5);
         }
     });

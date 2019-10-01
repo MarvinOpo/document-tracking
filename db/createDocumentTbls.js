@@ -1,3 +1,5 @@
+const year = '2018';
+
 const mysql = require('mysql');
 const conn = mysql.createConnection({
     host: 'localhost',
@@ -19,7 +21,8 @@ conn.connect(function (err) {
                             mname varchar(10) not null,
                             lname varchar(50) not null,
                             designation varchar(50) not null,
-                            department varchar(100) not null
+                            department varchar(100) not null,
+                            access_right varchar(10) not null
                         )`;
 
     conn.query(userTbl, function (err, results, fields) {
@@ -27,12 +30,27 @@ conn.connect(function (err) {
 
         console.log("User Table created");
 
-        createDocumentTbl();
+        createAccessRightsTbl();
     });
 });
 
+function createAccessRightsTbl() {
+    let rytsTbl = `create table if not exists access_rights(
+        id int primary key auto_increment,
+        description varchar(50) not null,
+        all_documents tinyint(1) default 0
+    )`;
+
+    conn.query(rytsTbl, function (err, results, fields) {
+        if (err) throw err;
+
+        console.log("Access_Rights Table created");
+
+        createDocumentTbl();
+    });
+}
+
 function createDocumentTbl() {
-    const year = (new Date()).getFullYear();
 
     let docTbl = `create table if not exists documents_` + year + `(
                                 id int primary key auto_increment,
@@ -45,10 +63,11 @@ function createDocumentTbl() {
                                 priority varchar(20) not null,
                                 created_by varchar(25) not null,
                                 updated_by varchar(25) not null,
-                                created_at datetime,
-                                updated_at datetime,
                                 location varchar(100),
-                                status varchar(25) not null default 'Pending'
+                                status varchar(25) not null default 'Pending',
+                                lapse_at datetime,
+                                created_at datetime,
+                                updated_at datetime
                             )`;
 
     conn.query(docTbl, function (err, results, fields) {
@@ -61,8 +80,7 @@ function createDocumentTbl() {
 }
 
 function createLogsTbl() {
-    const year = (new Date()).getFullYear();
-    
+
     let logsTbl = `create table if not exists logs_` + year + `(
         id int primary key auto_increment,
         document_id varchar(25) not null,

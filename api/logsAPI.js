@@ -25,7 +25,6 @@ exports.insert_log = function (log, barcodes, year) {
         }
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
             if (err) reject(new Error("Insert failed"));
 
             resolve();
@@ -62,7 +61,7 @@ exports.get_log_history = function (param) {
 
         const values = [param.department, param.date_from, param.date_to];
 
-        if(param.limit){
+        if (param.limit) {
             sql += `LIMIT ? OFFSET ?`
             values.push(parseInt(param.limit));
             values.push(parseInt(param.offset));
@@ -84,8 +83,7 @@ exports.update_recieve = function (param) {
         const values = [param.recieve_by, param.department, param.barcodes];
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
-            if (err) reject(new Error("Update recieve logs failed"));
+            if (err) reject(new Error("Update receive logs failed"));
 
             resolve(result);
         });
@@ -100,10 +98,45 @@ exports.update_release = function (param) {
         const values = [param.release_by, param.barcodes];
 
         conn.query(sql, values, function (err, result) {
-            console.log(result);
             if (err) reject(new Error("Update release logs failed"));
 
             resolve(result);
+        });
+    });
+}
+
+exports.delete = function (param) {
+    return new Promise(function (resolve, reject) {
+        let sql = "DELETE FROM logs_" + param.year + " WHERE id = ? "
+
+        let values = [param.did];
+
+        conn.query(sql, values, function (err, result) {
+            if (err) reject(new Error("Delete logs failed"));
+
+            if (result) {
+                sql = "UPDATE logs_" + param.year + " SET release_by = null, "
+                    + "release_date = null WHERE id = ? "
+
+                values = [param.uid];
+
+                conn.query(sql, values, function (err, result) {
+                    if (err) reject(new Error("Delete logs failed"));
+        
+                    if (result) {
+                        sql = "UPDATE documents_" + param.year + " SET location = ?, "
+                            + "status = 'Received' WHERE id = ? "
+        
+                        values = [param.department, param.document_id];
+        
+                        conn.query(sql, values, function (err, result) {
+                            if (err) reject(new Error("Delete logs failed"));
+                
+                            resolve();
+                        });
+                    }
+                });
+            }
         });
     });
 }

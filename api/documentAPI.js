@@ -31,7 +31,7 @@ exports.get_documents = function (param) {
         //    + "(SELECT count(*) from logs WHERE release_to = ? "
         //    + "AND document_id = d.id) > 0) ";
 
-        // let sql = "SELECT d.* FROM documents d WHERE (location = ? AND status = 'Recieved') AND ( "
+        // let sql = "SELECT d.* FROM documents d WHERE (location = ? AND status = 'Received') AND ( "
         //    + "(SELECT u.department from users u WHERE id = d.created_by) = ? OR "
         //    + "(SELECT count(*) from logs WHERE release_to = ? "
         //    + "AND document_id = d.id) > 0) ";
@@ -56,7 +56,7 @@ exports.get_documents = function (param) {
         } else {
             sql = "SELECT d.* from documents_" + param.year + " d "
                 + "WHERE ((created_by = ? OR (location = ? "
-                + "AND (status = 'Recieved' OR status = 'Cycle End'))) OR "
+                + "AND (status = 'Received' OR status = 'Cycle End'))) OR "
                 + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
                 + "AND document_id = d.id AND (recieve_by IS NOT NULL OR release_date IS NOT NULL)) > 0) "
 
@@ -97,7 +97,7 @@ exports.get_documents = function (param) {
             }
         }
 
-        sql += "ORDER BY priority DESC, id DESC "
+        sql += "ORDER BY id DESC "
 
         if (param.limit) {
             sql += " LIMIT ? OFFSET ?";
@@ -106,7 +106,6 @@ exports.get_documents = function (param) {
         }
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
             if (err) reject(new Error("GET document failed"));
 
             resolve(result);
@@ -229,7 +228,7 @@ exports.get_sendout = function (param) {
 
         let values = [param.date_from, param.date_to, param.department];
 
-        if (param.limit) {
+        if (parseInt(param.limit)) {
             sql += `LIMIT ? OFFSET ?`
             values.push(parseInt(param.limit));
             values.push(parseInt(param.offset));
@@ -242,6 +241,34 @@ exports.get_sendout = function (param) {
         });
     });
 }
+
+// exports.get_sendout = function (param) {
+//     return new Promise(function (resolve, reject) {
+//         let sql = `SELECT d.barcode, d.name, d.type, l.release_date, 
+//                         (SELECT release_to 
+//                             FROM logs_` + param.year + ` rl 
+//                             WHERE rl.id > l.id AND rl.document_id = l.document_id 
+//                             limit 1) AS release_to 
+//                     FROM documents_` + param.year + ` d, logs_` + param.year + ` l
+//                     WHERE d.id = l.document_id AND l.release_date IS NOT NULL AND
+//                          l.release_date >= ? AND l.release_date <= ? AND l.release_to = ?
+//                     ORDER BY release_date desc `
+
+//         let values = [param.date_from, param.date_to, param.department];
+
+//         if (parseInt(param.limit)) {
+//             sql += `LIMIT ? OFFSET ?`
+//             values.push(parseInt(param.limit));
+//             values.push(parseInt(param.offset));
+//         }
+
+//         conn.query(sql, values, function (err, result) {
+//             if (err) reject(new Error("GET sendout failed"));
+
+//             resolve(result);
+//         });
+//     });
+// }
 
 exports.get_release_sendout = function (param) {
     return new Promise(function (resolve, reject) {
@@ -263,7 +290,7 @@ exports.get_count = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = "SELECT count(*) AS count from documents_" + param.year + " d "
             + "WHERE ((created_by = ? OR (location = ? "
-            + "AND status = 'Recieved')) OR "
+            + "AND status = 'Received')) OR "
             + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
             + "AND document_id = d.id AND (recieve_by IS NOT NULL OR release_date IS NOT NULL)) > 0) "
 
@@ -411,7 +438,7 @@ exports.get_docno = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = "SELECT d.document_no from documents_" + param.year + " d "
             + "WHERE d.document_no != '' AND d.document_no != 'n/a' AND ((created_by = ? OR (location = ? "
-            + "AND status = 'Recieved')) OR "
+            + "AND status = 'Received')) OR "
             + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
             + "AND document_id = d.id AND recieve_by IS NOT NULL) > 0) "
 
@@ -470,7 +497,7 @@ exports.get_barcodes = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = "SELECT d.barcode from documents_" + param.year + " d "
             + "WHERE ((created_by = ? OR (location = ? "
-            + "AND status = 'Recieved')) OR "
+            + "AND status = 'Received')) OR "
             + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
             + "AND document_id = d.id AND recieve_by IS NOT NULL) > 0) "
 
@@ -526,7 +553,7 @@ exports.get_types = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = "SELECT d.type from documents_" + param.year + " d "
             + "WHERE ((created_by = ? OR (location = ? "
-            + "AND status = 'Recieved')) OR "
+            + "AND status = 'Received')) OR "
             + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
             + "AND document_id = d.id AND recieve_by IS NOT NULL) > 0) "
 
@@ -594,6 +621,15 @@ exports.get_pending_graph_data = function (param) {
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET pending document failed"));
+
+            if(!result.length) {
+                let data = {
+                    pending_counts: pnd_arr
+                };
+
+                resolve(data);
+                return
+            }
 
             for (let i = 0; i < result.length; i++) {
                 switch (result[i].month) {
@@ -667,6 +703,15 @@ exports.get_recieve_graph_data = function (param) {
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET document types failed"));
 
+            if(!result.length) {
+                let data = {
+                    recieve_counts: rcv_arr
+                };
+
+                resolve(data);
+                return
+            }
+
             for (let i = 0; i < result.length; i++) {
                 switch (result[i].month) {
                     case "January":
@@ -736,6 +781,15 @@ exports.get_release_graph_data = function (param) {
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET document types failed"));
+
+            if(!result.length) {
+                let data = {
+                    release_counts: rls_arr
+                };
+
+                resolve(data);
+                return
+            }
 
             for (let i = 0; i < result.length; i++) {
                 switch (result[i].month) {
@@ -811,13 +865,12 @@ exports.get_recievable_bcodes = function (param) {
 exports.get_releasable_bcodes = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = "SELECT barcode FROM documents_" + param.year + " "
-            + "WHERE (location = ? AND status = 'Recieved') OR "
+            + "WHERE (location = ? AND status = 'Received') OR "
             + "(location = '' AND created_by = ?) ";
 
         const values = [param.department, param.id];
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
             if (err) reject(new Error("GET releasable barcodes failed"));
 
             resolve(result);
@@ -843,13 +896,13 @@ exports.update_document = function (document, year) {
 
 exports.recieve_document = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "UPDATE documents_" + param.year + " SET status = 'Recieved' "
+        let sql = "UPDATE documents_" + param.year + " SET status = 'Received', lapse_at = NOW() "
             + "WHERE barcode IN (?)";
 
         const values = [param.barcodes];
 
         conn.query(sql, values, function (err, result) {
-            if (err || result.affectedRows == 0) reject(new Error("Recieve failed"));
+            if (err || result.affectedRows == 0) reject(new Error("Receive failed"));
 
             resolve();
         });

@@ -53,6 +53,7 @@ exports.post_login = async function (req, res) {
         req.session.NAME = user[0].fname + " " + user[0].mname + " " + user[0].lname;
         req.session.DESIGNATION = user[0].designation;
         req.session.DEPARTMENT = user[0].department;
+        req.session.ACCESS = user[0].access_rights;
 
         if (password == '123') {
             res.redirect('/update_info');

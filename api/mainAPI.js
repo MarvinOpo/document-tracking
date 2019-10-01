@@ -9,7 +9,7 @@ const conn = mysql.createConnection({
 
 exports.get_user = function (username, password) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+        let sql = "SELECT * FROM users WHERE username = ? AND password = MD5(?)";
 
         const values = [username, password];
 
@@ -25,14 +25,12 @@ exports.get_user = function (username, password) {
 
 exports.update_user = function (body, id) {
     return new Promise(function (resolve, reject) {
-        let sql = `UPDATE users SET password = ?, designation = ?, department = ?
+        let sql = `UPDATE users SET password = MD5(?), designation = ?, department = ?
                 WHERE id = ?`;
 
         const values = [body.password, body.designation, body.department, id];
 
-        console.log(sql);
         conn.query(sql, values, function (err, result) {
-            console.log(err);
             if (err) reject(new Error("Get user failed"));
 
             resolve();

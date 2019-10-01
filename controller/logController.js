@@ -63,3 +63,16 @@ exports.get_log_history = async function (req, res) {
         res.send(result);
     }
 }
+
+exports.delete = async function (req, res) {
+    
+    let result = {};
+    try {
+        await logAPI.delete(req.query);
+        result['status'] = 'success';
+        res.send(result);
+    } catch (err) {
+        result['status'] = 'error';
+        res.send(result);
+    }
+}

@@ -8,12 +8,16 @@ function selectizeFilter() {
     let $documents, $type, $docno, $general;
 
     let options = '';
-    for (let i = new Date().getFullYear() - 1; i > 2019; i--) {
+    for (let i = new Date().getFullYear() - 1; i > 2017; i--) {
         options += `<option value="` + i + `">` + i + `</option>`;
     }
 
     $('#year_filter').append(options);
-    $('#year_filter').selectize();
+    $('#year_filter').selectize({
+        onChange: function (value) {
+            refreshSelectize();
+        }
+    });
     
     $documents = $('#document_filter').selectize({
         valueField: 'barcode',
@@ -182,61 +186,87 @@ function populate_table(data) {
     for (let i = 0; i < data.length; i++) {
         table_data += "<tr id='" + data[i].barcode + "' class='tr-shadow'>"
             + "<td> "
-            + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + ")'> Track </button>";
+            + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + " )'> Track </button>";
 
         table_data += "</td>"
             + "<td>"
-            + "<span class='btn btn-link'>" + data[i].barcode + "</span>"
+            + "<span class='btn btn-link' onclick='editDocument(" + JSON.stringify(data[i]) + ")'>" + data[i].barcode + "</span>"
             + "</td>"
             + "<td>" + data[i].document_no + "</td>"
             + "<td>" + data[i].name + "</td>"
             + "<td>" + data[i].description + "</td>"
             + "<td>" + data[i].type + "</td>";
 
-        let priority_duration = 0;
+        // let priority_duration = 0;
 
         if (data[i].priority == "Regular") {
-            priority_duration = 10;
+            // priority_duration = 48;
             table_data += "<td><button id='priority_view' class='btn btn-primary mnw-116'>" + data[i].priority + "</button></td>";
         } else if (data[i].priority == "Urgent") {
-            priority_duration = 5;
+            // priority_duration = 2;
             table_data += "<td><button id='priority_view' class='btn btn-danger mnw-116'>" + data[i].priority + "</button></td>";
         }
 
-        let now = new Date();
-        const created_date = new Date(data[i].created_at);
+        // if (data[i].location == $(".department").text() && data[i].status == "Received") {
+        //     let now = new Date();
+        //     const lapse_date = new Date(data[i].lapse_at);
 
-        const hours_diff = Math.abs(now - created_date) / 36e5;
+        //     const hours_diff = Math.abs(now - lapse_date) / 36e5;
 
-        if (hours_diff > priority_duration) {
-            if (data[i].status != "Cycle End") {
-                due_documents.push(data[i].barcode);
-            } else {
-                now = new Date(data[i].updated_at);
-            }
-        }
+        //     if (hours_diff > priority_duration) {
+        //         if (data[i].status != "Cycle End") {
+        //             due_documents.push(data[i].barcode);
+        //         }
+        //     }
 
-        let date_diff = Math.abs(now - created_date) / 1000;
+        //     let date_diff = Math.abs(now - lapse_date) / 1000;
 
-        const days = Math.floor(date_diff / 86400);
-        date_diff -= days * 86400;
+        //     const days = Math.floor(date_diff / 86400);
+        //     date_diff -= days * 86400;
 
-        const hours = Math.floor(date_diff / 3600) % 24;
-        date_diff -= hours * 3600;
+        //     const hours = Math.floor(date_diff / 3600) % 24;
+        //     date_diff -= hours * 3600;
 
-        const minutes = Math.floor(date_diff / 60) % 60;
-        date_diff -= minutes * 60;
+        //     const minutes = Math.floor(date_diff / 60) % 60;
+        //     date_diff -= minutes * 60;
 
-        let remaining_time = "";
-        if (minutes) remaining_time = minutes + " min(s)";
-        if (hours) remaining_time = hours + " hr(s)<br>" + remaining_time;
-        if (days) remaining_time = days + " day(s)<br>" + remaining_time;
+        //     let remaining_time = "";
+        //     if (minutes) remaining_time = minutes + " min(s)";
+        //     if (hours) remaining_time = hours + " hr(s)<br>" + remaining_time;
+        //     if (days) remaining_time = days + " day(s)<br>" + remaining_time;
 
-        table_data += "<td name = 'duration'>" + remaining_time + "</td>";
+        //     table_data += "<td name = 'duration'>" + remaining_time + "</td>";
+        // } else {
+            table_data += "<td class='d-none' name='duration'>N/A</td>";
+        // }
+
 
         table_data += "<td >" + data[i].remarks + "</td>"
             + "<td>"
-            + "<div class='table-data-feature'></div>"
+            + "<div class='table-data-feature'>"
+
+        if (data[i].status != "Cycle End") {
+            if (data[i].created_by == $(".department").attr('id')) {
+                table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Print' onclick='editBarcodeSetting(" + JSON.stringify(data[i].barcode) + ")'>"
+                    + '<i class="zmdi zmdi-print"></i>'
+                    + " </button>"
+                    // + "<button class='item' data-toggle='tooltip' data-placement='top' title='Delete' onclick='deleteDocument(" + data[i].id + ")'>"
+                    // + "<i class='zmdi zmdi-delete'></i>"
+                    + " </button>";
+            }
+
+            if (data[i].location == $(".department").text() && data[i].status == "Received") {
+                table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
+                    + "<i class='zmdi zmdi-refresh-sync-off'></i>"
+                    + " </button>";
+            }
+        } else if ($('.department').attr('id') == data[i].updated_by) {
+            table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Recycle' onclick='recycleDocument(" + data[i].id + ")'>"
+                + "<i class='zmdi zmdi-refresh-sync-alert'></i>"
+                + " </button>";
+        }
+
+        table_data += "</div>"
             + " </td>"
             + " </tr>"
             + "<tr class='spacer'></tr>";
@@ -250,8 +280,86 @@ function populate_table(data) {
         // $(id + ' td').addClass("text-white");
     }
 
+
     $('#loader_container').hide();
 }
+
+// function populate_table(data) {
+//     let due_documents = [];
+//     let table_data = '';
+//     for (let i = 0; i < data.length; i++) {
+//         table_data += "<tr id='" + data[i].barcode + "' class='tr-shadow'>"
+//             + "<td> "
+//             + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + ")'> Track </button>";
+
+//         table_data += "</td>"
+//             + "<td>"
+//             + "<span class='btn btn-link'>" + data[i].barcode + "</span>"
+//             + "</td>"
+//             + "<td>" + data[i].document_no + "</td>"
+//             + "<td>" + data[i].name + "</td>"
+//             + "<td>" + data[i].description + "</td>"
+//             + "<td>" + data[i].type + "</td>";
+
+//         let priority_duration = 0;
+
+//         if (data[i].priority == "Regular") {
+//             priority_duration = 240;
+//             table_data += "<td><button id='priority_view' class='btn btn-primary mnw-116'>" + data[i].priority + "</button></td>";
+//         } else if (data[i].priority == "Urgent") {
+//             priority_duration = 120;
+//             table_data += "<td><button id='priority_view' class='btn btn-danger mnw-116'>" + data[i].priority + "</button></td>";
+//         }
+
+//         let now = new Date();
+//         const created_date = new Date(data[i].created_at);
+
+//         const hours_diff = Math.abs(now - created_date) / 36e5;
+
+//         if (hours_diff > priority_duration) {
+//             if (data[i].status != "Cycle End") {
+//                 due_documents.push(data[i].barcode);
+//             } else {
+//                 now = new Date(data[i].updated_at);
+//             }
+//         }
+
+//         let date_diff = Math.abs(now - created_date) / 1000;
+
+//         const days = Math.floor(date_diff / 86400);
+//         date_diff -= days * 86400;
+
+//         const hours = Math.floor(date_diff / 3600) % 24;
+//         date_diff -= hours * 3600;
+
+//         const minutes = Math.floor(date_diff / 60) % 60;
+//         date_diff -= minutes * 60;
+
+//         let remaining_time = "";
+//         if (minutes) remaining_time = minutes + " min(s)";
+//         if (hours) remaining_time = hours + " hr(s)<br>" + remaining_time;
+//         if (days) remaining_time = days + " day(s)<br>" + remaining_time;
+
+//         table_data += "<td name = 'duration'>" + remaining_time + "</td>";
+
+//         table_data += "<td >" + data[i].remarks + "</td>"
+//             + "<td>"
+//             + "<div class='table-data-feature'></div>"
+//             + " </td>"
+//             + " </tr>"
+//             + "<tr class='spacer'></tr>";
+//     }
+
+//     $('#table_data').html(table_data);
+
+//     for (let i = 0; i < due_documents.length; i++) {
+//         const id = "tr#" + due_documents[i];
+//         $(id).addClass("background-due");
+//         // $(id + ' td').addClass("text-white");
+//     }
+
+//     $('#loader_container').hide();
+// }
 
 function populate_pager(numItems) {
     let page = ($('.current:not(.prev)').html());
@@ -268,7 +376,8 @@ function populate_pager(numItems) {
         cssStyle: "light-theme",
         currentPage: page,
 
-        onPageClick: function (pageNumber) {
+        onPageClick: function (pageNumber, event) {
+            event.preventDefault();
             getDocuments((pageNumber - 1) * 5);
         }
     });
@@ -339,12 +448,13 @@ function populate_tracking(data, status) {
         else table_data += "<span class='block-email'>Pending</span>";
 
         table_data += "</div></td>"
-            + "<td>" + data[i].remarks + "</td>"
-            + " </tr>"
-            + "<tr class='spacer'></tr>";
+            + "<td>" + data[i].remarks + "</td>";
 
-        if (i == data.length - 1 && status == 'Cycle End') {
-            table_data += `<tr class="tr-shadow">
+        if (i == data.length - 1) {
+            if (status == 'Cycle End') {
+                table_data += `<td></td></tr>
+                            <tr class='spacer'></tr>
+                            <tr class="tr-shadow">
                                 <td style='color: red; font-weight: bold;'>CYCLE END</td>
                                 <td></td>
                                 <td></td>
@@ -352,7 +462,21 @@ function populate_tracking(data, status) {
                                 <td></td>
                                 <td></td>
                                 <td></td>
+                                <td></td>
                             </tr>`;
+            } else if (!data[i].recieve_by && status != "Origin" && data[i - 1].release_by == $('.name').attr("id")) {
+                table_data += `<td>
+                                <span onClick="cancelRelease(` + data[i].document_id + `,` + data[i].id + `,` + data[i - 1].id + `)">x</span>
+                            </td>
+                            </tr>
+                            <tr class='spacer'></tr>`;
+            } else {
+                table_data += `<td></td></tr>
+                            <tr class='spacer'></tr>`;
+            }
+        } else {
+            table_data += `<td></td></tr>
+                            <tr class='spacer'></tr>`;
         }
     }
 

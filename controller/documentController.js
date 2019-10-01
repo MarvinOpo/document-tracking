@@ -267,7 +267,7 @@ exports.update = async function (req, res) {
     }
 }
 
-exports.recieve = async function (req, res) {
+exports.receive = async function (req, res) {
     let result = {};
 
     try {

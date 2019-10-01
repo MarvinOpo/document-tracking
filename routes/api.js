@@ -40,10 +40,10 @@ router.post('/document/get_release_sendout', documentController.get_release_send
 // Get Types
 router.get('/document/get_types', documentController.get_types);
 
-// Get Recieve Report
+// Get Receive Report
 router.get('/document/get_pending_graph_data', documentController.get_pending_graph_data);
 
-// Get Recieve Report
+// Get Receive Report
 router.get('/document/get_recieve_graph_data', documentController.get_recieve_graph_data);
 
 // Get Release Report
@@ -58,8 +58,8 @@ router.get('/document/get_releasable_bcodes', documentController.get_releasable_
 // Update document
 router.post('/document/update', documentController.update);
 
-// Recieve document
-router.post('/document/recieve', documentController.recieve);
+// Receive document
+router.post('/document/receive', documentController.receive);
 
 // Cycle end document
 router.get('/document/end_cycle', documentController.end_cycle);
@@ -98,11 +98,14 @@ router.get('/logs/get_logs', logController.get_logs);
 // Get log history
 router.get('/logs/get_log_history', logController.get_log_history);
 
-// Update recieved log
+// Update received log
 router.post('/logs/update_recieve', logController.update_recieve);
 
 // Update released log
 router.post('/logs/update_release', logController.update_release);
+
+// Delete log
+router.get('/logs/delete', logController.delete);
 
 //------------------ USER -----------------//
 

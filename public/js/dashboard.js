@@ -3,6 +3,7 @@ let sendout_date_from, sendout_date_to;
 let should_print;
 let pending_count, recieve_count, release_count;
 let mgensearch_selectize;
+let pendingChart, receiveChart, sendoutChart, totalChart;
 
 (function ($) {
     toastr.options = {
@@ -29,23 +30,30 @@ let mgensearch_selectize;
     recent_date_from = moment(startdate.valueOf()).format('YYYY-MM-DD HH:mm:ss');
     recent_date_to = moment().format('YYYY-MM-DD HH:mm:ss');
 
-    sendout_date_from = recent_date_from;
+    sendout_date_from = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
     sendout_date_to = recent_date_to;
 
     let options = '';
-    for (let i = new Date().getFullYear() - 1; i > 2019; i--) {
+    for (let i = new Date().getFullYear() - 1; i > 2017; i--) {
         options += `<option value="` + i + `">` + i + `</option>`;
     }
 
     $('#year_filter').append(options);
-    $('#year_filter').selectize();
+    $('#year_filter').selectize({
+        onChange: function (value) {
+            $('#recent_doc_tbody').html('');
+            $('#sendout_doc_tbody').html('');
 
-    getRecentDocuments(0, 5);
-    getSendOutDocuments(0, 5);
+            pendingChart.destroy();
+            receiveChart.destroy();
+            sendoutChart.destroy();
+            totalChart.destroy();
 
-    getPendingGraphData();
-    getRecieveGraphData();
-    getReleaseGraphData();
+            loadData();
+        }
+    });
+
+    loadData();
 
     $('#load_more_btn').click(function () {
         getRecentDocuments($('#tblRecentDocs tr').length - 1, 5);
@@ -73,7 +81,7 @@ let mgensearch_selectize;
     });
 
     $('#sendout_daterange').daterangepicker({
-        startDate: startdate,
+        startDate: moment().startOf('day'),
         endDate: moment(),
         timePicker: true,
         locale: {
@@ -102,7 +110,7 @@ let mgensearch_selectize;
 
         $('#printable_title').html('Recent Documents');
         $('#printable_date').text(startdate + " - " + enddate);
-        $('#printed_by').html("Printed by: " + $('.name').attr('id'));
+        $('#printed_by').html("Printed by: " + $('.department').html());
         $('#printed_date').html("Printed date: " + moment().format('MM/DD/YY HH:mm a'));
     });
 
@@ -114,23 +122,30 @@ let mgensearch_selectize;
         $('.table-load-more-sendout').show();
         getSendOutDocuments(0, '');
 
-        const startdate = moment(sendout_date_from).format('MM/DD/YY');
-        const enddate = moment(sendout_date_to).format('MM/DD/YY');
+        // const startdate = moment(sendout_date_from).format('MM/DD/YY');
+        // const enddate = moment(sendout_date_to).format('MM/DD/YY');
 
         $('#printable_title').html('Send Out Report');
-        $('#printable_date').text(startdate + " - " + enddate);
+        $('#printable_date').hide();
         $('#printed_by').html("Printed by: " + $('.name').attr('id'));
-        $('#printed_date').html("Printed date: " + moment().format('MM/DD/YY HH:mm a'));
+        $('#printed_date').html('');
     });
 
-    const adm_access = 'ADMINISTRATIVE OFFICE, MEDICAL CHIEF CENTER';
-
-    if (!adm_access.includes($('.department').text())) {
+    if ($('.access-rights').attr('id') != '1') {
         $('#nav_all_docs').remove();
         $('#nav_all_docs_mobile').remove();
     }
 
 })(jQuery);
+
+function loadData() {
+    getRecentDocuments(0, 5);
+    getSendOutDocuments(0, 5);
+
+    getPendingGraphData();
+    getRecieveGraphData();
+    getReleaseGraphData();
+}
 
 function getRecentDocuments(offset, limit) {
     let year = $('#year_filter').val();
@@ -368,45 +383,29 @@ function populateRecentDocs(data) {
 
 function populateSendOutDocs(data) {
     let table_data = $('#sendout_doc_tbody').html();
-    let release_date = "";
-
-    let ctr = $('#tblSendOut tr').length - 1;
+    let ctr = 1;
 
     for (let i = 0; i < data.length; i++) {
-        if (data[i].release_date) {
-            release_date = (data[i].release_date).replace("T", " ");
-            release_date = release_date.replace(".000Z", "");
-        }
+        const date = moment(data[i].release_date).format('MM/DD/YYYY');
+        const time = moment(data[i].release_date).format('hh:mm a');
 
-        // if (i == 0) {
-        //     table_data += `<tr>
-        //                     <td class="p-l-10 p-t-20 p-b-5 text-left">` + data[i].release_to + `</td>
-        //                    </tr>`;
-        // }
-
-        if (table_data.includes(data[i].release_to)) {
-            table_data += `<tr>
-                            <td class="p-l-20 text-left">` + (ctr++) + ". " + data[i].barcode + `</td>
-                            <td>` + data[i].name + `</td>
-                            <td>` + data[i].type + `</td>
-                            <td>` + moment(data[i].release_date).format('MM/DD/YY HH:mm') + `</td>
-                            <td class="align-bottom">_________________________</td>
-                           </tr>`;
-        } else {
+        if (!table_data.includes(data[i].release_to)) {
             ctr = 1;
 
             table_data += `<tr>
-                            <td  class="p-l-10 p-t-20 p-b-5 text-left">` + data[i].release_to + `</td>
-                           </tr>
-                           
-                           <tr>
-                            <td class="p-l-20 text-left">` + (ctr++) + ". " + data[i].barcode + `</td>
+                            <td class="p-l-10 p-t-20 p-b-5 text-left"><b>` + data[i].release_to + `</b></td>
+                            <td class="p-t-20 p-b-5 text-left">` + date + `</td>
+                        </tr>`;
+        }
+
+        table_data += `<tr>
+                            <td class="p-l-20 text-left">` + (ctr++) + `. ` + data[i].barcode + `</td>
                             <td>` + data[i].name + `</td>
                             <td>` + data[i].type + `</td>
-                            <td>` + moment(data[i].release_date).format('MM/DD/YY HH:mm') + `</td>
-                            <td class="align-bottom">_________________________</td>
-                           </tr>`;
-        }
+                            <td>` + time + `</td>
+                            <td class="align-bottom">____________</td>
+                            <td class="align-bottom">____________</td>
+                        </tr>`;
     }
 
     $('#sendout_doc_tbody').html(table_data);
@@ -419,6 +418,8 @@ function populateSendOutDocs(data) {
         printJS({
             printable: 'printable_div',
             type: 'html',
+            marginLeft: 0,
+            marginRight: 0,
             honorColor: true,
             targetStyles: ['*']
         })
@@ -458,7 +459,7 @@ function populatePendingGraph() {
     let ctx = document.getElementById("pending_chart").getContext('2d');
     if (ctx) {
         ctx.height = 130;
-        let myChart = new Chart(ctx, {
+        pendingChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['January', 'February', 'March', 'April', 'May', 'June',
@@ -528,7 +529,7 @@ function populateRecieveGraph() {
     let ctx = document.getElementById('recieve_chart').getContext('2d');
     if (ctx) {
         ctx.height = 130;
-        let myChart = new Chart(ctx, {
+        receiveChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['January', 'February', 'March', 'April', 'May', 'June',
@@ -536,7 +537,7 @@ function populateRecieveGraph() {
                 type: 'line',
                 datasets: [{
                     data: recieve_count,
-                    label: 'Recieved',
+                    label: 'Received',
                     backgroundColor: 'rgba(255,255,255,.1)',
                     borderColor: 'rgba(255,255,255,.55)',
                 },]
@@ -598,7 +599,7 @@ function populateReleaseGraph(data) {
     let ctx = document.getElementById("release_chart").getContext('2d');
     if (ctx) {
         ctx.height = 130;
-        let myChart = new Chart(ctx, {
+        sendoutChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['January', 'February', 'March', 'April', 'May', 'June',
@@ -667,7 +668,7 @@ function populateTotalGraph(total) {
     let ctx = document.getElementById("total_chart").getContext('2d');
     if (ctx) {
         ctx.height = 115;
-        let myChart = new Chart(ctx, {
+        totalChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['January', 'February', 'March', 'April', 'May', 'June',

@@ -1,6 +1,7 @@
-let document_selectize, type_selectize, docno_selectize, general_selectize;
+let document_selectize, type_selectize, docno_selectize, general_selectize, year_selectize;
 let mtype_selectize, mpriority_selectize, mbcode_recieve_selectize;
-let mdept_selectize, mbcode_release_selectize;
+let mdept_selectize, mbcode_release_selectize, mbcode_position_selectize;
+let date_from;
 
 (function ($) {
     toastr.options = {
@@ -94,7 +95,8 @@ let mdept_selectize, mbcode_release_selectize;
             $('#release_error_container').html('');
         }
 
-        getPrintableSentout();
+        // getPrintableSentout();
+        updateDocReleaseLog();
     });
 
     $('#modal_add_recieve').mousedown(function () {
@@ -116,8 +118,43 @@ let mdept_selectize, mbcode_release_selectize;
         updateDocRecieveLog($('#modal_recieve_barcode').val());
     });
 
+    $('#modal_document').on('shown.bs.modal', function () {
+        year_selectize.setValue('');
+    });
+
+    $('#modal_release').on('shown.bs.modal', function () {
+        mdept_selectize.removeOption($('.department').text());
+        $('.modal-title').text('Release Document To');
+    });
+
     $('#modal_recieve').on('shown.bs.modal', function () {
         $('#modal_recieve_barcode-selectized').focus();
+    });
+
+    $('#modal_print_sendout').on('shown.bs.modal', function () {
+        $('#modal_printed_by').html("Printed by: " + $('.department').text());
+        $('#printout_header').show();
+        $('#modal_sendout_header').show();
+        $('#modal_sendout_tbody').html('');
+        $('#modal_no_sendout_container').removeClass('d-none');
+        date_from = moment().format('YYYY-MM-DD HH:mm:ss');
+
+        // getSendOutDocuments();
+
+    });
+
+    $('input[type=checkbox]').change(function () {
+        if (this.checked) {
+            $('#printout_header').show();
+            $('#modal_sendout_header').show();
+        } else {
+            $('#printout_header').hide();
+            $('#modal_sendout_header').hide();
+        }
+    });
+
+    $('#modal_sendout_add').click(function () {
+        $('#modal_release').modal('show');
     });
 
     $('#modal_recieve').on('hidden.bs.modal', function () {
@@ -178,24 +215,48 @@ let mdept_selectize, mbcode_release_selectize;
         $('#modal_release_doc_info').hide();
     });
 
-    const adm_access = 'ADMINISTRATIVE OFFICE, MEDICAL CHIEF CENTER';
+    // $("#modalTblSendOut").on("click", "tr", function () {
+    //     for (let i = $(this).attr('class'); i >= 0; i--) {
+    //         $('tr.' + i).remove();
+    //     }
 
-    if (!adm_access.includes($('.department').text())) {
+    //     $('#printout_header').hide();
+    //     $('#modal_sendout_header').hide();
+    // });
+
+    $('#modal_preview').click(function () {
+        print_sendout();
+    });
+
+    $('#modal_preview_bcode').click(function () {
+        printBarcode();
+    });
+
+    $('#modal_bcode_margin').change(function () {
+        mbcode_position_selectize.trigger('change');
+    });
+
+    if ($('.access-rights').attr('id') != '1') {
         $('#nav_all_docs').remove();
         $('#nav_all_docs_mobile').remove();
     }
 })(jQuery);
 
 function selectizeFilter(filter) {
-    let $documents, $type, $docno, $general;
+    let $year, $documents, $type, $docno, $general;
 
     let options = '';
-    for (let i = new Date().getFullYear() - 1; i > 2019; i--) {
+    for (let i = new Date().getFullYear() - 1; i > 2017; i--) {
         options += `<option value="` + i + `">` + i + `</option>`;
     }
 
     $('#year_filter').append(options);
-    $('#year_filter').selectize();
+    $year = $('#year_filter').selectize({
+        onChange: function (value) {
+            refreshSelectize();
+            refreshModalSelectize();
+        }
+    });
 
     $documents = $('#document_filter').selectize({
         valueField: 'barcode',
@@ -244,6 +305,7 @@ function selectizeFilter(filter) {
         }
     });
 
+    year_selectize = $year[0].selectize;
     document_selectize = $documents[0].selectize;
     type_selectize = $type[0].selectize;
     docno_selectize = $docno[0].selectize;
@@ -253,7 +315,7 @@ function selectizeFilter(filter) {
 }
 
 function selectizeModal() {
-    let $mtype, $mpriority, $mdept, $mbcodeRecieve, $mbcodeRelease;
+    let $mtype, $mpriority, $mdept, $mbcodeRecieve, $mbcodeRelease, $mbcodePos;
 
     $mtype = $('#modal_type').selectize({
         onChange: function (value) {
@@ -342,11 +404,47 @@ function selectizeModal() {
         }
     });
 
+    $mbcodePos = $('#modal_bcode_pos').selectize({
+        create: false,
+        onChange: function (value) {
+            let margin = $('#modal_bcode_margin').val();
+            if (!margin) margin = 0;
+
+            switch ($('#modal_bcode_pos').val()) {
+                case 'top':
+                    $('.barcode').css({ 'position': 'absolute', 'top': margin, 'bottom': '' });
+                    break;
+                case 'bottom':
+                    $('.barcode').css({ 'position': 'absolute', 'top': '', 'bottom': margin });
+                    break;
+            }
+
+        }
+    });
+
+    $('#modal_bcode_align').selectize({
+        create: false,
+        onChange: function (value) {
+            switch (value) {
+                case 'left':
+                    $('.barcode').css({ 'position': 'absolute', 'left': '0', 'right': '', 'width': '' });
+                    break;
+                case 'right':
+                    $('.barcode').css({ 'position': 'absolute', 'left': '', 'right': '0', 'width': '' });
+                    break;
+                case 'center':
+                    $('.barcode').css({ 'position': 'absolute', 'left': '', 'right': '', 'width': '100%' });
+                    break;
+            }
+        }
+    });
+
     mtype_selectize = $mtype[0].selectize;
     mpriority_selectize = $mpriority[0].selectize;
     mdept_selectize = $mdept[0].selectize;
     mbcode_recieve_selectize = $mbcodeRecieve[0].selectize;
     mbcode_release_selectize = $mbcodeRelease[0].selectize;
+    mbcode_position_selectize = $mbcodePos[0].selectize;
 
     refreshModalSelectize();
     document_selectize.trigger('change');
@@ -432,6 +530,8 @@ function insertDocument(body) {
 }
 
 function trackDocument(id, status) {
+    $('.modal-title').html('Document Tracking');
+
     let year = $('#year_filter').val();
 
     if (!year) year = (new Date()).getFullYear();
@@ -567,8 +667,36 @@ function getPrintableSentout() {
     })
         .then(res => res.json())
         .then(data => {
-            populate_sendout(data);
+            // populate_sendout(data);
             updateDocReleaseLog();
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
+function getSendOutDocuments() {
+    const year = (new Date()).getFullYear();
+    const date_to = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
+
+    const param = '?year=' + year + '&department=' + $('.department').text() +
+        "&limit=0&date_from=" + date_from + "&date_to=" + date_to;
+
+    fetch('/API/document/get_sendout' + param, { method: 'GET' })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.length) {
+                $('#modalTblContainer').addClass('d-none');
+                $('#modal_no_sendout_container').removeClass('d-none');
+                return;
+            } else {
+                $('#modalTblContainer').removeClass('d-none');
+                $('#modal_no_sendout_container').addClass('d-none');
+            }
+
+            if (data.length) {
+                populateModalSendout(data);
+            }
         })
         .catch(err => {
             console.log(err);
@@ -632,7 +760,6 @@ function updateDocument(body) {
     })
         .then(res => res.json())
         .then(data => {
-            console.log(data);
             if (data.status == "success") {
                 toastr.success("Successfully saved.");
                 $('#modal_document').modal('hide');
@@ -656,7 +783,7 @@ function recieveDocument(barcodes) {
         barcodes: barcodes
     };
 
-    fetch('/API/document/recieve', {
+    fetch('/API/document/receive', {
         method: 'POST',
         body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' }
@@ -664,7 +791,7 @@ function recieveDocument(barcodes) {
         .then(res => res.json())
         .then(data => {
             if (data.status == 'success') {
-                toastr.success("Documents recieved.");
+                toastr.success("Documents received.");
                 $('#modal_recieve').modal('hide');
                 document_selectize.trigger("change");
             }
@@ -674,6 +801,48 @@ function recieveDocument(barcodes) {
         });
 }
 
+function cancelRelease(document_id, did, uid) {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&document_id=' + document_id +
+        '&department=' + $('.department').text() + '&did=' + did + "&uid=" + uid;
+
+    toastr.options.timeOut = 0;
+    toastr.options.extendedTimeOut = 0;
+    toastr.options.positionClass = "toast-top-center";
+    toastr.warning('<div class="text-center"><label>Are you sure you want to cancel release?</label>'
+        + '<button type="button" id="okBtn" class="btn btn-danger" value="yes">Yes</button>'
+        + '<button type="button" id="surpriseBtn" class="btn btn-secondary" style="margin: 0 8px 0 8px" value="no">No</button></div>',
+        "",
+        {
+            allowHtml: true,
+            onclick: function (toast) {
+                toastr.options.timeOut = 2000;
+                toastr.options.extendedTimeOut = 1000;
+                toastr.options.positionClass = "toast-bottom-right";
+                value = toast.target.value
+                if (value == 'yes') {
+                    fetch('/API/logs/delete' + param, { method: 'GET' })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status == 'success') {
+                                toastr.success("Release cancelled.");
+                                $('#modal_track').modal('hide');
+                                document_selectize.trigger("change");
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+                }
+
+                toastr.remove();
+            }
+
+        });
+}
 function endDocument(id) {
     let year = $('#year_filter').val();
 
@@ -723,7 +892,7 @@ function recycleDocument(id) {
     if (!year) year = (new Date()).getFullYear();
 
     const param = '?year=' + year + "&id=" + id + "&user_id=" + $('.department').attr('id')
-        + "&status=Recieved";
+        + "&status=Received";
 
     toastr.options.timeOut = 0;
     toastr.options.extendedTimeOut = 0;
@@ -827,8 +996,11 @@ function updateDocLocation(body) {
                 toastr.success("Documents released.");
                 $('#modal_release').modal('hide');
                 document_selectize.trigger("change");
+                // print_sendout();
 
-                print_sendout();
+                // if (!date_from) date_from = moment().format('YYYY-MM-DD HH:mm:ss');
+
+                getSendOutDocuments();
             }
         })
         .catch(err => {
@@ -886,9 +1058,9 @@ function openRecieveModal(barcode) {
 }
 
 function openReleaseModal(barcode) {
-    $('#modal_release').modal('show');
+    $('#modal_print_sendout').modal('show');
 
-    mbcode_release_selectize.setValue(barcode);
+    // mbcode_release_selectize.setValue(barcode);
 }
 
 function insertLogs(body) {
@@ -958,12 +1130,12 @@ function populate_table(data) {
             + "<td> "
             + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + " )'> Track </button>";
 
-        if ((!data[i].location || data[i].location == $(".department").text()) && data[i].status != "Cycle End") {
-            if (data[i].status == 'Recieved' || !data[i].location)
-                table_data += "<button class='btn btn-outline-success m-l-5' onclick='openReleaseModal(" + JSON.stringify(data[i].barcode) + ")'> Release </button>";
-            else if (data[i].status == 'Pending' && data[i].location)
-                table_data += "<button class='btn btn-outline-success m-l-5' onclick='openRecieveModal(" + JSON.stringify(data[i].barcode) + ")'> Recieve </button>";
-        }
+        // if ((!data[i].location || data[i].location == $(".department").text()) && data[i].status != "Cycle End") {
+        //     if (data[i].status == 'Received' || !data[i].location)
+        //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openReleaseModal(" + JSON.stringify(data[i].barcode) + ")'> Release </button>";
+        //     else if (data[i].status == 'Pending' && data[i].location)
+        //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openRecieveModal(" + JSON.stringify(data[i].barcode) + ")'> Receive </button>";
+        // }
 
         table_data += "</td>"
             + "<td>"
@@ -977,43 +1149,46 @@ function populate_table(data) {
         let priority_duration = 0;
 
         if (data[i].priority == "Regular") {
-            priority_duration = 10;
+            priority_duration = 48;
             table_data += "<td><button id='priority_view' class='btn btn-primary mnw-116'>" + data[i].priority + "</button></td>";
         } else if (data[i].priority == "Urgent") {
-            priority_duration = 5;
+            priority_duration = 2;
             table_data += "<td><button id='priority_view' class='btn btn-danger mnw-116'>" + data[i].priority + "</button></td>";
         }
 
-        let now = new Date();
-        const created_date = new Date(data[i].created_at);
+        if (data[i].location == $(".department").text() && data[i].status == "Received") {
+            let now = new Date();
+            const lapse_date = new Date(data[i].lapse_at);
 
-        const hours_diff = Math.abs(now - created_date) / 36e5;
+            const hours_diff = Math.abs(now - lapse_date) / 36e5;
 
-        if (hours_diff > priority_duration && data[i].location == $(".department").text()) {
-            if (data[i].status != "Cycle End") {
-                due_documents.push(data[i].barcode);
-            } else {
-                now = new Date(data[i].updated_at);
+            if (hours_diff > priority_duration) {
+                if (data[i].status != "Cycle End") {
+                    due_documents.push(data[i].barcode);
+                }
             }
+
+            let date_diff = Math.abs(now - lapse_date) / 1000;
+
+            const days = Math.floor(date_diff / 86400);
+            date_diff -= days * 86400;
+
+            const hours = Math.floor(date_diff / 3600) % 24;
+            date_diff -= hours * 3600;
+
+            const minutes = Math.floor(date_diff / 60) % 60;
+            date_diff -= minutes * 60;
+
+            let remaining_time = "";
+            if (minutes) remaining_time = minutes + " min(s)";
+            if (hours) remaining_time = hours + " hr(s)<br>" + remaining_time;
+            if (days) remaining_time = days + " day(s)<br>" + remaining_time;
+
+            table_data += "<td name = 'duration'>" + remaining_time + "</td>";
+        } else {
+            table_data += "<td name = 'duration'>N/A</td>";
         }
 
-        let date_diff = Math.abs(now - created_date) / 1000;
-
-        const days = Math.floor(date_diff / 86400);
-        date_diff -= days * 86400;
-
-        const hours = Math.floor(date_diff / 3600) % 24;
-        date_diff -= hours * 3600;
-
-        const minutes = Math.floor(date_diff / 60) % 60;
-        date_diff -= minutes * 60;
-
-        let remaining_time = "";
-        if (minutes) remaining_time = minutes + " min(s)";
-        if (hours) remaining_time = hours + " hr(s)<br>" + remaining_time;
-        if (days) remaining_time = days + " day(s)<br>" + remaining_time;
-
-        table_data += "<td name = 'duration'>" + remaining_time + "</td>";
 
         table_data += "<td >" + data[i].remarks + "</td>"
             + "<td>"
@@ -1021,7 +1196,7 @@ function populate_table(data) {
 
         if (data[i].status != "Cycle End") {
             if (data[i].created_by == $(".department").attr('id')) {
-                table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Print' onclick='printBarcode(" + JSON.stringify(data[i].barcode) + ")'>"
+                table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Print' onclick='editBarcodeSetting(" + JSON.stringify(data[i].barcode) + ")'>"
                     + '<i class="zmdi zmdi-print"></i>'
                     + " </button>"
                     // + "<button class='item' data-toggle='tooltip' data-placement='top' title='Delete' onclick='deleteDocument(" + data[i].id + ")'>"
@@ -1029,7 +1204,7 @@ function populate_table(data) {
                     + " </button>";
             }
 
-            if (data[i].location == $(".department").text() && data[i].status == "Recieved") {
+            if (data[i].location == $(".department").text() && data[i].status == "Received") {
                 table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
                     + "<i class='zmdi zmdi-refresh-sync-off'></i>"
                     + " </button>";
@@ -1058,6 +1233,114 @@ function populate_table(data) {
     $('#loader_container').hide();
 }
 
+// function populate_table(data) {
+//     let due_documents = [];
+//     let table_data = '';
+//     for (let i = 0; i < data.length; i++) {
+//         table_data += "<tr id='" + data[i].barcode + "' class='tr-shadow'>"
+//             + "<td> "
+//             + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + " )'> Track </button>";
+
+//         // if ((!data[i].location || data[i].location == $(".department").text()) && data[i].status != "Cycle End") {
+//         //     if (data[i].status == 'Received' || !data[i].location)
+//         //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openReleaseModal(" + JSON.stringify(data[i].barcode) + ")'> Release </button>";
+//         //     else if (data[i].status == 'Pending' && data[i].location)
+//         //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openRecieveModal(" + JSON.stringify(data[i].barcode) + ")'> Receive </button>";
+//         // }
+
+//         table_data += "</td>"
+//             + "<td>"
+//             + "<span class='btn btn-link' onclick='editDocument(" + JSON.stringify(data[i]) + ")'>" + data[i].barcode + "</span>"
+//             + "</td>"
+//             + "<td>" + data[i].document_no + "</td>"
+//             + "<td>" + data[i].name + "</td>"
+//             + "<td>" + data[i].description + "</td>"
+//             + "<td>" + data[i].type + "</td>";
+
+//         let priority_duration = 0;
+
+//         if (data[i].priority == "Regular") {
+//             priority_duration = 240;
+//             table_data += "<td><button id='priority_view' class='btn btn-primary mnw-116'>" + data[i].priority + "</button></td>";
+//         } else if (data[i].priority == "Urgent") {
+//             priority_duration = 120;
+//             table_data += "<td><button id='priority_view' class='btn btn-danger mnw-116'>" + data[i].priority + "</button></td>";
+//         }
+
+//         let now = new Date();
+//         const created_date = new Date(data[i].created_at);
+
+//         const hours_diff = Math.abs(now - created_date) / 36e5;
+
+//         if (hours_diff > priority_duration && data[i].location == $(".department").text()) {
+//             if (data[i].status != "Cycle End") {
+//                 due_documents.push(data[i].barcode);
+//             } else {
+//                 now = new Date(data[i].updated_at);
+//             }
+//         }
+
+//         let date_diff = Math.abs(now - created_date) / 1000;
+
+//         const days = Math.floor(date_diff / 86400);
+//         date_diff -= days * 86400;
+
+//         const hours = Math.floor(date_diff / 3600) % 24;
+//         date_diff -= hours * 3600;
+
+//         const minutes = Math.floor(date_diff / 60) % 60;
+//         date_diff -= minutes * 60;
+
+//         let remaining_time = "";
+//         if (minutes) remaining_time = minutes + " min(s)";
+//         if (hours) remaining_time = hours + " hr(s)<br>" + remaining_time;
+//         if (days) remaining_time = days + " day(s)<br>" + remaining_time;
+
+//         table_data += "<td name = 'duration'>" + remaining_time + "</td>";
+
+//         table_data += "<td >" + data[i].remarks + "</td>"
+//             + "<td>"
+//             + "<div class='table-data-feature'>"
+
+//         if (data[i].status != "Cycle End") {
+//             if (data[i].created_by == $(".department").attr('id')) {
+//                 table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Print' onclick='editBarcodeSetting(" + JSON.stringify(data[i].barcode) + ")'>"
+//                     + '<i class="zmdi zmdi-print"></i>'
+//                     + " </button>"
+//                     // + "<button class='item' data-toggle='tooltip' data-placement='top' title='Delete' onclick='deleteDocument(" + data[i].id + ")'>"
+//                     // + "<i class='zmdi zmdi-delete'></i>"
+//                     + " </button>";
+//             }
+
+//             if (data[i].location == $(".department").text() && data[i].status == "Received") {
+//                 table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
+//                     + "<i class='zmdi zmdi-refresh-sync-off'></i>"
+//                     + " </button>";
+//             }
+//         } else if ($('.department').attr('id') == data[i].updated_by) {
+//             table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Recycle' onclick='recycleDocument(" + data[i].id + ")'>"
+//                 + "<i class='zmdi zmdi-refresh-sync-alert'></i>"
+//                 + " </button>";
+//         }
+
+//         table_data += "</div>"
+//             + " </td>"
+//             + " </tr>"
+//             + "<tr class='spacer'></tr>";
+//     }
+
+//     $('#table_data').html(table_data);
+
+//     for (let i = 0; i < due_documents.length; i++) {
+//         const id = "tr#" + due_documents[i];
+//         $(id).addClass("background-due");
+//         // $(id + ' td').addClass("text-white");
+//     }
+
+
+//     $('#loader_container').hide();
+// }
+
 function populate_pager(numItems) {
     let page = ($('.current:not(.prev)').html());
 
@@ -1073,7 +1356,8 @@ function populate_pager(numItems) {
         cssStyle: "light-theme",
         currentPage: page,
 
-        onPageClick: function (pageNumber) {
+        onPageClick: function (pageNumber, event) {
+            event.preventDefault();
             getDocuments((pageNumber - 1) * 5);
         }
     });
@@ -1144,12 +1428,13 @@ function populate_tracking(data, status) {
         else table_data += "<span class='block-email'>Pending</span>";
 
         table_data += "</div></td>"
-            + "<td>" + data[i].remarks + "</td>"
-            + " </tr>"
-            + "<tr class='spacer'></tr>";
+            + "<td>" + data[i].remarks + "</td>";
 
-        if(i == data.length - 1 && status == 'Cycle End'){
-            table_data += `<tr class="tr-shadow">
+        if (i == data.length - 1) {
+            if (status == 'Cycle End') {
+                table_data += `<td></td></tr>
+                            <tr class='spacer'></tr>
+                            <tr class="tr-shadow">
                                 <td style='color: red; font-weight: bold;'>CYCLE END</td>
                                 <td></td>
                                 <td></td>
@@ -1157,7 +1442,21 @@ function populate_tracking(data, status) {
                                 <td></td>
                                 <td></td>
                                 <td></td>
+                                <td></td>
                             </tr>`;
+            } else if (!data[i].recieve_by && status != "Origin" && data[i - 1].release_by == $('.name').attr("id")) {
+                table_data += `<td>
+                                <span onClick="cancelRelease(` + data[i].document_id + `,` + data[i].id + `,` + data[i - 1].id + `)">x</span>
+                            </td>
+                            </tr>
+                            <tr class='spacer'></tr>`;
+            } else {
+                table_data += `<td></td></tr>
+                            <tr class='spacer'></tr>`;
+            }
+        } else {
+            table_data += `<td></td></tr>
+                            <tr class='spacer'></tr>`;
         }
     }
 
@@ -1167,18 +1466,18 @@ function populate_tracking(data, status) {
 
 function populate_sendout(data) {
 
-    const date = moment().format('MM/DD/YY hh:mm a');
-
     let table_data = `  <tr>
                             <td class="p-l-10 p-t-20 p-b-5 text-left">` + $('#modal_dept').val() + `</td>
-                            <td class="p-t-20 p-b-5 text-left">` + date + `</td>
                         </tr>`;
 
     for (let i = 0; i < data.length; i++) {
+        const release_date = moment(data[i].release_date).format('MM/DD/YY hh:mm a');
+
         table_data += `<tr>
                             <td class="p-l-20 text-left">` + (i + 1) + `. ` + data[i].barcode + `</td>
                             <td>` + data[i].name + `</td>
                             <td>` + data[i].type + `</td>
+                            <td>` + release_date + `</td>
                             <td class="align-bottom">____________</td>
                             <td class="align-bottom">____________</td>
                         </tr>`;
@@ -1187,9 +1486,73 @@ function populate_sendout(data) {
     $('#sendout_doc_tbody').html(table_data);
 }
 
+function populateModalSendout(data) {
+    data = data.reverse();
+
+    let table_data = "";
+    let ctr = 1;
+
+    for (let i = 0; i < data.length; i++) {
+        const date = moment(data[i].release_date).format('MM/DD/YYYY');
+        const time = moment(data[i].release_date).format('hh:mm a');
+
+        if (!table_data.includes(data[i].release_to)) {
+            ctr = 1;
+
+            table_data += `<tr>
+                            <td class="p-l-10 p-t-20 p-b-5 text-left"><b>` + data[i].release_to + `</b></td>
+                            <td class="p-t-20 p-b-5 text-left">` + date + `</td>
+                        </tr>`;
+        }
+
+        table_data += `<tr>
+                            <td class="p-l-20 text-left">` + (ctr++) + `. ` + data[i].barcode + `</td>
+                            <td>` + data[i].name + `</td>
+                            <td>` + data[i].type + `</td>
+                            <td>` + time + `</td>
+                            <td class="align-bottom">____________</td>
+                            <td class="align-bottom">____________</td>
+                        </tr>`;
+    }
+
+    $('#modal_sendout_tbody').html(table_data);
+}
+
+// function populateModalSendout(data) {
+//     data = data.reverse();
+
+//     let table_data = "";
+//     let ctr = 1, groupClass = 0;
+
+//     for (let i = 0; i < data.length; i++) {
+//         const date = moment(data[i].release_date).format('MM/DD/YY hh:mm a');
+
+//         if (!table_data.includes(data[i].release_to)) {
+//             groupClass += 1;
+//             ctr = 1;
+
+//             table_data += `  <tr class='` + groupClass + `'>
+//                             <td class="p-l-10 p-t-20 p-b-5 text-left"><b>` + data[i].release_to + `</b></td>
+//                             <td class="p-t-20 p-b-5 text-left"><b>` + date + `</b></td>
+//                         </tr>`;
+//         }
+
+//         table_data += `<tr class='` + groupClass + `'>
+//                             <td class="p-l-20 text-left">` + (ctr++) + `. ` + data[i].barcode + `</td>
+//                             <td>` + data[i].name + `</td>
+//                             <td>` + data[i].type + `</td>
+//                             <td class="align-bottom">____________</td>
+//                             <td class="align-bottom">____________</td>
+//                         </tr>`;
+//     }
+
+//     $('#modal_sendout_tbody').html(table_data);
+// }
+
 function print_sendout() {
+    $('#printed_by').html("Printed By: " + $('.department').text());
     printJS({
-        printable: 'printable_div',
+        printable: 'modal_printable',
         type: 'html',
         honorColor: true,
         targetStyles: ['*']
@@ -1215,16 +1578,29 @@ function getTwoDigitFormat(num) {
     return num;
 }
 
-function printBarcode(code) {
-    JsBarcode("#barcode", code, {
-        format: "CODE128",
+function editBarcodeSetting(code) {
+    JsBarcode(".barcode", code, {
+        format: "CODE128A",
         lineColor: "#000",
-        width: 2,
-        height: 30,
+        width: 1,
+        height: 50,
         marginBottom: 10,
-        displayValue: true
+        marginTop: 15,
+        displayValue: true,
+        textPosition: "top",
+        fontSize: 15
     });
 
+    const $barcode = $('#barcode_container').html();
+
+    $('#modal_bcode_container').html($barcode);
+
+    $('.barcode').css({ 'position': 'absolute', 'top': '0', 'right': '0' });
+
+    $('#modal_print_bcode').modal('show');
+}
+
+function printBarcode() {
     const $barcode = $('#barcode_container').html();
 
     const Pagelink = "about:blank";
@@ -1263,7 +1639,7 @@ function printBarcode(code) {
 
         + "</head>"
         + "<body onload='step1()'>"
-        + "<div class='footer'>" + $barcode + "</div>"
+        + "<div>" + $barcode + "</div>"
         + "</body>"
         + "</html>"
     );

@@ -91,7 +91,7 @@
                                                 <span>Pending</span>
                                             </div>
                                         </div>
-                                        <div class="pending_total align-bottom">
+                                        <div class="pending_chart align-bottom">
                                             <canvas id="pending_chart" class="align-bottom"></canvas>
                                         </div>
                                     </div>
@@ -108,7 +108,7 @@
                                             </div>
                                             <div class="text">
                                                 <h2 id="recieve_total">0</h2>
-                                                <span>Recieved</span>
+                                                <span>Received</span>
                                             </div>
                                         </div>
                                         <div class="recieve_overview_chart">
@@ -179,7 +179,7 @@
                                         <thead>
                                             <tr>
                                                 <th>Barcode</th>
-                                                <th>Recieve By</th>
+                                                <th>Receive By</th>
                                                 <th>IN</th>
                                                 <th>OUT</th>
                                                 <th>Release To</th>
@@ -226,7 +226,7 @@
                                                 <th class="mnw-120">Name</th>
                                                 <th>Type</th>
                                                 <th class="mnw-100">Date</th>
-                                                <th>Recieve By</th>
+                                                <th>Receive By</th>
                                             </tr>
                                         </thead>
 
@@ -267,11 +267,12 @@
                                                         <th>Barcode</th>
                                                         <th>Name</th>
                                                         <th>Type</th>
-                                                        <th>OUT</th>
-                                                        <th>Recieve By</th>
+                                                        <th>Out</th>
+                                                        <th>Receive By</th>
+                                                        <th>Date/Time</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody id="sendout_doc_tbody" class="text-size-12">
+                                                <tbody id="sendout_doc_tbody" class="text-size-14">
 
                                                 </tbody>
                                             </table>
@@ -297,7 +298,7 @@
                                     <hr>
                                     <h4 id="printable_title">Recent Documents</h4>
                                     <span id="printable_date">08/01/2019 - 08/01/2019</span>
-                                    <br><br>
+                                    <br>
                                     <div class="w-100 text-left">
                                         <h6 id="printed_by">Printed By:</h6>
                                         <h6 id="printed_date">Printed Date:</h6>
@@ -471,7 +472,7 @@
                             <thead>
                                 <tr>
                                     <th>Released To</th>
-                                    <th>Recieved By</th>
+                                    <th>Received By</th>
                                     <th>IN</th>
                                     <th>Released By</th>
                                     <th>OUT</th>
@@ -495,7 +496,7 @@
             <!-- Modal content-->
             <div class="modal-content" style="width: 700px;">
                 <div class="modal-header">
-                    <h4 class="modal-title">Recieve Document</h4>
+                    <h4 class="modal-title">Receive Document</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -525,7 +526,7 @@
                     <div class="modal-footer" style="justify-content: center;">
                         <button id="modal_add_recieve" type="button"
                             class="au-btn au-btn-icon au-btn--green au-btn--small"
-                            style="width: 82.88px">Recieve</button>
+                            style="width: 82.88px">Receive</button>
                         <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
                             data-dismiss="modal">Close</button>
                     </div>

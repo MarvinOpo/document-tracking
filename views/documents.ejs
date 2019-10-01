@@ -108,13 +108,23 @@
                                             <li class="border-bottom border-success text-center">
                                                 <label class="w-100 m-t-10" data-toggle="modal"
                                                     data-target="#modal_recieve">
-                                                    Recieve Docs </label>
+                                                    Receive Docs </label>
                                             </li>
-                                            <li class="text-center">
+                                            <!-- <li class="border-bottom border-success text-center">
                                                 <label class="w-100 m-t-10" data-toggle="modal"
                                                     data-target="#modal_release">
                                                     Release Docs </label>
+                                            </li> -->
+                                            <li class="border-bottom border-success text-center">
+                                                <label class="w-100 m-t-10" data-toggle="modal"
+                                                    data-target="#modal_print_sendout">
+                                                    Release Docs </label>
                                             </li>
+                                            <!-- <li class="text-center">
+                                                <label class="w-100 m-t-10" data-toggle="modal"
+                                                    data-target="#modal_print_sendout">
+                                                    Print Sendout </label>
+                                            </li> -->
                                         </ul>
 
                                         <button class="au-btn au-btn-icon au-btn--green au-btn--small"
@@ -170,7 +180,7 @@
                                 </div>
 
                                 <div id="document_container" class="table-responsive table-responsive-data2 m-b-35">
-                                    <div class="mnh-500">
+                                    <div>
                                         <table class="table table-data2">
                                             <thead>
                                                 <tr>
@@ -181,7 +191,7 @@
                                                     <th>Description</th>
                                                     <th>Type</th>
                                                     <th>Urgency</th>
-                                                    <th>Duration</th>
+                                                    <th>Lapse Time</th>
                                                     <th>Remarks</th>
                                                     <th></th>
                                                 </tr>
@@ -227,7 +237,7 @@
                                                         <th>Barcode</th>
                                                         <th>Name</th>
                                                         <th>Type</th>
-                                                        <th>Recieve By</th>
+                                                        <th>Receive By</th>
                                                         <th>Date/Time</th>
                                                     </tr>
                                                 </thead>
@@ -242,7 +252,7 @@
                                 <!-- END DATA TABLE -->
                                 <!-- Printed Barcode Container -->
                                 <div id="barcode_container" class="d-none">
-                                    <svg id="barcode" style="float: bottom;"></svg>
+                                    <svg class="barcode"></svg>
                                     <!-- <img id="barcode" style="float: bottom;" /> -->
                                 </div>
                             </div>
@@ -286,6 +296,9 @@
                                     <option value="Applicants">Applicants</option>
                                     <option value="Application for Leave">Application for Leave</option>
                                     <option value="Appointment">Appointment</option>
+                                    <option value="Bac Abstract">Bac Abstract</option>
+                                    <option value="Bac Resolution">Bac Resolution</option>
+                                    <option value="Bac Twg Report">Bac Twg Report</option>
                                     <option value="Bill Number">Bill Number</option>
                                     <option value="Canvass">Canvass</option>
                                     <option value="Cheque">Cheque</option>
@@ -303,9 +316,11 @@
                                     <option value="Hospital Order">Hospital Order</option>
                                     <option value="House Keeping">House Keeping</option>
                                     <option value="Internal Medicine Department">Internal Medicine Department</option>
+                                    <option value="Job Order">Job Order</option>
                                     <option value="Liquidation Report">Liquidation Report</option>
                                     <option value="NOA">NOA</option>
                                     <option value="Notices">Notices</option>
+                                    <option value="Notice to Proceed">Notice to Proceed</option>
                                     <option value="Oncology Dept.">Oncology Dept.</option>
                                     <option value="Other Reports">Other Reports</option>
                                     <option value="Pass Slip">Pass Slip</option>
@@ -322,6 +337,7 @@
                                     <option value="SLCI">SLCI</option>
                                     <option value="Social Worker">Social Worker</option>
                                     <option value="Sub-allotment">Sub-allotment</option>
+                                    <option value="Travel Authority Oath">Travel Authority Oath</option>
                                 </select>
                             </div>
                         </div>
@@ -434,12 +450,13 @@
                             <thead>
                                 <tr>
                                     <th>Released To</th>
-                                    <th>Recieved By</th>
+                                    <th>Received By</th>
                                     <th>IN</th>
                                     <th>Released By</th>
                                     <th>OUT</th>
                                     <th>Duration</th>
                                     <th>Remarks</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody id="track_data">
@@ -458,7 +475,7 @@
             <!-- Modal content-->
             <div class="modal-content" style="width: 700px;">
                 <div class="modal-header">
-                    <h4 class="modal-title">Recieve Document</h4>
+                    <h4 class="modal-title">Receive Document</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -482,13 +499,129 @@
                             class="au-input au-input--full m-b-10 text-capitalize"></textarea>
                     </div>
                     <!-- <label>Remarks </label>
-                    <textarea id="modal_remarks_recieve" class="au-input au-input--full m-b-10 text-capitalize"
-                        placeholder="Write something here..."></textarea> -->
+                        <textarea id="modal_remarks_recieve" class="au-input au-input--full m-b-10 text-capitalize"
+                            placeholder="Write something here..."></textarea> -->
 
                     <div class="modal-footer" style="justify-content: center;">
                         <button id="modal_add_recieve" type="button"
                             class="au-btn au-btn-icon au-btn--green au-btn--small"
-                            style="width: 82.88px">Recieve</button>
+                            style="width: 82.88px">Receive</button>
+                        <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_print_sendout" data-backdrop="static" data-keyboard="false" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4>Print Sendout</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="modal_print_container" class="row">
+                        <div id="modal_printable" class="col-lg-12 text-center">
+                            <div id='printout_header'>
+                                <h3>Vicente Sotto Memorial Medical Center</h3>
+                                <h5>B. Rodriguez St., Cebu City</h5>
+                                <hr>
+                                <h4 id="printable_title">Send Out Report</h4>
+                                <br>
+                                <div class="w-100 text-left">
+                                    <h6 id="modal_printed_by">Printed by: IT Office</h6>
+                                </div>
+                                <hr>
+                            </div>
+
+                            <div id="modalTblContainer">
+                                <table id="modalTblSendOut" class="w-100">
+                                    <thead id="modal_sendout_header" class="m-b-50">
+                                        <tr>
+                                            <th>Barcode</th>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Out</th>
+                                            <th>Receive By</th>
+                                            <th>Date/Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="modal_sendout_tbody" class="text-size-12">
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="modal_no_sendout_container" class="w-100 d-none">
+                                <img src="images/no_see.png" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-4" style="justify-content: normal;">
+                        <div><input id="modal_sendout_header" type="checkbox" checked> Include Header</div>
+                        <div class="ml-100">
+                            <button id="modal_sendout_add" type="button"
+                                class="au-btn au-btn-icon au-btn--green au-btn--small">Add</button>
+                            <button id="modal_preview" type="button"
+                                class="au-btn au-btn-icon au-btn--blue au-btn--small">Print</button>
+                        </div>
+                        <!-- <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button> -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_print_bcode" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4>Barcode Setting</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body h-100">
+                    <div class="row">
+                        <div id="modal_bcode_container" class="col-md-8 card ml-2 mnh-300 text-center">
+
+                        </div>
+                        <div class="col-md-3">
+                            <label>Bcode Position <span class="color-red">*</span></label>
+                            <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                                <select id="modal_bcode_pos" class="demo-default w-100">
+                                    <option value="top">Top</option>
+                                    <option value="bottom">Bottom</option>
+                                </select>
+                            </div>
+
+                            <label>Bcode Align <span class="color-red">*</span></label>
+                            <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                                <select id="modal_bcode_align" class="demo-default w-100">
+                                    <option value="right">Right</option>
+                                    <option value="left">Left</option>
+                                    <option value="center">Center</option>
+                                </select>
+                            </div>
+
+                            <label>Margin <span class="color-red">*</span></label>
+                            <input id="modal_bcode_margin" type="number"
+                                class="au-input au-input--full m-b-10 text-capitalize" placeholder="0"
+                                style="height: 36px;" />
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-4" style="justify-content: center;">
+                        <button id="modal_preview_bcode" type="button"
+                            class="au-btn au-btn-icon au-btn--green au-btn--small">Preview</button>
                         <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
                             data-dismiss="modal">Close</button>
                     </div>

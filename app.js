@@ -13,8 +13,8 @@ var app = express();
 
 app.use(session({
   secret: "document-tracking",
-  saveUninitialized: false,
-  resave: false
+  resave: false,
+  saveUninitialized: false
 }));
 
 app.use(function (req, res, next) {
@@ -37,12 +37,12 @@ app.use('/api', apiRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -52,7 +52,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   next();
 });
