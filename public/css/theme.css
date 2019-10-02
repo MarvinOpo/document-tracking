@@ -14776,6 +14776,14 @@ td:not([name="duration"]), th {
     vertical-align: bottom;
 }
 
+#tblReports td:last-child {
+    min-width: 300px;
+}
+
+#reports_tbody td {
+    border: 0.5px solid gray !important; 
+    border-collapse: collapse !important;
+}
 /* #tblSendOut td {
     padding-left: 5px;
     padding-right: 5px;
@@ -14863,6 +14871,10 @@ table .match-parent {
     min-width: 200px;
 }
 
+.mnw-300 {
+    min-width: 300px;
+}
+
 .mnh-300 {
     min-height: 300px !important;
 }
@@ -14887,7 +14899,15 @@ table .match-parent {
     max-width: 1400px !important;
 }
 
-.table-load-more {
+.h-36 {
+    height: 36px !important;
+}
+
+.w-300 {
+    width: 300px !important;
+}
+
+.table-load-more, .table-load-more-reports {
     text-align: center;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -14920,6 +14940,10 @@ table .match-parent {
 
 .text-size-8 {
     font-size: 8px;
+}
+
+.text-size-10 {
+    font-size: 10px;
 }
 
 .text-size-12 {
@@ -15004,8 +15028,18 @@ table .match-parent {
 #modal_print_sendout {
     z-index: 1999; 
 }
+
 #modal_release {
     z-index: 2000; 
+}
+
+#print_reports{
+    margin-left: -25px;
+    margin-top: 2px;   
+}
+
+.ml--80 {
+    margin-left: -80px;
 }
 
 /* img {

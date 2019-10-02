@@ -107,7 +107,7 @@
                                             style="position: absolute; width: 178px;">
                                             <li class="border-bottom border-success text-center">
                                                 <label class="w-100 m-t-10" data-toggle="modal"
-                                                    data-target="#modal_recieve">
+                                                    data-target="#modal_receive">
                                                     Receive Docs </label>
                                             </li>
                                             <!-- <li class="border-bottom border-success text-center">
@@ -290,7 +290,7 @@
                                 <select id="modal_type" class="demo-default w-100">
                                     <option value="">Select Type</option>
                                     <option value="Abstract">Abstract</option>
-                                    <option value="Account Recievable">Account Recievable</option>
+                                    <option value="Account Receivable">Account Receivable</option>
                                     <option value="ACIC">ACIC</option>
                                     <option value="Application Bill">Application Bill</option>
                                     <option value="Applicants">Applicants</option>
@@ -469,7 +469,7 @@
         </div>
     </div>
 
-    <div id="modal_recieve" class="modal fade" role="dialog">
+    <div id="modal_receive" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
             <!-- Modal content-->
@@ -480,30 +480,30 @@
                 </div>
                 <div class="modal-body">
 
-                    <div id="recieve_error_container"></div>
+                    <div id="receive_error_container"></div>
 
                     <label>Barcode <span class="color-red">*</span></label>
                     <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
-                        <select id="modal_recieve_barcode" class="demo-default w-100">
+                        <select id="modal_receive_barcode" class="demo-default w-100">
                             <option value="">Select Barcode</option>
                         </select>
                     </div>
 
-                    <div id="modal_recieve_doc_info" class="au-input au-input--full m-t-20">
+                    <div id="modal_receive_doc_info" class="au-input au-input--full m-t-20">
                         <span>Name</span>
-                        <input id="modal_recieve_name" type="text"
+                        <input id="modal_receive_name" type="text"
                             class="au-input au-input--full m-b-10 text-capitalize" style="height: 36px;" />
 
                         <span>Description</span>
-                        <textarea id="modal_recieve_desc" type="text"
+                        <textarea id="modal_receive_desc" type="text"
                             class="au-input au-input--full m-b-10 text-capitalize"></textarea>
                     </div>
                     <!-- <label>Remarks </label>
-                        <textarea id="modal_remarks_recieve" class="au-input au-input--full m-b-10 text-capitalize"
+                        <textarea id="modal_remarks_receive" class="au-input au-input--full m-b-10 text-capitalize"
                             placeholder="Write something here..."></textarea> -->
 
                     <div class="modal-footer" style="justify-content: center;">
-                        <button id="modal_add_recieve" type="button"
+                        <button id="modal_add_receive" type="button"
                             class="au-btn au-btn-icon au-btn--green au-btn--small"
                             style="width: 82.88px">Receive</button>
                         <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"

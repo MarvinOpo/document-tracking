@@ -1,7 +1,8 @@
 let recent_date_from, recent_date_to;
 let sendout_date_from, sendout_date_to;
+let reports_date_from, reports_date_to;
 let should_print;
-let pending_count, recieve_count, release_count;
+let pending_count, receive_count, release_count;
 let mgensearch_selectize;
 let pendingChart, receiveChart, sendoutChart, totalChart;
 
@@ -33,16 +34,27 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
     sendout_date_from = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
     sendout_date_to = recent_date_to;
 
+    reports_date_from = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
+    reports_date_to = recent_date_to;
+
     let options = '';
     for (let i = new Date().getFullYear() - 1; i > 2017; i--) {
         options += `<option value="` + i + `">` + i + `</option>`;
     }
 
+    $('#reports_type_filter').selectize({
+        onChange: function (value) {
+            $('#reports_tbody').html('');
+            $('.table-load-more-reports').show();
+            getReports(0, 5);
+        }
+    });
     $('#year_filter').append(options);
     $('#year_filter').selectize({
         onChange: function (value) {
             $('#recent_doc_tbody').html('');
             $('#sendout_doc_tbody').html('');
+            $('#reports_tbody').html('');
 
             pendingChart.destroy();
             receiveChart.destroy();
@@ -61,6 +73,10 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
 
     $('#load_more_sendout').click(function () {
         getSendOutDocuments($('.table-load-more-sendout').attr('id'), 5);
+    });
+
+    $('#load_more_reports').click(function () {
+        getReports($('#reports_tbody tr').length, 5);
     });
 
     $('#recent_daterange').daterangepicker({
@@ -98,6 +114,23 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
         getSendOutDocuments(0, 5);
     });
 
+    $('#reports_daterange').daterangepicker({
+        startDate: moment().startOf('month'),
+        endDate: moment(),
+        timePicker: true,
+        locale: {
+            format: 'MM/DD/YYYY HH:mm:ss'
+        },
+        opens: 'right'
+    }, function (start, end, label) {
+        reports_date_from = start.format('YYYY-MM-DD HH:mm:ss');
+        reports_date_to = end.format('YYYY-MM-DD HH:mm:ss');
+
+        $('#reports_tbody').html('');
+        $('.table-load-more-reports').show();
+        getReports(0, 5);
+    });
+
     $('#print_recent').click(function () {
         $('#tblContainer').addClass('table table-data3');
 
@@ -131,6 +164,31 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
         $('#printed_date').html('');
     });
 
+    $('#print_reports').click(function () {
+        $('#tblContainer').removeClass('table table-data3');
+
+        $('.table-load-more-reports').attr('id', 0);
+        $('#reports_tbody').html('');
+        $('.table-load-more-reports').show();
+        getReports(0, '');
+
+        const month_from = moment(reports_date_from).format('MMM ');
+        const month_to = moment(reports_date_to).format('MMM ');
+        const year = moment(reports_date_from).format('YYYY');
+
+        let date = "";
+        if (month_from != month_to) {
+            date = month_from + "- " + month_to + year;
+        } else {
+            date = month_from + year;
+        }
+
+        $('#printable_title').html('MONITORING TOOL');
+        $('#printable_date').html('For the Month of ' + date);
+        $('#printed_by').html("Printed by: " + $('.name').attr('id'));
+        $('#printed_date').html('');
+    });
+
     if ($('.access-rights').attr('id') != '1') {
         $('#nav_all_docs').remove();
         $('#nav_all_docs_mobile').remove();
@@ -141,9 +199,10 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
 function loadData() {
     getRecentDocuments(0, 5);
     getSendOutDocuments(0, 5);
+    getReports(0, 5);
 
     getPendingGraphData();
-    getRecieveGraphData();
+    getReceiveGraphData();
     getReleaseGraphData();
 }
 
@@ -245,6 +304,51 @@ function getSendOutDocuments(offset, limit) {
         });
 }
 
+function getReports(offset, limit) {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&department=' + $('.department').text() + "&offset=" + offset +
+        "&limit=" + limit + "&date_from=" + reports_date_from + "&date_to=" + reports_date_to +
+        "&type=" + $('#reports_type_filter').val();
+
+    fetch('/API/logs/get_reports' + param, { method: 'GET' })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.length && $('#reports_tbody tr').length < 1) {
+                $('#reports_table_container').addClass('d-none');
+                $('.table-load-more-reports').addClass('d-none');
+                $('#reports_no_see_container').removeClass('d-none');
+                return;
+            } else {
+                $('#reports_table_container').removeClass('d-none');
+                $('.table-load-more-reports').removeClass('d-none');
+                $('#reports_no_see_container').addClass('d-none');
+            }
+
+            if (limit) {
+                should_print = false;
+            } else {
+                should_print = true;
+            }
+
+
+            if (data.length < 5) {
+                $('.table-load-more-reports').hide();
+            }
+
+            if (data.length) {
+                populateReports(data);
+            } else {
+                toastr.error("Nothing more to load.");
+            }
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
 function getPendingGraphData() {
     let year = $('#year_filter').val();
 
@@ -264,20 +368,20 @@ function getPendingGraphData() {
         });
 }
 
-function getRecieveGraphData() {
+function getReceiveGraphData() {
     let year = $('#year_filter').val();
 
     if (!year) year = (new Date()).getFullYear();
 
     const param = '?year=' + year + '&department=' + $('.department').text();
 
-    fetch('/API/document/get_recieve_graph_data' + param, { method: 'GET' })
+    fetch('/API/document/get_receive_graph_data' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
-            recieve_count = data.recieve_counts;
+            receive_count = data.receive_counts;
             calculateTotal();
 
-            populateRecieveGraph();
+            populateReceiveGraph();
         })
         .catch(err => {
             console.log(err);
@@ -305,12 +409,12 @@ function getReleaseGraphData() {
 }
 
 function calculateTotal() {
-    if (recieve_count && release_count) {
+    if (receive_count && release_count) {
 
         let total = [];
 
-        for (let i = 0; i < recieve_count.length; i++) {
-            total.push(recieve_count[i] + release_count[i]);
+        for (let i = 0; i < receive_count.length; i++) {
+            total.push(receive_count[i] + release_count[i]);
         }
 
         populateTotalGraph(total);
@@ -323,11 +427,11 @@ function populateRecentDocs(data) {
     // if(!table_data) table_data = "";
 
     for (let i = 0; i < data.length; i++) {
-        let recieve_date = "", release_date = "";
+        let receive_date = "", release_date = "";
 
-        if (data[i].recieve_date) {
-            recieve_date = (data[i].recieve_date).replace("T", "<br>");
-            recieve_date = recieve_date.replace(".000Z", "");
+        if (data[i].receive_date) {
+            receive_date = (data[i].receive_date).replace("T", "<br>");
+            receive_date = receive_date.replace(".000Z", "");
         }
 
         if (data[i].release_date) {
@@ -336,25 +440,21 @@ function populateRecentDocs(data) {
         }
 
         table_data += `<tr>
-                            <td>`+ data[i].barcode + `</td>`;
+                            <td>`+ data[i].barcode + `</td>
+                            <td>` + data[i].release_from + `</td>`;;
 
-        if (data[i].recieve_by)
-            table_data += `<td>` + data[i].recieve_by + `</td>`;
+        if (data[i].receive_by)
+            table_data += `<td>` + data[i].receive_by + `</td>`;
         else
             table_data += `<td><span class='block-email'>Pending</span></td>`;
 
-        if (recieve_date)
-            table_data += `<td>` + recieve_date + `</td>`;
+        if (receive_date)
+            table_data += `<td>` + receive_date + `</td>`;
         else
             table_data += `<td><span class='block-email'>Pending</span></td>`;
 
         if (release_date)
             table_data += `<td>` + release_date + `</td>`;
-        else
-            table_data += `<td><span class='block-email'>Pending</span></td>`;
-
-        if (data[i].release_to)
-            table_data += `<td>` + data[i].release_to + `</td>`;
         else
             table_data += `<td><span class='block-email'>Pending</span></td>`;
 
@@ -375,6 +475,7 @@ function populateRecentDocs(data) {
             targetStyles: ['*']
         })
 
+        $('#tblContainer').html('');
         $('#recent_doc_tbody').html('');
         $('.table-load-more').show();
         getRecentDocuments(0, 5);
@@ -386,8 +487,8 @@ function populateSendOutDocs(data) {
     let ctr = 1;
 
     for (let i = 0; i < data.length; i++) {
-        const date = moment(data[i].release_date).format('MM/DD/YYYY');
-        const time = moment(data[i].release_date).format('hh:mm a');
+        const date = moment(data[i].created_at).format('MM/DD/YYYY');
+        const time = moment(data[i].created_at).format('hh:mm a');
 
         if (!table_data.includes(data[i].release_to)) {
             ctr = 1;
@@ -425,9 +526,114 @@ function populateSendOutDocs(data) {
         })
 
         $('.table-load-more-sendout').attr('id', 0);
+        $('#tblContainer').html('');
         $('#sendout_doc_tbody').html('');
         $('.table-load-more-sendout').show();
         getSendOutDocuments(0, 5);
+    }
+}
+
+function populateReports(data) {
+    let table_data = $('#reports_tbody').html();
+    let ctr = $('#reports_tbody tr').length;
+
+    for (let i = 0; i < data.length; i++) {
+        const receive_date = moment(data[i].receive_date).format('YYYY-MM-DD');
+        const receive_time = moment(data[i].receive_date).format('HH:mm:ss');
+
+        let release_date = '', release_time = '';
+        if (data[i].release_date) {
+            release_date = moment(data[i].release_date).format('YYYY-MM-DD');
+            release_time = moment(data[i].release_date).format('HH:mm:ss');
+        }
+
+        table_data += `<tr>
+                            <td class='text-left'>` + (++ctr) + `. ` + data[i].document_no + `</td>
+                            <td>` + data[i].name + `</td>
+                            <td>
+                                <div class='row'>
+                                    <div class='col-md-12'>`
+            + receive_date +
+            `</div>
+                                    <div class='col-md-12'>`
+            + receive_time +
+            `</div>
+                                </div>
+                            </td>`;
+
+        let date_release;
+        if (release_date) {
+            table_data += `<td>
+                <div class='row'>
+                    <div class='col-md-12'>`
+                + release_date +
+                `</div>
+                    <div class='col-md-12'>`
+                + release_time +
+                `</div>
+                </div>
+            </td>`;
+
+            date_release = new Date(data[i].release_date);
+        } else {
+            table_data += `<td><span class='block-email'>Pending</span></td>`;
+            date_release = new Date();
+        }
+
+        const date_receive = new Date(data[i].receive_date);
+
+        let date_diff = Math.abs(date_release - date_receive) / 1000;
+
+        const days = Math.floor(date_diff / 86400);
+        date_diff -= days * 86400;
+
+        const hours = Math.floor(date_diff / 3600) % 24;
+        date_diff -= hours * 3600;
+
+        const minutes = Math.floor(date_diff / 60) % 60;
+        date_diff -= minutes * 60;
+
+        const secs = Math.floor(date_diff / 1) % 60;
+        date_diff -= secs * 60;
+
+        table_data += `<td>`;
+
+        if (days || hours || minutes) {
+            if (days) table_data += "<div class='col-md-12'>" + days + " day(s) </div>";
+            if (hours) table_data += "<div class='col-md-12'>" + hours + " hr(s) </div>";
+            if (minutes) table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
+        } else {
+            table_data += "<div class='col-md-12'>few seconds</div>";
+        }
+        if (data[i].priority == 'Regular') {
+            table_data += `</td><td>2 days</td>`;
+        } else {
+            table_data += `</td><td>2 hrs</td>`;
+        }
+
+        table_data += `<td>` + data[i].remarks + `</td>]
+                        </tr>`;
+    }
+
+    $('#reports_tbody').html(table_data);
+
+    if (should_print) {
+        $('#tblContainer').html($('#tblReports').html());
+
+        printJS({
+            printable: 'printable_div',
+            type: 'html',
+            marginLeft: 0,
+            marginRight: 0,
+            honorColor: true,
+            targetStyles: ['*']
+        })
+
+        $('.table-load-more-reports').attr('id', 0);
+        $('#tblContainer').html('');
+        $('#reports_tbody').html('');
+        $('.table-load-more-reports').show();
+        getReports(0, 5);
     }
 }
 
@@ -522,11 +728,11 @@ function populatePendingGraph() {
     }
 }
 
-function populateRecieveGraph() {
-    const total = recieve_count.reduce((a, b) => a + b, 0);
-    $('#recieve_total').html(total);
+function populateReceiveGraph() {
+    const total = receive_count.reduce((a, b) => a + b, 0);
+    $('#receive_total').html(total);
 
-    let ctx = document.getElementById('recieve_chart').getContext('2d');
+    let ctx = document.getElementById('receive_chart').getContext('2d');
     if (ctx) {
         ctx.height = 130;
         receiveChart = new Chart(ctx, {
@@ -536,7 +742,7 @@ function populateRecieveGraph() {
                     'July', 'August', 'September', 'October', 'November', 'December'],
                 type: 'line',
                 datasets: [{
-                    data: recieve_count,
+                    data: receive_count,
                     label: 'Received',
                     backgroundColor: 'rgba(255,255,255,.1)',
                     borderColor: 'rgba(255,255,255,.55)',

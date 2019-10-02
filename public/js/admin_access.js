@@ -274,6 +274,45 @@ function deleteUser(id) {
         });
 }
 
+function resetPassword(id) {
+    const param = '?id=' + id;
+
+    toastr.options.timeOut = 0;
+    toastr.options.extendedTimeOut = 0;
+    toastr.options.positionClass = "toast-top-center";
+    toastr.warning('<div class="text-center"><label>Are you sure you want to reset password?</label>'
+        + '<button type="button" id="okBtn" class="btn btn-danger" value="yes">Yes</button>'
+        + '<button type="button" id="surpriseBtn" class="btn btn-secondary" style="margin: 0 8px 0 8px" value="no">No</button></div>',
+        "",
+        {
+            allowHtml: true,
+            onclick: function (toast) {
+                toastr.options.timeOut = 2000;
+                toastr.options.extendedTimeOut = 1000;
+                toastr.options.positionClass = "toast-bottom-right";
+                value = toast.target.value
+                if (value == 'yes') {
+                    fetch('/API/user/reset_password' + param, { method: 'GET' })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status == "success") {
+                                toastr.success("Successfully reset password.");
+                                dept_selectize.trigger("change");
+                            } else {
+                                toastr.error("An error has occured.");
+                            }
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+                }
+
+                toastr.remove();
+            }
+
+        });
+}
+
 function populate_pager(numItems) {
     let page = ($('.current:not(.prev)').html());
 
@@ -319,6 +358,9 @@ function populate_table(data) {
                                     </button>
                                     <button class='item' data-toggle='tooltip' data-placement='top' title='Delete' onclick='deleteUser(` + data[i].id + `)'>
                                         <i class='zmdi zmdi-delete'></i>
+                                    </button>
+                                    <button class='item' data-toggle='tooltip' data-placement='top' title='Reset' onclick='resetPassword(` + data[i].id + `)'>
+                                        <i class='zmdi zmdi-lock'></i>
                                     </button>
                                 </div>
                             </td>

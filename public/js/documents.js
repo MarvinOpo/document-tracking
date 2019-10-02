@@ -1,5 +1,5 @@
 let document_selectize, type_selectize, docno_selectize, general_selectize, year_selectize;
-let mtype_selectize, mpriority_selectize, mbcode_recieve_selectize;
+let mtype_selectize, mpriority_selectize, mbcode_receive_selectize;
 let mdept_selectize, mbcode_release_selectize, mbcode_position_selectize;
 let date_from;
 
@@ -99,23 +99,23 @@ let date_from;
         updateDocReleaseLog();
     });
 
-    $('#modal_add_recieve').mousedown(function () {
-        if (!$('#modal_recieve_barcode').val()) {
+    $('#modal_add_receive').mousedown(function () {
+        if (!$('#modal_receive_barcode').val()) {
             const text_error = "<div class='input-error'>"
                 + "<span class='error-text'>"
                 + "Please fill all required fields (*)"
                 + "</span>"
                 + "</div>"
 
-            $('#recieve_error_container').html(text_error);
+            $('#receive_error_container').html(text_error);
 
-            $('#modal_recieve_barcode-selectized').focus();
+            $('#modal_receive_barcode-selectized').focus();
             return;
         } else {
-            $('#recieve_error_container').html('');
+            $('#receive_error_container').html('');
         }
 
-        updateDocRecieveLog($('#modal_recieve_barcode').val());
+        updateDocReceiveLog($('#modal_receive_barcode').val());
     });
 
     $('#modal_document').on('shown.bs.modal', function () {
@@ -127,8 +127,8 @@ let date_from;
         $('.modal-title').text('Release Document To');
     });
 
-    $('#modal_recieve').on('shown.bs.modal', function () {
-        $('#modal_recieve_barcode-selectized').focus();
+    $('#modal_receive').on('shown.bs.modal', function () {
+        $('#modal_receive_barcode-selectized').focus();
     });
 
     $('#modal_print_sendout').on('shown.bs.modal', function () {
@@ -157,13 +157,13 @@ let date_from;
         $('#modal_release').modal('show');
     });
 
-    $('#modal_recieve').on('hidden.bs.modal', function () {
+    $('#modal_receive').on('hidden.bs.modal', function () {
         $(this)
             .find("input")
             .val('')
             .end();
 
-        mbcode_recieve_selectize.setValue("");
+        mbcode_receive_selectize.setValue("");
         refreshModalSelectize();
     });
 
@@ -199,12 +199,12 @@ let date_from;
         refreshModalSelectize();
     });
 
-    $('#modal_recieve_barcode-selectized').focus(function () {
-        $('#modal_recieve_doc_info').show();
+    $('#modal_receive_barcode-selectized').focus(function () {
+        $('#modal_receive_doc_info').show();
     });
 
-    $('#modal_recieve_barcode-selectized').focusout(function () {
-        $('#modal_recieve_doc_info').hide();
+    $('#modal_receive_barcode-selectized').focusout(function () {
+        $('#modal_receive_doc_info').hide();
     });
 
     $('#modal_release_barcode-selectized').focus(function () {
@@ -315,7 +315,7 @@ function selectizeFilter(filter) {
 }
 
 function selectizeModal() {
-    let $mtype, $mpriority, $mdept, $mbcodeRecieve, $mbcodeRelease, $mbcodePos;
+    let $mtype, $mpriority, $mdept, $mbcodeReceive, $mbcodeRelease, $mbcodePos;
 
     $mtype = $('#modal_type').selectize({
         onChange: function (value) {
@@ -357,12 +357,13 @@ function selectizeModal() {
     $mpriority = $('#modal_priority').selectize();
 
     $mdept = $('#modal_dept').selectize({
+        maxItems: 10,
         valueField: 'department',
         labelField: 'department',
         searchField: ['department']
     });
 
-    $mbcodeRecieve = $('#modal_recieve_barcode').selectize({
+    $mbcodeReceive = $('#modal_receive_barcode').selectize({
         // create: true,
         maxOptions: 1,
         maxItems: 100,
@@ -371,14 +372,14 @@ function selectizeModal() {
         searchField: ['barcode'],
         onChange: function (value) {
 
-            $('#recieve_error_container').html("");
+            $('#receive_error_container').html("");
 
-            if ($('#modal_recieve_barcode').val() && $('#modal_recieve_barcode').val() != "") {
-                const barcode = $('#modal_recieve_barcode').val()[$('#modal_recieve_barcode').val().length - 1];
-                checkDocForRecieve(barcode);
+            if ($('#modal_receive_barcode').val() && $('#modal_receive_barcode').val() != "") {
+                const barcode = $('#modal_receive_barcode').val()[$('#modal_receive_barcode').val().length - 1];
+                checkDocForReceive(barcode);
             } else {
-                $('#modal_recieve_name').val("");
-                $('#modal_recieve_desc').val("");
+                $('#modal_receive_name').val("");
+                $('#modal_receive_desc').val("");
             }
         }
     });
@@ -442,7 +443,7 @@ function selectizeModal() {
     mtype_selectize = $mtype[0].selectize;
     mpriority_selectize = $mpriority[0].selectize;
     mdept_selectize = $mdept[0].selectize;
-    mbcode_recieve_selectize = $mbcodeRecieve[0].selectize;
+    mbcode_receive_selectize = $mbcodeReceive[0].selectize;
     mbcode_release_selectize = $mbcodeRelease[0].selectize;
     mbcode_position_selectize = $mbcodePos[0].selectize;
 
@@ -479,7 +480,7 @@ function refreshSelectize() {
 }
 
 function refreshModalSelectize() {
-    mbcode_recieve_selectize.clearOptions();
+    mbcode_receive_selectize.clearOptions();
     mbcode_release_selectize.clearOptions();
 
     let year = $('#year_filter').val();
@@ -488,8 +489,8 @@ function refreshModalSelectize() {
 
     const param = '?year=' + year + '&id=' + $('.department').attr('id') + '&department=' + $('.department').text();
 
-    const recieveRoute = '/API/document/get_recievable_bcodes' + param;
-    loadFilter(mbcode_recieve_selectize, recieveRoute);
+    const receiveRoute = '/API/document/get_receivable_bcodes' + param;
+    loadFilter(mbcode_receive_selectize, receiveRoute);
 
     const releaseRoute = '/API/document/get_releasable_bcodes' + param;
     loadFilter(mbcode_release_selectize, releaseRoute);
@@ -515,6 +516,7 @@ function insertDocument(body) {
                 const log = {
                     year: body.year,
                     barcodes: barcodes,
+                    from: "Origin",
                     department: $('.department').text(),
                     remarks: "Origin"
                 }
@@ -548,7 +550,7 @@ function trackDocument(id, status) {
         });
 }
 
-function checkDocForRecieve(barcode) {
+function checkDocForReceive(barcode) {
     let year = $('#year_filter').val();
 
     if (!year) year = (new Date()).getFullYear();
@@ -559,8 +561,8 @@ function checkDocForRecieve(barcode) {
         .then(res => res.json())
         .then(data => {
             if (data.status != "error" && data.length > 0) {
-                $('#modal_recieve_name').val(data[0].name);
-                $('#modal_recieve_desc').val(data[0].description);
+                $('#modal_receive_name').val(data[0].name);
+                $('#modal_receive_desc').val(data[0].description);
             } else {
                 const text_error = "<div class='input-error'>"
                     + "<span class='error-text'>"
@@ -568,10 +570,10 @@ function checkDocForRecieve(barcode) {
                     + "</span>"
                     + "</div>"
 
-                $('#recieve_error_container').html(text_error);
+                $('#receive_error_container').html(text_error);
 
-                $('#modal_recieve_name').val("");
-                $('#modal_recieve_desc').val("");
+                $('#modal_receive_name').val("");
+                $('#modal_receive_desc').val("");
             }
         })
         .catch(err => {
@@ -773,7 +775,7 @@ function updateDocument(body) {
         });
 }
 
-function recieveDocument(barcodes) {
+function receiveDocument(barcodes) {
     let year = $('#year_filter').val();
 
     if (!year) year = (new Date()).getFullYear();
@@ -792,7 +794,7 @@ function recieveDocument(barcodes) {
         .then(data => {
             if (data.status == 'success') {
                 toastr.success("Documents received.");
-                $('#modal_recieve').modal('hide');
+                $('#modal_receive').modal('hide');
                 document_selectize.trigger("change");
             }
         })
@@ -871,7 +873,7 @@ function endDocument(id) {
                         .then(data => {
                             if (data.status == 'success') {
                                 toastr.success("Document cycle ended.");
-                                $('#modal_recieve').modal('hide');
+                                $('#modal_receive').modal('hide');
                                 document_selectize.trigger("change");
                             }
                         })
@@ -914,7 +916,7 @@ function recycleDocument(id) {
                         .then(data => {
                             if (data.status == 'success') {
                                 toastr.success("Document recycled.");
-                                $('#modal_recieve').modal('hide');
+                                $('#modal_receive').modal('hide');
                                 document_selectize.trigger("change");
                             }
                         })
@@ -929,7 +931,7 @@ function recycleDocument(id) {
         });
 }
 
-function updateDocRecieveLog(barcodes) {
+function updateDocReceiveLog(barcodes) {
     let year = $('#year_filter').val();
 
     if (!year) year = (new Date()).getFullYear();
@@ -937,11 +939,11 @@ function updateDocRecieveLog(barcodes) {
     const body = {
         year: year,
         barcodes: barcodes,
-        recieve_by: $('.name').attr('id'),
+        receive_by: $('.name').attr('id'),
         department: $('.department').text()
     };
 
-    fetch('/API/logs/update_recieve', {
+    fetch('/API/logs/update_receive', {
         method: 'POST',
         body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' }
@@ -949,7 +951,7 @@ function updateDocRecieveLog(barcodes) {
         .then(res => res.json())
         .then(data => {
             if (data.status == 'success') {
-                recieveDocument($('#modal_recieve_barcode').val());
+                receiveDocument($('#modal_receive_barcode').val());
             }
         })
         .catch(err => {
@@ -1051,10 +1053,10 @@ function deleteDocument(id) {
         });
 }
 
-function openRecieveModal(barcode) {
-    $('#modal_recieve').modal('show');
+function openReceiveModal(barcode) {
+    $('#modal_receive').modal('show');
 
-    mbcode_recieve_selectize.setValue(barcode);
+    mbcode_receive_selectize.setValue(barcode);
 }
 
 function openReleaseModal(barcode) {
@@ -1064,23 +1066,42 @@ function openReleaseModal(barcode) {
 }
 
 function insertLogs(body) {
-    let triggerRecieve = false;
-
     if (!body) {
+        let departments = $('#modal_dept').val();
+
         let year = $('#year_filter').val();
 
         if (!year) year = (new Date()).getFullYear();
 
         body = {
             year: year,
+            from: $('.department').text(),
             barcodes: $('#modal_release_barcode').val(),
-            department: $('#modal_dept').val(),
-            remarks: $('#modal_release_remarks').val()
+            remarks: $('#modal_release_remarks').val(),
+            triggerReceive: false,
+            updateLocation: false
         };
-    } else {
-        triggerRecieve = true;
-    }
 
+        console.log(body);
+        console.log(departments.length);
+
+        for (let i = 0; i < departments.length; i++) {
+            body['department'] = departments[i];
+
+            if (i == departments.length - 1) {
+                body['updateLocation'] = true;
+            }
+
+            console.log(body);
+            fetchLogInsert(body);
+        }
+    } else {
+        body['triggerReceive'] = true;
+        fetchLogInsert(body)
+    }
+}
+
+function fetchLogInsert(body) {
     fetch('/API/logs/insert', {
         method: 'POST',
         body: JSON.stringify(body),
@@ -1089,20 +1110,24 @@ function insertLogs(body) {
         .then(res => res.json())
         .then(data => {
             if (data.status == 'success') {
-                if (triggerRecieve)
-                    updateDocRecieveLog(body.barcodes);
-                else
+                if (body.triggerReceive)
+                    updateDocReceiveLog(body.barcodes);
+                else if (body.updateLocation) {
+                    if ($('#modal_dept').val().length > 1) {
+                        body['department'] = "Many";
+                    }
+
                     updateDocLocation(body);
+                }
             }
         })
         .catch(err => {
             console.log(err);
         });
 }
-
 // function updateLogs() {
 //     const body = {
-//         recieve_by: "Mark Vincent Opo",
+//         receive_by: "Mark Vincent Opo",
 //         department: "IT Office"
 //     };
 
@@ -1134,7 +1159,7 @@ function populate_table(data) {
         //     if (data[i].status == 'Received' || !data[i].location)
         //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openReleaseModal(" + JSON.stringify(data[i].barcode) + ")'> Release </button>";
         //     else if (data[i].status == 'Pending' && data[i].location)
-        //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openRecieveModal(" + JSON.stringify(data[i].barcode) + ")'> Receive </button>";
+        //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openReceiveModal(" + JSON.stringify(data[i].barcode) + ")'> Receive </button>";
         // }
 
         table_data += "</td>"
@@ -1180,9 +1205,14 @@ function populate_table(data) {
             date_diff -= minutes * 60;
 
             let remaining_time = "";
-            if (minutes) remaining_time = minutes + " min(s)";
-            if (hours) remaining_time = hours + " hr(s)<br>" + remaining_time;
-            if (days) remaining_time = days + " day(s)<br>" + remaining_time;
+
+            if (days || hours || minutes) {
+                if (days) remaining_time += days + " day(s)<br>";
+                if (hours) remaining_time += hours + " hr(s)<br>";
+                if (minutes) remaining_time += minutes + " min(s)";
+            } else {
+                remaining_time = 'Few seconds ago'
+            }
 
             table_data += "<td name = 'duration'>" + remaining_time + "</td>";
         } else {
@@ -1245,7 +1275,7 @@ function populate_table(data) {
 //         //     if (data[i].status == 'Received' || !data[i].location)
 //         //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openReleaseModal(" + JSON.stringify(data[i].barcode) + ")'> Release </button>";
 //         //     else if (data[i].status == 'Pending' && data[i].location)
-//         //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openRecieveModal(" + JSON.stringify(data[i].barcode) + ")'> Receive </button>";
+//         //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openReceiveModal(" + JSON.stringify(data[i].barcode) + ")'> Receive </button>";
 //         // }
 
 //         table_data += "</td>"
@@ -1377,12 +1407,12 @@ function populate_tracking(data, status) {
         table_data += "<tr class='tr-shadow'>"
             + "<td class='desc'>" + data[i].release_to + "</td>";
 
-        if (data[i].recieve_by)
-            table_data += "<td>" + data[i].recieve_by + "</td>";
+        if (data[i].receive_by)
+            table_data += "<td>" + data[i].receive_by + "</td>";
         else table_data += "<td><span class='block-email'>Pending</span></td>";
 
-        if (data[i].recieve_date) {
-            const dateTime = (data[i].recieve_date).split('T');
+        if (data[i].receive_date) {
+            const dateTime = (data[i].receive_date).split('T');
 
             table_data += "<td><div class='row'><div class='col-md-12'>" + dateTime[0]
                 + "</div><div class='col-md-12'>" + dateTime[1].substring(0, 8)
@@ -1405,11 +1435,11 @@ function populate_tracking(data, status) {
 
         table_data += "<td name = 'duration'><div class='row'>";
 
-        if (data[i].recieve_date && data[i].release_date) {
+        if (data[i].receive_date && data[i].release_date) {
             const date_release = new Date(data[i].release_date);
-            const date_recieve = new Date(data[i].recieve_date);
+            const date_receive = new Date(data[i].receive_date);
 
-            let date_diff = Math.abs(date_release - date_recieve) / 1000;
+            let date_diff = Math.abs(date_release - date_receive) / 1000;
 
             const days = Math.floor(date_diff / 86400);
             date_diff -= days * 86400;
@@ -1444,7 +1474,7 @@ function populate_tracking(data, status) {
                                 <td></td>
                                 <td></td>
                             </tr>`;
-            } else if (!data[i].recieve_by && status != "Origin" && data[i - 1].release_by == $('.name').attr("id")) {
+            } else if (!data[i].receive_by && status != "Origin" && data[i - 1].release_by == $('.name').attr("id")) {
                 table_data += `<td>
                                 <span onClick="cancelRelease(` + data[i].document_id + `,` + data[i].id + `,` + data[i - 1].id + `)">x</span>
                             </td>
@@ -1487,14 +1517,12 @@ function populate_sendout(data) {
 }
 
 function populateModalSendout(data) {
-    data = data.reverse();
-
     let table_data = "";
     let ctr = 1;
 
     for (let i = 0; i < data.length; i++) {
-        const date = moment(data[i].release_date).format('MM/DD/YYYY');
-        const time = moment(data[i].release_date).format('hh:mm a');
+        const date = moment(data[i].created_at).format('MM/DD/YYYY');
+        const time = moment(data[i].created_at).format('hh:mm a');
 
         if (!table_data.includes(data[i].release_to)) {
             ctr = 1;

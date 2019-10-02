@@ -7,20 +7,21 @@ const conn = mysql.createConnection({
     database: 'document_tracking'
 });
 
-exports.insert_log = function (log, barcodes, year) {
+exports.insert_log = function (log, body) {
     return new Promise(function (resolve, reject) {
-        let sql = "INSERT INTO logs_" + year + "(document_id, release_to, remarks) ";
+        let sql = "INSERT INTO logs_" + body.year + "(document_id, release_from, release_to, remarks) ";
 
         let values = [];
 
         sql += "values";
-        for (let i = 0; i < barcodes.length; i++) {
-            sql += "((SELECT id from documents_" + year + " WHERE barcode = ?),?,?) "
-            values.push(barcodes[i]);
+        for (let i = 0; i < body.barcodes.length; i++) {
+            sql += "((SELECT id from documents_" + body.year + " WHERE barcode = ?),?,?,?) "
+            values.push(body.barcodes[i]);
+            values.push(body.from);
             values.push(log.getReleaseTo());
             values.push(log.getRemarks());
 
-            if (i < barcodes.length - 1) sql += ",";
+            if (i < body.barcodes.length - 1) sql += ",";
 
         }
 
@@ -48,16 +49,13 @@ exports.get_logs = function (param) {
 
 exports.get_log_history = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT l.*, d.barcode, 
-                    (SELECT release_to 
-                        FROM logs_` + param.year + ` rl 
-                        WHERE rl.id > l.id AND  rl.document_id = l.document_id
-                        limit 1) AS release_to 
-                    FROM logs_` + param.year + ` l, documents_` + param.year + ` d
-                    WHERE release_to = ? && d.id = l.document_id &&
-                          (l.recieve_date >= ? && l.release_date <= ? ||
-                            (l.recieve_date IS NULL && l.release_date IS NULL))
-                    ORDER BY id desc `;
+        let sql = `SELECT l.*, d.barcode FROM logs_`+ param.year +` l
+                        RIGHT JOIN documents_`+ param.year +` d
+                        ON l.document_id = d.id
+                    WHERE l.release_to = ?
+                        AND l.created_at >= ?
+	                    AND l.created_at <= ?
+                    ORDER BY l.id desc `;
 
         const values = [param.department, param.date_from, param.date_to];
 
@@ -75,12 +73,43 @@ exports.get_log_history = function (param) {
     });
 }
 
-exports.update_recieve = function (param) {
+exports.get_reports = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "UPDATE logs_" + param.year + " SET recieve_by = ?, recieve_date = NOW() "
-            + "WHERE release_to = ? AND recieve_by IS NULL AND document_id IN (SELECT id from documents_" + param.year + " WHERE barcode IN (?)) ";
+        let sql = `SELECT l.receive_date, l.release_date, l.remarks,
+                         d.document_no, d.name, d.priority
+                    FROM logs_` + param.year + ` l, documents_` + param.year + ` d
+                    WHERE release_to = ? && d.id = l.document_id &&
+                          (l.receive_date >= ? && l.receive_date <= ?) `;
 
-        const values = [param.recieve_by, param.department, param.barcodes];
+        const values = [param.department, param.date_from, param.date_to];
+
+        if(param.type){
+            sql += '&& type = ? '
+            values.push(param.type);
+        }
+
+        sql += `ORDER BY l.id desc `;
+
+        if (param.limit) {
+            sql += `LIMIT ? OFFSET ?`
+            values.push(parseInt(param.limit));
+            values.push(parseInt(param.offset));
+        }
+
+        conn.query(sql, values, function (err, result) {
+            if (err) reject(new Error("GET reports failed"));
+
+            resolve(result);
+        });
+    });
+}
+
+exports.update_receive = function (param) {
+    return new Promise(function (resolve, reject) {
+        let sql = "UPDATE logs_" + param.year + " SET receive_by = ?, receive_date = NOW() "
+            + "WHERE release_to = ? AND receive_by IS NULL AND document_id IN (SELECT id from documents_" + param.year + " WHERE barcode IN (?)) ";
+
+        const values = [param.receive_by, param.department, param.barcodes];
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("Update receive logs failed"));

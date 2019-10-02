@@ -11,11 +11,11 @@ class Log{
     setReleaseTo(releaseTo){ this.releaseTo = releaseTo; }
     getReleaseTo(){ return this.releaseTo; }
 
-    setRecieveBy(recieveBy){ this.recieveBy = recieveBy }
-    getRecieveBy(){ return this.recieveBy }
+    setReceiveBy(receiveBy){ this.receiveBy = receiveBy }
+    getReceiveBy(){ return this.receiveBy }
 
-    setRecieveDate(recieveDate){ this.recieveDate = recieveDate }
-    getRecieveDate(){ return this.recieveDate }
+    setReceiveDate(receiveDate){ this.receiveDate = receiveDate }
+    getReceiveDate(){ return this.receiveDate }
 
     setReleaseDate(releaseDate){ this.releaseDate = releaseDate }
     getReleaseDate(){ return this.releaseDate }

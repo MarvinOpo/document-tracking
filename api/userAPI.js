@@ -92,7 +92,20 @@ exports.delete_user = function (id) {
         const values = [id];
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
+            if (err) reject(new Error("Delete user failed"));
+
+            resolve();
+        });
+    })
+}
+
+exports.reset_password = function (id) {
+    return new Promise(function (resolve, reject) {
+        let sql = `UPDATE users SET password=MD5('123') WHERE id = ? `;
+
+        const values = [id];
+
+        conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("Delete user failed"));
 
             resolve();

@@ -8,7 +8,7 @@ exports.insert = async function (req, res) {
 
     let result = {};
     try {
-        await logAPI.insert_log(log, req.body.barcodes, req.body.year);
+        await logAPI.insert_log(log, req.body);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {
@@ -17,11 +17,11 @@ exports.insert = async function (req, res) {
     }
 }
 
-exports.update_recieve = async function (req, res) {
+exports.update_receive = async function (req, res) {
     let result = {};
 
     try {
-        await logAPI.update_recieve(req.body);
+        await logAPI.update_receive(req.body);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {
@@ -57,6 +57,17 @@ exports.get_log_history = async function (req, res) {
     try {
         const logs = await logAPI.get_log_history(req.query);
         res.send(logs);
+    } catch (err) {
+        let result = {};
+        result['status'] = 'error';
+        res.send(result);
+    }
+}
+
+exports.get_reports = async function (req, res) {
+    try {
+        const reports = await logAPI.get_reports(req.query);
+        res.send(reports);
     } catch (err) {
         let result = {};
         result['status'] = 'error';

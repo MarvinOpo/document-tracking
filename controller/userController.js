@@ -75,7 +75,17 @@ exports.delete = async function (req, res) {
     }
 }
 
-
+exports.reset_password = async function (req, res) {
+    let result = {};
+    try {
+        await userAPI.reset_password(req.query.id);
+        result['status'] = 'success';
+        res.send(result);
+    } catch (err) {
+        result['status'] = 'error';
+        res.send(result);
+    }
+}
 
 exports.get_count = async function (req, res) {
     try {

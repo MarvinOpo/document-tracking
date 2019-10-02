@@ -84,12 +84,14 @@ function createLogsTbl() {
     let logsTbl = `create table if not exists logs_` + year + `(
         id int primary key auto_increment,
         document_id varchar(25) not null,
+        release_from varchar(100) not null,
         release_to varchar(100) not null,
-        recieve_by varchar(100),
-        recieve_date datetime,
+        receive_by varchar(100),
+        receive_date datetime,
         release_by varchar(100),
         release_date datetime,
         remarks varchar(255)
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`;
 
     conn.query(logsTbl, function (err, results, fields) {

@@ -107,12 +107,12 @@
                                                 <i class="zmdi zmdi-file-plus"></i>
                                             </div>
                                             <div class="text">
-                                                <h2 id="recieve_total">0</h2>
+                                                <h2 id="receive_total">0</h2>
                                                 <span>Received</span>
                                             </div>
                                         </div>
-                                        <div class="recieve_overview_chart">
-                                            <canvas id="recieve_chart"></canvas>
+                                        <div class="receive_overview_chart">
+                                            <canvas id="receive_chart"></canvas>
                                         </div>
                                     </div>
                                 </div>
@@ -179,10 +179,10 @@
                                         <thead>
                                             <tr>
                                                 <th>Barcode</th>
+                                                <th>From</th>
                                                 <th>Receive By</th>
                                                 <th>IN</th>
                                                 <th>OUT</th>
-                                                <th>Release To</th>
                                                 <th>Remarks</th>
                                             </tr>
                                         </thead>
@@ -311,6 +311,118 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="title-5 m-b-25">Reports</h3>
+
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <span class="text-size-12">Date</span>
+                                        <input type="text" id="reports_daterange"
+                                            class="form-control text-size-12 h-36 w-300">
+                                    </div>
+
+                                    <div class="col-md-2 ml--80">
+                                        <span class="text-size-12">Type</span>
+                                        <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
+                                            <select id="reports_type_filter" class="demo-default w-100">
+                                                <option value="">Select Type</option>
+                                                <option value="Abstract">Abstract</option>
+                                                <option value="Account Receivable">Account Receivable</option>
+                                                <option value="ACIC">ACIC</option>
+                                                <option value="Application Bill">Application Bill</option>
+                                                <option value="Applicants">Applicants</option>
+                                                <option value="Application for Leave">Application for Leave</option>
+                                                <option value="Appointment">Appointment</option>
+                                                <option value="Bac Abstract">Bac Abstract</option>
+                                                <option value="Bac Resolution">Bac Resolution</option>
+                                                <option value="Bac Twg Report">Bac Twg Report</option>
+                                                <option value="Bill Number">Bill Number</option>
+                                                <option value="Canvass">Canvass</option>
+                                                <option value="Cheque">Cheque</option>
+                                                <option value="Communication">Communication</option>
+                                                <option value="Consigment Order">Consigment Order</option>
+                                                <option value="Contracts">Contracts</option>
+                                                <option value="Daily Consolidated Reports">Daily Consolidated Reports
+                                                </option>
+                                                <option value="DBM">DBM</option>
+                                                <option value="DHL">DHL</option>
+                                                <option value="Disbursement Voucher">Disbursement Voucher</option>
+                                                <option value="DTR">DTR</option>
+                                                <option value="Fund Utilization Report">Fund Utilization Report</option>
+                                                <option value="HEMS">HEMS</option>
+                                                <option value="Hospital Memo">Hospital Memo</option>
+                                                <option value="Hospital Order">Hospital Order</option>
+                                                <option value="House Keeping">House Keeping</option>
+                                                <option value="Internal Medicine Department">Internal Medicine
+                                                    Department</option>
+                                                <option value="Job Order">Job Order</option>
+                                                <option value="Liquidation Report">Liquidation Report</option>
+                                                <option value="NOA">NOA</option>
+                                                <option value="Notices">Notices</option>
+                                                <option value="Notice to Proceed">Notice to Proceed</option>
+                                                <option value="Oncology Dept.">Oncology Dept.</option>
+                                                <option value="Other Reports">Other Reports</option>
+                                                <option value="Pass Slip">Pass Slip</option>
+                                                <option value="Patient's Referral">Patient's Referral</option>
+                                                <option value="Pediatrics Dept.">Pediatrics Dept.</option>
+                                                <option value="Personal Data Sheet">Personal Data Sheet</option>
+                                                <option value="Petty Cash Voucher">Petty Cash Voucher</option>
+                                                <option value="PHIC Cheque">PHIC Cheque</option>
+                                                <option value="Procurement Office">Procurement Office</option>
+                                                <option value="Purchase Order">Purchase Order</option>
+                                                <option value="Purchase Request">Purchase Request</option>
+                                                <option value="Requisition and Issue Slip">Requisition and Issue Slip
+                                                </option>
+                                                <option value="Resolution">Resolution</option>
+                                                <option value="SLCI">SLCI</option>
+                                                <option value="Social Worker">Social Worker</option>
+                                                <option value="Sub-allotment">Sub-allotment</option>
+                                                <option value="Travel Authority Oath">Travel Authority Oath</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-1 mt-4">
+                                        <div id="print_reports" class="input-group-addon d-inline-block h-36">
+                                            <i class="zmdi zmdi-print"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="reports_no_see_container" class="w-100 h-100 d-none">
+                                    <img src="images/no_see.png" />
+                                </div>
+                            </div>
+
+                            <div id="reports_table_container" class="table-responsive table--no-card m-b-40 ml-3">
+                                <table id="tblReports"
+                                    class="match-parent table table-data3 table-borderless table-striped table-earning text-size-10">
+
+                                    <thead>
+                                        <tr>
+                                            <th width='300px' class='text-left'>DocNo.</th>
+                                            <th>Suppliers/Reports</th>
+                                            <th width='120px'>IN</th>
+                                            <th width='120px'>OUT</th>
+                                            <th width='150px'>Duration</th>
+                                            <th>Target</th>
+                                            <th width='300px'>Remarks</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="reports_tbody" class="text-size-12">
+
+                                    </tbody>
+                                </table>
+
+                                <div class="table-load-more-reports">
+                                    <button id="load_more_reports" class="au-btn au-btn-load js-load-btn">load
+                                        more</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- END MAIN CONTENT-->
@@ -400,7 +512,8 @@
                             <option value="Laboratory Department">Laboratory Department</option>
                             <option value="Billing Section">Billing Section</option>
                             <option value="Engineering Department">Engineering Department</option>
-                            <option value="Health Maintenance Information System">Health Maintenance Information System
+                            <option value="Health Maintenance Information System">Health Maintenance Information
+                                System
                             </option>
                             <option value="Region VII Blood Center">Region VII Blood Center</option>
                             <option value="DOH VII">DOH VII</option>
@@ -490,7 +603,7 @@
         </div>
     </div>
 
-    <div id="modal_recieve" class="modal fade" role="dialog">
+    <div id="modal_receive" class="modal fade" role="dialog">
         <div class="modal-dialog">
 
             <!-- Modal content-->
@@ -501,30 +614,30 @@
                 </div>
                 <div class="modal-body">
 
-                    <div id="recieve_error_container"></div>
+                    <div id="receive_error_container"></div>
 
                     <label>Barcode <span class="color-red">*</span></label>
                     <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
-                        <select id="modal_recieve_barcode" class="demo-default w-100">
+                        <select id="modal_receive_barcode" class="demo-default w-100">
                             <option value="">Select Barcode</option>
                         </select>
                     </div>
 
-                    <div id="modal_recieve_doc_info" class="au-input au-input--full m-t-20">
+                    <div id="modal_receive_doc_info" class="au-input au-input--full m-t-20">
                         <span>Name</span>
-                        <input id="modal_recieve_name" type="text"
+                        <input id="modal_receive_name" type="text"
                             class="au-input au-input--full m-b-10 text-capitalize" style="height: 36px;" />
 
                         <span>Description</span>
-                        <textarea id="modal_recieve_desc" type="text"
+                        <textarea id="modal_receive_desc" type="text"
                             class="au-input au-input--full m-b-10 text-capitalize"></textarea>
                     </div>
                     <!-- <label>Remarks </label>
-                        <textarea id="modal_remarks_recieve" class="au-input au-input--full m-b-10 text-capitalize"
+                        <textarea id="modal_remarks_receive" class="au-input au-input--full m-b-10 text-capitalize"
                             placeholder="Write something here..."></textarea> -->
 
                     <div class="modal-footer" style="justify-content: center;">
-                        <button id="modal_add_recieve" type="button"
+                        <button id="modal_add_receive" type="button"
                             class="au-btn au-btn-icon au-btn--green au-btn--small"
                             style="width: 82.88px">Receive</button>
                         <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"

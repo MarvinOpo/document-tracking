@@ -41,10 +41,11 @@ exports.get_documents = function (param) {
         if (param.general == 'pending') {
             sql = `SELECT d.*
                     FROM logs_` + param.year + ` l RIGHT JOIN documents_` + param.year + ` d 
-                        ON l.document_id = d.id 
+                        ON l.document_id = d.id
+                        AND d.location <> 'Many' 
                         AND d.status <> 'Cycle End'
                     WHERE release_to = ?
-                        AND (recieve_by IS NOT NULL 
+                        AND (receive_by IS NOT NULL 
                                 AND release_date IS NULL) `;
 
             values = [param.department];
@@ -58,7 +59,7 @@ exports.get_documents = function (param) {
                 + "WHERE ((created_by = ? OR (location = ? "
                 + "AND (status = 'Received' OR status = 'Cycle End'))) OR "
                 + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-                + "AND document_id = d.id AND (recieve_by IS NOT NULL OR release_date IS NOT NULL)) > 0) "
+                + "AND document_id = d.id AND (receive_by IS NOT NULL OR release_date IS NOT NULL)) > 0) "
 
             values = [param.user_id, param.department, param.department];
 
@@ -176,7 +177,7 @@ exports.get_pending_documents = function (param) {
                         ON l.document_id = d.id 
                         AND d.status <> 'Cycle End'
                     WHERE release_to = ?
-                        AND (recieve_by IS NOT NULL 
+                        AND (receive_by IS NOT NULL 
                                 AND release_date IS NULL) `
 
         let values = [param.department];
@@ -216,17 +217,16 @@ exports.get_pending_documents = function (param) {
 
 exports.get_sendout = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT d.barcode, d.name, d.type, l.release_date, 
-                        (SELECT release_to 
-                            FROM logs_` + param.year + ` rl 
-                            WHERE rl.id > l.id AND rl.document_id = l.document_id 
-                            limit 1) AS release_to 
-                    FROM documents_` + param.year + ` d, logs_` + param.year + ` l
-                    WHERE d.id = l.document_id AND l.release_date IS NOT NULL AND
-                         l.release_date >= ? AND l.release_date <= ? AND l.release_to = ?
-                    ORDER BY release_to, release_date desc `
+        let sql = `SELECT l.release_to, l.document_id, d.barcode, d.name, d.type, l.created_at 
+                    FROM logs_` + param.year + ` l 
+                    RIGHT JOIN documents_` + param.year + ` d
+                            ON l.document_id = d.id
+                    WHERE l.release_from = ?
+                            AND l.created_at >= ?
+                            AND l.created_at <= ?
+                    ORDER BY l.release_to, l.created_at `
 
-        let values = [param.date_from, param.date_to, param.department];
+        let values = [param.department, param.date_from, param.date_to];
 
         if (parseInt(param.limit)) {
             sql += `LIMIT ? OFFSET ?`
@@ -241,6 +241,34 @@ exports.get_sendout = function (param) {
         });
     });
 }
+
+// exports.get_sendout = function (param) {
+//     return new Promise(function (resolve, reject) {
+//         let sql = `SELECT d.barcode, d.name, d.type, l.release_date, 
+//                         (SELECT release_to 
+//                             FROM logs_` + param.year + ` rl 
+//                             WHERE rl.id > l.id AND rl.document_id = l.document_id 
+//                             limit 1) AS release_to 
+//                     FROM documents_` + param.year + ` d, logs_` + param.year + ` l
+//                     WHERE d.id = l.document_id AND l.release_date IS NOT NULL AND
+//                          l.release_date >= ? AND l.release_date <= ? AND l.release_to = ?
+//                     ORDER BY release_to, release_date desc `
+
+//         let values = [param.date_from, param.date_to, param.department];
+
+//         if (parseInt(param.limit)) {
+//             sql += `LIMIT ? OFFSET ?`
+//             values.push(parseInt(param.limit));
+//             values.push(parseInt(param.offset));
+//         }
+
+//         conn.query(sql, values, function (err, result) {
+//             if (err) reject(new Error("GET sendout failed"));
+
+//             resolve(result);
+//         });
+//     });
+// }
 
 // exports.get_sendout = function (param) {
 //     return new Promise(function (resolve, reject) {
@@ -292,7 +320,7 @@ exports.get_count = function (param) {
             + "WHERE ((created_by = ? OR (location = ? "
             + "AND status = 'Received')) OR "
             + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-            + "AND document_id = d.id AND (recieve_by IS NOT NULL OR release_date IS NOT NULL)) > 0) "
+            + "AND document_id = d.id AND (receive_by IS NOT NULL OR release_date IS NOT NULL)) > 0) "
 
         let values = [param.user_id, param.department, param.department];
 
@@ -388,9 +416,10 @@ exports.get_pending_count = function (param) {
         let sql = `SELECT COUNT(*) AS count
                     FROM logs l RIGHT JOIN documents d 
                         ON l.document_id = d.id 
+                        AND d.location <> 'Many'
                         AND d.status <> 'Cycle End'
                     WHERE release_to = ?
-                        AND (recieve_by IS NOT NULL 
+                        AND (receive_by IS NOT NULL 
                                 AND release_date IS NULL) `;
 
         let values = [param.department];
@@ -440,7 +469,7 @@ exports.get_docno = function (param) {
             + "WHERE d.document_no != '' AND d.document_no != 'n/a' AND ((created_by = ? OR (location = ? "
             + "AND status = 'Received')) OR "
             + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-            + "AND document_id = d.id AND recieve_by IS NOT NULL) > 0) "
+            + "AND document_id = d.id AND receive_by IS NOT NULL) > 0) "
 
         let values = [param.user_id, param.department, param.department];
 
@@ -499,7 +528,7 @@ exports.get_barcodes = function (param) {
             + "WHERE ((created_by = ? OR (location = ? "
             + "AND status = 'Received')) OR "
             + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-            + "AND document_id = d.id AND recieve_by IS NOT NULL) > 0) "
+            + "AND document_id = d.id AND receive_by IS NOT NULL) > 0) "
 
         let values = [param.user_id, param.department, param.department];
 
@@ -555,7 +584,7 @@ exports.get_types = function (param) {
             + "WHERE ((created_by = ? OR (location = ? "
             + "AND status = 'Received')) OR "
             + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-            + "AND document_id = d.id AND recieve_by IS NOT NULL) > 0) "
+            + "AND document_id = d.id AND receive_by IS NOT NULL) > 0) "
 
         let values = [param.user_id, param.department, param.department];
 
@@ -608,13 +637,15 @@ exports.get_all_types = function (param) {
 
 exports.get_pending_graph_data = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT MONTHNAME(recieve_date) AS month, COUNT(*) AS count
+        let sql = `SELECT MONTHNAME(receive_date) AS month, COUNT(*) AS count
                     FROM logs_` + param.year + ` l 
                     RIGHT JOIN documents_` + param.year + ` d 
-                        ON l.document_id = d.id AND d.status <> 'Cycle End'
-                    WHERE release_to = ? && (recieve_by IS NOT NULL AND release_date IS NULL)
+                        ON l.document_id = d.id 
+                        AND d.location <> 'Many' 
+                        AND d.status <> 'Cycle End'
+                    WHERE release_to = ? && (receive_by IS NOT NULL AND release_date IS NULL)
                     GROUP BY month
-                    ORDER BY recieve_date `
+                    ORDER BY receive_date `
 
         const values = [param.department];
         let pnd_arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -688,14 +719,14 @@ exports.get_pending_graph_data = function (param) {
     });
 }
 
-exports.get_recieve_graph_data = function (param) {
+exports.get_receive_graph_data = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT MONTHNAME(recieve_date) AS month,
+        let sql = `SELECT MONTHNAME(receive_date) AS month,
                 COUNT(*) AS count
                 FROM logs_` + param.year + `
-                WHERE release_to = ? AND recieve_by IS NOT NULL
+                WHERE release_to = ? AND receive_by IS NOT NULL
                 GROUP BY month
-                ORDER BY recieve_date`
+                ORDER BY receive_date`
 
         const values = [param.department];
         let rcv_arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -705,7 +736,7 @@ exports.get_recieve_graph_data = function (param) {
 
             if(!result.length) {
                 let data = {
-                    recieve_counts: rcv_arr
+                    receive_counts: rcv_arr
                 };
 
                 resolve(data);
@@ -754,7 +785,7 @@ exports.get_recieve_graph_data = function (param) {
 
                 if (i == result.length - 1) {
                     let data = {
-                        recieve_counts: rcv_arr
+                        receive_counts: rcv_arr
                     };
 
                     resolve(data);
@@ -847,15 +878,20 @@ exports.get_release_graph_data = function (param) {
     });
 }
 
-exports.get_recievable_bcodes = function (param) {
+exports.get_receivable_bcodes = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT barcode FROM documents_" + param.year + " "
-            + "WHERE location = ? AND status = 'Pending' AND location <> '' ";
+        let sql = `SELECT d.barcode FROM documents_`+ param.year +` d 
+                    RIGHT JOIN logs_`+ param.year +` l
+                            ON l.document_id = d.id 
+                            AND l.release_to = ?
+                            AND l.receive_date IS NULL
+                    WHERE d.barcode IS NOT NULL `
 
         const values = [param.department];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET recievable barcodes failed"));
+            console.log(err);
+            if (err) reject(new Error("GET receivable barcodes failed"));
 
             resolve(result);
         });
@@ -894,7 +930,7 @@ exports.update_document = function (document, year) {
     })
 }
 
-exports.recieve_document = function (param) {
+exports.receive_document = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = "UPDATE documents_" + param.year + " SET status = 'Received', lapse_at = NOW() "
             + "WHERE barcode IN (?)";

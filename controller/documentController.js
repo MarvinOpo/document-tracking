@@ -201,9 +201,9 @@ exports.get_pending_graph_data = async function (req, res) {
     }
 };
 
-exports.get_recieve_graph_data = async function (req, res) {
+exports.get_receive_graph_data = async function (req, res) {
     try {
-        const reports = await docAPI.get_recieve_graph_data(req.query);
+        const reports = await docAPI.get_receive_graph_data(req.query);
         res.send(reports);
     } catch (err) {
         let result = {};
@@ -223,9 +223,9 @@ exports.get_release_graph_data = async function (req, res) {
     }
 };
 
-exports.get_recievable_bcodes = async function (req, res) {
+exports.get_receivable_bcodes = async function (req, res) {
     try {
-        const bcodes = await docAPI.get_recievable_bcodes(req.query);
+        const bcodes = await docAPI.get_receivable_bcodes(req.query);
         res.send(bcodes);
     } catch (err) {
         let result = {};
@@ -271,7 +271,7 @@ exports.receive = async function (req, res) {
     let result = {};
 
     try {
-        await docAPI.recieve_document(req.body);
+        await docAPI.receive_document(req.body);
         result['status'] = 'success';
         res.send(result);
     } catch (err) {

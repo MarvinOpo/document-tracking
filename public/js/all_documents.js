@@ -243,28 +243,7 @@ function populate_table(data) {
 
         table_data += "<td >" + data[i].remarks + "</td>"
             + "<td>"
-            + "<div class='table-data-feature'>"
-
-        if (data[i].status != "Cycle End") {
-            if (data[i].created_by == $(".department").attr('id')) {
-                table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Print' onclick='editBarcodeSetting(" + JSON.stringify(data[i].barcode) + ")'>"
-                    + '<i class="zmdi zmdi-print"></i>'
-                    + " </button>"
-                    // + "<button class='item' data-toggle='tooltip' data-placement='top' title='Delete' onclick='deleteDocument(" + data[i].id + ")'>"
-                    // + "<i class='zmdi zmdi-delete'></i>"
-                    + " </button>";
-            }
-
-            if (data[i].location == $(".department").text() && data[i].status == "Received") {
-                table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
-                    + "<i class='zmdi zmdi-refresh-sync-off'></i>"
-                    + " </button>";
-            }
-        } else if ($('.department').attr('id') == data[i].updated_by) {
-            table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Recycle' onclick='recycleDocument(" + data[i].id + ")'>"
-                + "<i class='zmdi zmdi-refresh-sync-alert'></i>"
-                + " </button>";
-        }
+            + "<div class='table-data-feature'>";
 
         table_data += "</div>"
             + " </td>"
@@ -397,12 +376,12 @@ function populate_tracking(data, status) {
         table_data += "<tr class='tr-shadow'>"
             + "<td class='desc'>" + data[i].release_to + "</td>";
 
-        if (data[i].recieve_by)
-            table_data += "<td>" + data[i].recieve_by + "</td>";
+        if (data[i].receive_by)
+            table_data += "<td>" + data[i].receive_by + "</td>";
         else table_data += "<td><span class='block-email'>Pending</span></td>";
 
-        if (data[i].recieve_date) {
-            const dateTime = (data[i].recieve_date).split('T');
+        if (data[i].receive_date) {
+            const dateTime = (data[i].receive_date).split('T');
 
             table_data += "<td><div class='row'><div class='col-md-12'>" + dateTime[0]
                 + "</div><div class='col-md-12'>" + dateTime[1].substring(0, 8)
@@ -425,11 +404,11 @@ function populate_tracking(data, status) {
 
         table_data += "<td name = 'duration'><div class='row'>";
 
-        if (data[i].recieve_date && data[i].release_date) {
+        if (data[i].receive_date && data[i].release_date) {
             const date_release = new Date(data[i].release_date);
-            const date_recieve = new Date(data[i].recieve_date);
+            const date_receive = new Date(data[i].receive_date);
 
-            let date_diff = Math.abs(date_release - date_recieve) / 1000;
+            let date_diff = Math.abs(date_release - date_receive) / 1000;
 
             const days = Math.floor(date_diff / 86400);
             date_diff -= days * 86400;
@@ -464,12 +443,6 @@ function populate_tracking(data, status) {
                                 <td></td>
                                 <td></td>
                             </tr>`;
-            } else if (!data[i].recieve_by && status != "Origin" && data[i - 1].release_by == $('.name').attr("id")) {
-                table_data += `<td>
-                                <span onClick="cancelRelease(` + data[i].document_id + `,` + data[i].id + `,` + data[i - 1].id + `)">x</span>
-                            </td>
-                            </tr>
-                            <tr class='spacer'></tr>`;
             } else {
                 table_data += `<td></td></tr>
                             <tr class='spacer'></tr>`;

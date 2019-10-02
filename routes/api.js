@@ -44,13 +44,13 @@ router.get('/document/get_types', documentController.get_types);
 router.get('/document/get_pending_graph_data', documentController.get_pending_graph_data);
 
 // Get Receive Report
-router.get('/document/get_recieve_graph_data', documentController.get_recieve_graph_data);
+router.get('/document/get_receive_graph_data', documentController.get_receive_graph_data);
 
 // Get Release Report
 router.get('/document/get_release_graph_data', documentController.get_release_graph_data);
 
-// Get recievable barcodes
-router.get('/document/get_recievable_bcodes', documentController.get_recievable_bcodes);
+// Get receivable barcodes
+router.get('/document/get_receivable_bcodes', documentController.get_receivable_bcodes);
 
 // Get releasable barcodes
 router.get('/document/get_releasable_bcodes', documentController.get_releasable_bcodes);
@@ -98,8 +98,11 @@ router.get('/logs/get_logs', logController.get_logs);
 // Get log history
 router.get('/logs/get_log_history', logController.get_log_history);
 
+// Get reports
+router.get('/logs/get_reports', logController.get_reports);
+
 // Update received log
-router.post('/logs/update_recieve', logController.update_recieve);
+router.post('/logs/update_receive', logController.update_receive);
 
 // Update released log
 router.post('/logs/update_release', logController.update_release);
@@ -123,6 +126,9 @@ router.post('/user/update', userController.update);
 
 // Delete user
 router.get('/user/delete', userController.delete);
+
+// Reset user password
+router.get('/user/reset_password', userController.reset_password);
 
 // Get users count
 router.get('/user/get_count', userController.get_count);
