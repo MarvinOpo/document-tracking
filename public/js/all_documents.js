@@ -163,6 +163,24 @@ function getDocuments(offset) {
 
 }
 
+function editDocument(data) {
+    $('.modal-title').text('Edit Document');
+    $('#modal_document').modal('show');
+
+    if (data.created_by != $('.department').attr('id')) {
+        $('#modal_add').hide();
+    }
+
+    $('#modal_name').val(data.name);
+    $('#modal_docno').val(data.document_no);
+
+    $('#modal_type').val(data.type);
+    $('#modal_priority').val(data.priority);
+
+    $('#modal_description').val(data.description);
+    $('#modal_remarks').val(data.remarks);
+}
+
 function trackDocument(id, status) {
     let year = $('#year_filter').val();
 

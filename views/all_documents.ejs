@@ -208,6 +208,66 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div id="modal_document" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content" style="width: 700px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Document</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+
+                    <div id="error_container"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Name <span class="color-red">*</span></label>
+                            <input id="modal_name" type="text" class="au-input au-input--full m-b-10 text-capitalize"
+                                style="height: 36px;" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Type <span class="color-red">*</span></label>
+                            <input id="modal_type" type="text" class="au-input au-input--full m-b-10 text-capitalize"
+                                style="height: 36px;" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Document No. <span class="color-red">*</span></label>
+                            <input id="modal_docno" type="text" class="au-input au-input--full m-b-10 text-uppercase"
+                                style="height: 36px;" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Urgency <span class="color-red">*</span></label>
+                            <input id="modal_priority" type="text" class="au-input au-input--full m-b-10 text-capitalize"
+                                style="height: 36px;" />
+                        </div>
+                    </div>
+
+                    <label>Description <span class="color-red">*</span></label>
+                    <textarea id="modal_description" class="au-input au-input--full m-b-10 text-capitalize"
+                        placeholder="Write something here..."></textarea>
+
+                    <label>Remarks </label>
+                    <textarea id="modal_remarks" class="au-input au-input--full m-b-10 text-capitalize"
+                        placeholder="Write something here..."></textarea>
+
+                    <div class="modal-footer" style="justify-content: center;">
+                        <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                            data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- Jquery JS-->
     <script src="vendor/jquery.min.js"></script>
     <!-- Bootstrap JS-->

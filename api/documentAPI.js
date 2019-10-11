@@ -316,13 +316,12 @@ exports.get_release_sendout = function (param) {
 
 exports.get_count = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT count(*) AS count from documents_" + param.year + " d "
-            + "WHERE ((created_by = ? OR (location = ? "
-            + "AND status = 'Received')) OR "
-            + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-            + "AND document_id = d.id AND (receive_by IS NOT NULL OR release_date IS NOT NULL)) > 0) "
+        let sql = `SELECT count(DISTINCT l.document_id) as count
+                    FROM logs_` + param.year + ` l 
+                    INNER JOIN documents_` + param.year + ` d
+                        ON d.id = l.document_id `;
 
-        let values = [param.user_id, param.department, param.department];
+        let values = [];
 
         if (param.general) {
             sql += `AND (
@@ -336,26 +335,31 @@ exports.get_count = function (param) {
 
 
             if (param.type) {
-                sql += "AND d.type = ? "
-                values[values.length] = param.type;
+                sql += "AND d.type = ? ";
+                values.push(param.type);
             }
         } else {
             if (param.barcode) {
-                sql += "AND barcode = ? "
-                values[values.length] = param.barcode;
+                sql += "AND barcode = ? ";
+                values.push(param.barcode);
 
             }
 
             if (param.type) {
-                sql += "AND type = ? "
-                values[values.length] = param.type;
+                sql += "AND type = ? ";
+                values.push(param.type);
             }
 
             if (param.docno) {
-                sql += "AND document_no = ? "
-                values[values.length] = param.docno;
+                sql += "AND document_no = ? ";
+                values.push(param.docno);
             }
         }
+
+        sql += `WHERE l.release_to = ?
+                AND l.receive_by IS NOT NULL `;
+        
+        values.push(param.department);
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET count document failed"));
@@ -900,11 +904,19 @@ exports.get_receivable_bcodes = function (param) {
 
 exports.get_releasable_bcodes = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT barcode FROM documents_" + param.year + " "
-            + "WHERE (location = ? AND status = 'Received') OR "
-            + "(location = '' AND created_by = ?) ";
+        // let sql = "SELECT barcode FROM documents_" + param.year + " "
+        //     + "WHERE (location = ? AND status = 'Received') OR "
+        //     + "(location = '' AND created_by = ?) ";
 
-        const values = [param.department, param.id];
+        let sql = `SELECT d.barcode FROM documents_`+ param.year +` d 
+                    RIGHT JOIN logs_`+ param.year +` l
+                            ON l.document_id = d.id 
+                            AND l.release_to = ?
+                            AND l.receive_date IS NOT NULL
+                            AND l.release_date IS NULL
+                    WHERE d.barcode IS NOT NULL`
+
+        const values = [param.department];
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET releasable barcodes failed"));

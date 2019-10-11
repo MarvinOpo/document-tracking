@@ -25,6 +25,9 @@ class User{
 
     setPassword(password){ this.password = password }
     getPassword(){ return this.password }
+
+    setRights(rights){ this.rights = rights }
+    getRights(){ return this.rights }
 }
 
 module.exports = User;

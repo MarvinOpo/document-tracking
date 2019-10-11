@@ -9,6 +9,7 @@ exports.insert = async function (req, res) {
     user.setUsername(req.body.username);
     user.setDesignation(req.body.designation);
     user.setDepartment(req.body.department);
+    user.setRights(req.body.rights);
 
     let result = {};
     try {
@@ -51,6 +52,7 @@ exports.update = async function (req, res) {
     user.setLname(req.body.lname);
     user.setDesignation(req.body.designation);
     user.setDepartment(req.body.department);
+    user.setRights(req.body.rights);
 
     let result = {};
     try {

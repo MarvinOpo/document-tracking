@@ -22,6 +22,16 @@ let date_from;
         "hideMethod": "fadeOut"
     };
 
+    getDocCount();
+
+    $('input, textarea').on('keypress', function (event) {
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+        if (key == '\'' || key == '"') {
+            event.preventDefault();
+            return false;
+        }
+    });
+
     const filter = (window.location.search.substring(1)).split("=")[1];
     if (filter) {
         $('#general_filter').append('<option value="' + filter + '">' + filter + '</option>')
@@ -129,6 +139,7 @@ let date_from;
 
     $('#modal_receive').on('shown.bs.modal', function () {
         $('#modal_receive_barcode-selectized').focus();
+        $('.modal-title').text('Receive Document');
     });
 
     $('#modal_print_sendout').on('shown.bs.modal', function () {
@@ -253,6 +264,7 @@ function selectizeFilter(filter) {
     $('#year_filter').append(options);
     $year = $('#year_filter').selectize({
         onChange: function (value) {
+            getDocCount();
             refreshSelectize();
             refreshModalSelectize();
         }
@@ -263,6 +275,7 @@ function selectizeFilter(filter) {
         labelField: 'barcode',
         searchField: ['barcode'],
         onChange: function (value) {
+            getDocCount();
             refreshSelectize();
 
             if (value) {
@@ -356,12 +369,20 @@ function selectizeModal() {
 
     $mpriority = $('#modal_priority').selectize();
 
-    $mdept = $('#modal_dept').selectize({
-        maxItems: 10,
-        valueField: 'department',
-        labelField: 'department',
-        searchField: ['department']
-    });
+    if ($('.access-rights').attr('id') == '1') {
+        $mdept = $('#modal_dept').selectize({
+            maxItems: 20,
+            valueField: 'department',
+            labelField: 'department',
+            searchField: ['department']
+        });
+    }else{
+        $mdept = $('#modal_dept').selectize({
+            valueField: 'department',
+            labelField: 'department',
+            searchField: ['department']
+        });
+    }
 
     $mbcodeReceive = $('#modal_receive_barcode').selectize({
         // create: true,
@@ -475,8 +496,6 @@ function refreshSelectize() {
 
     const docnoRoute = '/API/document/get_docno' + param;
     loadFilter(docno_selectize, docnoRoute);
-
-    getDocCount();
 }
 
 function refreshModalSelectize() {
@@ -625,7 +644,7 @@ function getDocuments(offset) {
             '&offset=' + offset + '&limit=' + 5 + '&department=' + $('.department').text() +
             '&user_id=' + $('.department').attr('id');
     } else {
-        param += '&general=' + $('#general_filter').val() + '&type=' + $('#type_filter').val() +
+        param += '&general=' + $('#general_filter').val().toLowerCase() + '&type=' + $('#type_filter').val() +
             '&offset=' + offset + '&limit=' + 5 + '&department=' + $('.department').text() +
             '&user_id=' + $('.department').attr('id');
     }
@@ -688,11 +707,11 @@ function getSendOutDocuments() {
         .then(res => res.json())
         .then(data => {
             if (!data.length) {
-                $('#modalTblContainer').addClass('d-none');
+                $('#modalTblSendOut').addClass('d-none');
                 $('#modal_no_sendout_container').removeClass('d-none');
                 return;
             } else {
-                $('#modalTblContainer').removeClass('d-none');
+                $('#modalTblSendOut').removeClass('d-none');
                 $('#modal_no_sendout_container').addClass('d-none');
             }
 
@@ -734,6 +753,7 @@ function getDocCount() {
 }
 
 function editDocument(data) {
+    console.log(data);
     $('.modal-title').text('Edit Document');
     $('#modal_document').modal('show');
 
@@ -1155,6 +1175,13 @@ function populate_table(data) {
             + "<td> "
             + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + " )'> Track </button>";
 
+        if (data[i].status != "Cycle End") {
+            if (data[i].created_by == $(".department").attr('id')) {
+                table_data += "<button class='btn btn-outline-success ml-1' onclick='editBarcodeSetting(" + JSON.stringify(data[i].barcode) + ")'>"
+                    + '<i class="zmdi zmdi-print"></i>'
+                    + " </button>";
+            }
+        }
         // if ((!data[i].location || data[i].location == $(".department").text()) && data[i].status != "Cycle End") {
         //     if (data[i].status == 'Received' || !data[i].location)
         //         table_data += "<button class='btn btn-outline-success m-l-5' onclick='openReleaseModal(" + JSON.stringify(data[i].barcode) + ")'> Release </button>";
@@ -1225,14 +1252,14 @@ function populate_table(data) {
             + "<div class='table-data-feature'>"
 
         if (data[i].status != "Cycle End") {
-            if (data[i].created_by == $(".department").attr('id')) {
-                table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Print' onclick='editBarcodeSetting(" + JSON.stringify(data[i].barcode) + ")'>"
-                    + '<i class="zmdi zmdi-print"></i>'
-                    + " </button>"
-                    // + "<button class='item' data-toggle='tooltip' data-placement='top' title='Delete' onclick='deleteDocument(" + data[i].id + ")'>"
-                    // + "<i class='zmdi zmdi-delete'></i>"
-                    + " </button>";
-            }
+            // if (data[i].created_by == $(".department").attr('id')) {
+            //     table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Print' onclick='editBarcodeSetting(" + JSON.stringify(data[i].barcode) + ")'>"
+            //         + '<i class="zmdi zmdi-print"></i>'
+            //         + " </button>"
+            //         // + "<button class='item' data-toggle='tooltip' data-placement='top' title='Delete' onclick='deleteDocument(" + data[i].id + ")'>"
+            //         // + "<i class='zmdi zmdi-delete'></i>"
+            //         // + " </button>";
+            // }
 
             if (data[i].location == $(".department").text() && data[i].status == "Received") {
                 table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
@@ -1508,8 +1535,8 @@ function populate_sendout(data) {
                             <td>` + data[i].name + `</td>
                             <td>` + data[i].type + `</td>
                             <td>` + release_date + `</td>
-                            <td class="align-bottom">____________</td>
-                            <td class="align-bottom">____________</td>
+                            <td class="border-bottom"></td>
+                            <td class="border-bottom"></td>
                         </tr>`;
     }
 
@@ -1528,7 +1555,7 @@ function populateModalSendout(data) {
             ctr = 1;
 
             table_data += `<tr>
-                            <td class="p-l-10 p-t-20 p-b-5 text-left"><b>` + data[i].release_to + `</b></td>
+                            <td class="p-t-20 p-b-5 text-left"><b>` + data[i].release_to + `</b></td>
                             <td class="p-t-20 p-b-5 text-left">` + date + `</td>
                         </tr>`;
         }
@@ -1538,8 +1565,8 @@ function populateModalSendout(data) {
                             <td>` + data[i].name + `</td>
                             <td>` + data[i].type + `</td>
                             <td>` + time + `</td>
-                            <td class="align-bottom">____________</td>
-                            <td class="align-bottom">____________</td>
+                            <td class="border-bottom"></td>
+                            <td class="border-bottom"></td>
                         </tr>`;
     }
 
@@ -1604,6 +1631,38 @@ function getTwoDigitFormat(num) {
     if (num < 10) num = "0" + num;
 
     return num;
+}
+
+function getThreeDigitFormat(num) {
+    if (num < 10) num = "00" + num;
+    else if (num < 100) num = "0" + num
+
+    return num;
+}
+
+function getDateDiff(startdate, enddate) {
+    const mstart = moment(startdate);
+    const mend = moment(enddate);
+
+    let totalHoursDiff = 0;
+    let totalMinsDiff = 0;
+    let totalSecsDiff = 0;
+    const mend_day = mend.format('D');
+
+    for (let i = mstart.format('D'); i <= mend_day; i++) {
+        const mstart_hour = mstart.format('H');
+        const mend_hour = mend.format('H');
+
+        if (i != mend_day) {
+            if (mstart_hour < 17) {
+                totalHoursDiff = totalHoursDiff + (17 - mstart_hour);
+            }
+        } else {
+
+        }
+
+        mstart_hour.add(1, 'days');
+    }
 }
 
 function editBarcodeSetting(code) {

@@ -9,8 +9,8 @@ const conn = mysql.createConnection({
 
 exports.insert_user = function (user) {
     return new Promise(function (resolve, reject) {
-        let sql = "INSERT INTO users(username, password, fname, mname, lname, designation, department) "
-            + "values(?, '123', ?, ?, ?, ?, ?)";
+        let sql = "INSERT INTO users(username, password, fname, mname, lname, designation, department, access_rights) "
+            + "values(?, MD5('123'), ?, ?, ?, ?, ?, ?)";
 
         let dept = user.getDepartment();
         let designation = user.getDesignation();
@@ -18,7 +18,8 @@ exports.insert_user = function (user) {
         if (!designation) designation = 'nd';
         if (!dept) dept = 'nd';
 
-        const values = [user.getUsername(), user.getFname(), user.getMinit(), user.getLname(), designation, dept];
+        const values = [user.getUsername(), user.getFname(), user.getMinit(),
+             user.getLname(), designation, dept, user.getRights()];
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("Insert failed"));
@@ -30,7 +31,8 @@ exports.insert_user = function (user) {
 
 exports.get_users = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT id, username, fname, mname as mi, lname, designation, department 
+        let sql = `SELECT id, username, fname, mname as mi, lname,
+                        designation, department, access_rights
                     FROM users WHERE username IS NOT NULL `;
 
         let values = [];
@@ -60,7 +62,6 @@ exports.get_users = function (param) {
         }
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
             if (err) reject(new Error("GET document failed"));
 
             resolve(result);
@@ -71,13 +72,14 @@ exports.get_users = function (param) {
 exports.update_user = function (user) {
     return new Promise(function (resolve, reject) {
         let sql = `UPDATE users SET fname = ?, mname = ?, lname = ?, 
-                    designation = ?, department = ? WHERE id = ? `;
+                    designation = ?, department = ?, access_rights = ?
+                    WHERE id = ? `;
 
         const values = [user.getFname(), user.getMinit(), user.getLname(), 
-                user.getDesignation(), user.getDepartment(), user.getId()]
+                user.getDesignation(), user.getDepartment(), user.getRights(),
+                user.getId()]
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
             if (err) reject(new Error("Get departments failed"));
 
             resolve();

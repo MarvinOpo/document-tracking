@@ -143,7 +143,7 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
 
         $('#printable_title').html('Recent Documents');
         $('#printable_date').text(startdate + " - " + enddate);
-        $('#printed_by').html("Printed by: " + $('.department').html());
+        $('#printed_by').html("Printed by: " + $('.department').text());
         $('#printed_date').html("Printed date: " + moment().format('MM/DD/YY HH:mm a'));
     });
 
@@ -160,7 +160,7 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
 
         $('#printable_title').html('Send Out Report');
         $('#printable_date').hide();
-        $('#printed_by').html("Printed by: " + $('.name').attr('id'));
+        $('#printed_by').html("Printed by: " + $('.department').text());
         $('#printed_date').html('');
     });
 
@@ -172,20 +172,20 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
         $('.table-load-more-reports').show();
         getReports(0, '');
 
-        const month_from = moment(reports_date_from).format('MMM ');
-        const month_to = moment(reports_date_to).format('MMM ');
-        const year = moment(reports_date_from).format('YYYY');
+        const month_from = moment(reports_date_from).format('MM/DD/YYYY');
+        const month_to = moment(reports_date_to).format('MM/DD/YYYY');
+        // const year = moment(reports_date_from).format('YYYY');
 
-        let date = "";
-        if (month_from != month_to) {
-            date = month_from + "- " + month_to + year;
-        } else {
-            date = month_from + year;
-        }
+        // let date = "";
+        // if (month_from != month_to) {
+        //     date = month_from + " - " + month_to;
+        // } else {
+        //     date = month_from;
+        // }
 
         $('#printable_title').html('MONITORING TOOL');
-        $('#printable_date').html('For the Month of ' + date);
-        $('#printed_by').html("Printed by: " + $('.name').attr('id'));
+        $('#printable_date').html(month_from + " - " + month_to);
+        $('#printed_by').html("<br>Printed by: " + $('.department').text());
         $('#printed_date').html('');
     });
 
@@ -490,13 +490,13 @@ function populateSendOutDocs(data) {
         const date = moment(data[i].created_at).format('MM/DD/YYYY');
         const time = moment(data[i].created_at).format('hh:mm a');
 
-        if (!table_data.includes(data[i].release_to)) {
+        const dept = `<td class="p-t-20 p-b-5 text-left"><b>` + data[i].release_to + `</b></td>
+                        <td class="p-t-20 p-b-5 text-left">` + date + `</td>`;
+
+        if (!table_data.includes(dept)) {
             ctr = 1;
 
-            table_data += `<tr>
-                            <td class="p-l-10 p-t-20 p-b-5 text-left"><b>` + data[i].release_to + `</b></td>
-                            <td class="p-t-20 p-b-5 text-left">` + date + `</td>
-                        </tr>`;
+            table_data += `<tr>` + dept + `</tr>`;
         }
 
         table_data += `<tr>
@@ -504,8 +504,8 @@ function populateSendOutDocs(data) {
                             <td>` + data[i].name + `</td>
                             <td>` + data[i].type + `</td>
                             <td>` + time + `</td>
-                            <td class="align-bottom">____________</td>
-                            <td class="align-bottom">____________</td>
+                            <td class="border-bottom"></td>
+                            <td class="border-bottom"></td>
                         </tr>`;
     }
 

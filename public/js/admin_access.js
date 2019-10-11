@@ -1,5 +1,5 @@
 let dept_selectize;
-let mdept_selectize;
+let mdept_selectize, mrights_selectize;
 
 (function ($) {
     toastr.options = {
@@ -41,7 +41,8 @@ let mdept_selectize;
 
     $('#modal_add').click(function () {
         if (!$('#modal_fname').val() || !$('#modal_lname').val() || !$('#modal_minit').val() ||
-            !$('#modal_designation').val() || !$('#modal_department').val()) {
+            !$('#modal_designation').val() || !$('#modal_department').val() ||
+            !$('#modal_rights').val()) {
 
             const text_error = "<div class='input-error'>"
                 + "<span class='error-text'>"
@@ -65,7 +66,8 @@ let mdept_selectize;
             minit: $('#modal_minit').val().toUpperCase().trim(),
             lname: lname,
             designation: $('#modal_designation').val().toUpperCase().trim(),
-            department: $('#modal_department').val().toUpperCase().trim()
+            department: $('#modal_department').val().toUpperCase().trim(),
+            rights: $('#modal_rights').val()
         };
 
         if ($('#modal_add').text() == 'Add') {
@@ -121,7 +123,7 @@ function selectizeFilter() {
 }
 
 function selectizeModal() {
-    let $mdepartment;
+    let $mdepartment, $rights;
 
     $mdepartment = $('#modal_department').selectize({
         create: true,
@@ -130,8 +132,11 @@ function selectizeModal() {
         searchField: ['department']
     });
 
-    mdept_selectize = $mdepartment[0].selectize;
+    $rights = $('#modal_rights').selectize();
 
+    mdept_selectize = $mdepartment[0].selectize;
+    mrights_selectize = $rights[0].selectize;
+    
     refreshModalSelectize();
 }
 
@@ -207,6 +212,7 @@ function editUser(data) {
     $('#modal_lname').val(data.lname);
     $('#modal_minit').val(data.mi);
 
+    mrights_selectize.setValue(data.access_rights);
     mdept_selectize.setValue(data.department);
 
     if (data.designation.toUpperCase() != 'ND') {
