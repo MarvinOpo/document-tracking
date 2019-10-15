@@ -78,8 +78,9 @@ exports.get_reports = function (param) {
         let sql = `SELECT l.receive_date, l.release_date, l.remarks,
                          d.document_no, d.name, d.priority
                     FROM logs_` + param.year + ` l, documents_` + param.year + ` d
-                    WHERE release_to = ? && d.id = l.document_id &&
-                          (l.receive_date >= ? && l.receive_date <= ?) `;
+                    WHERE release_to = ? AND d.id = l.document_id AND
+                          (l.receive_date >= ? AND l.receive_date <= ?)
+                           AND release_date IS NOT NULL `;
 
         const values = [param.department, param.date_from, param.date_to];
 

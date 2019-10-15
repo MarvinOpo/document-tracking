@@ -92,6 +92,7 @@
                                         <div class="rs-select2--light rs-select2--300">
                                             <select id="general_filter" class="demo-default">
                                                 <option value="">General Search</option>
+                                                <option value="Pending">Pending</option>
                                             </select>
                                         </div>
                                     </div>
@@ -541,23 +542,24 @@
                                 </div>
                             </div>
 
-                            <div class="table-responsive">
-                                <table id="modalTblSendOut" class="table w-100 text-size-10">
-                                    <thead id="m-b-50">
-                                        <tr class="border-bottom">
-                                            <th width='140px'>Barcode</th>
-                                            <th width='150px'>Name</th>
-                                            <th width='120px'>Type</th>
-                                            <th width='60px'>Out</th>
-                                            <th>Receive By</th>
-                                            <th>Date/Time</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="modal_sendout_tbody" class="w-100">
+                            <!-- <div class="table-responsive"> -->
+                            <table id="modalTblSendOut" class="table w-100 text-size-10"
+                                style="max-height: unset !important;">
+                                <thead id="m-b-50">
+                                    <tr class="border-bottom">
+                                        <th width='140px'>Barcode</th>
+                                        <th width='150px'>Name</th>
+                                        <th width='120px'>Type</th>
+                                        <th width='60px'>Out</th>
+                                        <th>Receive By</th>
+                                        <th>Date/Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modal_sendout_tbody" class="w-100">
 
-                                    </tbody>
-                                </table>
-                            </div>
+                                </tbody>
+                            </table>
+                            <!-- </div> -->
 
                             <div id="modal_no_sendout_container" class="w-100 d-none">
                                 <img src="images/no_see.png" />

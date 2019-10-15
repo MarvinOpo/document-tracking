@@ -47,6 +47,11 @@
 </head>
 
 <body class="animsition">
+    <div id="loader_container_dashboard" class="d-none">
+        <div class="loader"></div>
+        <span>Generating data. Please wait ...</span>
+    </div>
+
     <div class="page-wrapper">
         <!-- <div class="banner">
             <img class="banner" src="images/vsmmc_banner.png">
@@ -290,25 +295,6 @@
                                     <img src="images/no_see.png" />
                                 </div>
                             </div>
-
-                            <div id="printable_div2" class="row w-100 d-none">
-                                <div id="printable_div" class="col-lg-12 text-center w-100">
-                                    <h3>Vicente Sotto Memorial Medical Center</h3>
-                                    <h5>B. Rodriguez St., Cebu City</h5>
-                                    <hr>
-                                    <h4 id="printable_title">Recent Documents</h4>
-                                    <span id="printable_date">08/01/2019 - 08/01/2019</span>
-                                    <br>
-                                    <div class="w-100 text-left border-bottom pb-2">
-                                        <h6 id="printed_by">Printed By:</h6>
-                                        <h6 id="printed_date">Printed Date:</h6>
-                                    </div>
-
-                                    <table id="tblContainer" class="table w-100 text-size-10">
-                                        
-                                    </table>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="row">
@@ -400,18 +386,18 @@
                                     class="match-parent table table-data3 table-borderless table-striped table-earning text-size-10">
 
                                     <thead>
-                                        <tr>
-                                            <th width='300px' class='text-left'>DocNo.</th>
+                                        <tr class='text-size-14'>
+                                            <th width='250px' class='text-left'>DocNo.</th>
                                             <th>Suppliers/Reports</th>
-                                            <th width='120px'>IN</th>
-                                            <th width='120px'>OUT</th>
-                                            <th width='150px'>Duration</th>
-                                            <th>Target</th>
+                                            <th width='300px'>IN</th>
+                                            <th width='300px'>OUT</th>
+                                            <th width='200px'>Duration</th>
+                                            <th width='200px'>Target</th>
                                             <th width='300px'>Remarks</th>
                                         </tr>
                                     </thead>
 
-                                    <tbody id="reports_tbody" class="text-size-12">
+                                    <tbody id="reports_tbody">
 
                                     </tbody>
                                 </table>
@@ -420,6 +406,25 @@
                                     <button id="load_more_reports" class="au-btn au-btn-load js-load-btn">load
                                         more</button>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div id="printable_div2" class="row w-100 d-none">
+                            <div id="printable_div" class="col-lg-12 text-center w-100">
+                                <h3>Vicente Sotto Memorial Medical Center</h3>
+                                <h5>B. Rodriguez St., Cebu City</h5>
+                                <hr>
+                                <h4 id="printable_title">Recent Documents</h4>
+                                <span id="printable_date">08/01/2019 - 08/01/2019</span>
+                                <br>
+                                <div class="w-100 text-left border-bottom pb-2">
+                                    <h6 id="printed_by">Printed By:</h6>
+                                    <h6 id="printed_date">Printed Date:</h6>
+                                </div>
+
+                                <table id="tblContainerD" class="table w-100 text-size-10">
+
+                                </table>
                             </div>
                         </div>
                     </div>

@@ -223,10 +223,20 @@ exports.get_sendout = function (param) {
                             ON l.document_id = d.id
                     WHERE l.release_from = ?
                             AND l.created_at >= ?
-                            AND l.created_at <= ?
-                    ORDER BY l.release_to, l.created_at `
+                            AND l.created_at <= ? `
 
         let values = [param.department, param.date_from, param.date_to];
+
+        if (param.name) {
+            sql += `AND (SELECT lg.release_by 
+                    FROM logs_` + param.year + ` lg
+                    WHERE lg.document_id = l.document_id 
+                    AND lg.release_by IS NOT NULL
+                    ORDER BY id DESC LIMIT 1) = ? `;
+            values.push(param.name);
+        }
+
+        sql += `ORDER BY l.release_to, l.created_at `;
 
         if (parseInt(param.limit)) {
             sql += `LIMIT ? OFFSET ?`
@@ -358,7 +368,7 @@ exports.get_count = function (param) {
 
         sql += `WHERE l.release_to = ?
                 AND l.receive_by IS NOT NULL `;
-        
+
         values.push(param.department);
 
         conn.query(sql, values, function (err, result) {
@@ -469,26 +479,27 @@ exports.check_document = function (param) {
 
 exports.get_docno = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT d.document_no from documents_" + param.year + " d "
-            + "WHERE d.document_no != '' AND d.document_no != 'n/a' AND ((created_by = ? OR (location = ? "
-            + "AND status = 'Received')) OR "
-            + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-            + "AND document_id = d.id AND receive_by IS NOT NULL) > 0) "
+        let sql = `SELECT DISTINCT d.document_no FROM documents_`+ param.year + ` d 
+                    RIGHT JOIN logs_`+ param.year + ` l
+                            ON l.document_id = d.id 
+                            AND l.release_to = ?
+                            AND l.receive_date IS NOT NULL
+                    WHERE d.document_no <> 'N/A' `
 
-        let values = [param.user_id, param.department, param.department];
+        let values = [param.department];
 
         if (param.barcode) {
-            sql += "AND barcode = ? "
-            values[values.length] = param.barcode;
+            sql += "AND d.barcode = ? "
+            values.push(param.barcode);
 
         }
 
         if (param.type) {
-            sql += "AND type = ? "
-            values[values.length] = param.type;
+            sql += "AND d.type = ? "
+            values.push(param.type);
         }
 
-        sql += "ORDER BY ID "
+        sql += "ORDER BY d.ID "
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET filters document failed"));
@@ -528,25 +539,26 @@ exports.get_all_docno = function (param) {
 
 exports.get_barcodes = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT d.barcode from documents_" + param.year + " d "
-            + "WHERE ((created_by = ? OR (location = ? "
-            + "AND status = 'Received')) OR "
-            + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-            + "AND document_id = d.id AND receive_by IS NOT NULL) > 0) "
+        let sql = `SELECT d.barcode FROM documents_` + param.year + ` d 
+                    RIGHT JOIN logs_` + param.year + ` l
+                            ON l.document_id = d.id 
+                            AND l.release_to = ?
+                            AND l.receive_date IS NOT NULL
+                    WHERE d.barcode IS NOT NULL `
 
-        let values = [param.user_id, param.department, param.department];
+        let values = [param.department];
 
         if (param.type) {
-            sql += "AND type = ? "
+            sql += "AND d.type = ? "
             values[values.length] = param.type;
         }
 
         if (param.docno) {
-            sql += "AND document_no = ? "
+            sql += "AND d.document_no = ? "
             values[values.length] = param.docno;
         }
 
-        sql += "ORDER BY ID "
+        sql += "ORDER BY d.ID "
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET document barcodes failed"));
@@ -584,26 +596,27 @@ exports.get_all_barcodes = function (param) {
 
 exports.get_types = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT d.type from documents_" + param.year + " d "
-            + "WHERE ((created_by = ? OR (location = ? "
-            + "AND status = 'Received')) OR "
-            + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-            + "AND document_id = d.id AND receive_by IS NOT NULL) > 0) "
+        let sql = `SELECT DISTINCT d.type FROM documents_` + param.year + ` d 
+                    RIGHT JOIN logs_` + param.year + ` l
+                            ON l.document_id = d.id 
+                            AND l.release_to = ?
+                            AND l.receive_date IS NOT NULL
+                    WHERE d.barcode IS NOT NULL `
 
-        let values = [param.user_id, param.department, param.department];
+        let values = [param.department];
 
         if (param.barcode) {
-            sql += "AND barcode = ? "
+            sql += "AND d.barcode = ? "
             values[values.length] = param.barcode;
 
         }
 
         if (param.docno) {
-            sql += "AND document_no = ? "
+            sql += "AND d.document_no = ? "
             values[values.length] = param.docno;
         }
 
-        sql += "ORDER BY ID "
+        sql += "ORDER BY d.ID "
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET document types failed"));
@@ -657,7 +670,7 @@ exports.get_pending_graph_data = function (param) {
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET pending document failed"));
 
-            if(!result.length) {
+            if (!result.length) {
                 let data = {
                     pending_counts: pnd_arr
                 };
@@ -738,7 +751,7 @@ exports.get_receive_graph_data = function (param) {
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET document types failed"));
 
-            if(!result.length) {
+            if (!result.length) {
                 let data = {
                     receive_counts: rcv_arr
                 };
@@ -817,7 +830,7 @@ exports.get_release_graph_data = function (param) {
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET document types failed"));
 
-            if(!result.length) {
+            if (!result.length) {
                 let data = {
                     release_counts: rls_arr
                 };
@@ -884,8 +897,8 @@ exports.get_release_graph_data = function (param) {
 
 exports.get_receivable_bcodes = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT d.barcode FROM documents_`+ param.year +` d 
-                    RIGHT JOIN logs_`+ param.year +` l
+        let sql = `SELECT d.barcode FROM documents_` + param.year + ` d 
+                    RIGHT JOIN logs_`+ param.year + ` l
                             ON l.document_id = d.id 
                             AND l.release_to = ?
                             AND l.receive_date IS NULL
@@ -894,7 +907,6 @@ exports.get_receivable_bcodes = function (param) {
         const values = [param.department];
 
         conn.query(sql, values, function (err, result) {
-            console.log(err);
             if (err) reject(new Error("GET receivable barcodes failed"));
 
             resolve(result);
@@ -908,8 +920,8 @@ exports.get_releasable_bcodes = function (param) {
         //     + "WHERE (location = ? AND status = 'Received') OR "
         //     + "(location = '' AND created_by = ?) ";
 
-        let sql = `SELECT d.barcode FROM documents_`+ param.year +` d 
-                    RIGHT JOIN logs_`+ param.year +` l
+        let sql = `SELECT d.barcode FROM documents_` + param.year + ` d 
+                    RIGHT JOIN logs_`+ param.year + ` l
                             ON l.document_id = d.id 
                             AND l.release_to = ?
                             AND l.receive_date IS NOT NULL

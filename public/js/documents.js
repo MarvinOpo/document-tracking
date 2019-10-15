@@ -2,6 +2,7 @@ let document_selectize, type_selectize, docno_selectize, general_selectize, year
 let mtype_selectize, mpriority_selectize, mbcode_receive_selectize;
 let mdept_selectize, mbcode_release_selectize, mbcode_position_selectize;
 let date_from;
+let refreshFlag = true;
 
 (function ($) {
     toastr.options = {
@@ -22,8 +23,6 @@ let date_from;
         "hideMethod": "fadeOut"
     };
 
-    getDocCount();
-
     $('input, textarea').on('keypress', function (event) {
         var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
         if (key == '\'' || key == '"') {
@@ -41,6 +40,8 @@ let date_from;
     selectizeModal();
 
     $('#modal_add').click(function () {
+        $('#modal_add').prop('disabled', true);
+
         if (!$('#modal_name').val() || !$('#modal_docno').val() || !$('#modal_priority').val() ||
             !$('#modal_type').val() || !$('#modal_description').val()) {
 
@@ -52,6 +53,8 @@ let date_from;
 
             $('#error_container').html(text_error);
 
+
+            $('#modal_add').prop('disabled', false);
             return;
         } else {
             $('#error_container').html('');
@@ -90,6 +93,8 @@ let date_from;
     });
 
     $('#modal_add_release').mousedown(function () {
+        $('#modal_add_release').prop('disabled', true);
+
         if (!$('#modal_dept').val() || !$('#modal_release_barcode').val() ||
             !$('#modal_release_remarks').val()) {
             const text_error = "<div class='input-error'>"
@@ -99,12 +104,11 @@ let date_from;
                 + "</div>"
 
             $('#release_error_container').html(text_error);
-
+            $('#modal_add_release').prop('disabled', false);
             return;
         } else {
             $('#release_error_container').html('');
         }
-
         // getPrintableSentout();
         updateDocReleaseLog();
     });
@@ -130,16 +134,38 @@ let date_from;
 
     $('#modal_document').on('shown.bs.modal', function () {
         year_selectize.setValue('');
+        $('#modal_add').prop('disabled', false);
     });
 
     $('#modal_release').on('shown.bs.modal', function () {
-        mdept_selectize.removeOption($('.department').text());
+        mbcode_release_selectize.clearOptions();
         $('.modal-title').text('Release Document To');
+
+        let year = $('#year_filter').val();
+
+        if (!year) year = (new Date()).getFullYear();
+
+        const param = '?year=' + year + '&id=' + $('.department').attr('id') + '&department=' + $('.department').text();
+
+        const releaseRoute = '/API/document/get_releasable_bcodes' + param + '&name=' + $('.name').attr('id');
+        loadFilter(mbcode_release_selectize, releaseRoute);
+
+        mdept_selectize.removeOption($('.department').text());
     });
 
     $('#modal_receive').on('shown.bs.modal', function () {
-        $('#modal_receive_barcode-selectized').focus();
+        mbcode_receive_selectize.clearOptions();
         $('.modal-title').text('Receive Document');
+
+        let year = $('#year_filter').val();
+        if (!year) year = (new Date()).getFullYear();
+
+        const param = '?year=' + year + '&id=' + $('.department').attr('id') + '&department=' + $('.department').text();
+
+        const receiveRoute = '/API/document/get_receivable_bcodes' + param;
+        loadFilter(mbcode_receive_selectize, receiveRoute);
+
+        $('#modal_receive_barcode-selectized').focus();
     });
 
     $('#modal_print_sendout').on('shown.bs.modal', function () {
@@ -151,7 +177,8 @@ let date_from;
         date_from = moment().format('YYYY-MM-DD HH:mm:ss');
 
         // getSendOutDocuments();
-
+        const deptRoute = '/API/user/get_departments';
+        loadFilter(mdept_selectize, deptRoute);
     });
 
     $('input[type=checkbox]').change(function () {
@@ -175,7 +202,6 @@ let date_from;
             .end();
 
         mbcode_receive_selectize.setValue("");
-        refreshModalSelectize();
     });
 
     $('#modal_release').on('hidden.bs.modal', function () {
@@ -188,7 +214,6 @@ let date_from;
         mbcode_release_selectize.setValue("");
 
         $('#modal_release_remarks').val("");
-        refreshModalSelectize();
     });
 
     $('#modal_document').on('hidden.bs.modal', function (e) {
@@ -207,7 +232,6 @@ let date_from;
 
         mtype_selectize.setValue('');
         mpriority_selectize.setValue('Regular');
-        refreshModalSelectize();
     });
 
     $('#modal_receive_barcode-selectized').focus(function () {
@@ -265,8 +289,6 @@ function selectizeFilter(filter) {
     $year = $('#year_filter').selectize({
         onChange: function (value) {
             getDocCount();
-            refreshSelectize();
-            refreshModalSelectize();
         }
     });
 
@@ -276,7 +298,6 @@ function selectizeFilter(filter) {
         searchField: ['barcode'],
         onChange: function (value) {
             getDocCount();
-            refreshSelectize();
 
             if (value) {
                 general_selectize.setValue('');
@@ -376,7 +397,7 @@ function selectizeModal() {
             labelField: 'department',
             searchField: ['department']
         });
-    }else{
+    } else {
         $mdept = $('#modal_dept').selectize({
             valueField: 'department',
             labelField: 'department',
@@ -468,11 +489,7 @@ function selectizeModal() {
     mbcode_release_selectize = $mbcodeRelease[0].selectize;
     mbcode_position_selectize = $mbcodePos[0].selectize;
 
-    refreshModalSelectize();
     document_selectize.trigger('change');
-
-    const deptRoute = '/API/user/get_departments';
-    loadFilter(mdept_selectize, deptRoute);
 }
 
 function refreshSelectize() {
@@ -498,24 +515,6 @@ function refreshSelectize() {
     loadFilter(docno_selectize, docnoRoute);
 }
 
-function refreshModalSelectize() {
-    mbcode_receive_selectize.clearOptions();
-    mbcode_release_selectize.clearOptions();
-
-    let year = $('#year_filter').val();
-
-    if (!year) year = (new Date()).getFullYear();
-
-    const param = '?year=' + year + '&id=' + $('.department').attr('id') + '&department=' + $('.department').text();
-
-    const receiveRoute = '/API/document/get_receivable_bcodes' + param;
-    loadFilter(mbcode_receive_selectize, receiveRoute);
-
-    const releaseRoute = '/API/document/get_releasable_bcodes' + param;
-    loadFilter(mbcode_release_selectize, releaseRoute);
-
-}
-
 function insertDocument(body) {
     fetch('/API/document/insert', {
         method: 'POST',
@@ -527,6 +526,8 @@ function insertDocument(body) {
             if (data.status == "success") {
                 toastr.success("Successfully saved.");
                 $('#modal_document').modal('hide');
+
+                refreshFlag = true;
                 document_selectize.trigger("change");
 
                 const barcodes = [];
@@ -664,6 +665,11 @@ function getDocuments(offset) {
             }
 
             populate_table(data);
+
+            if (refreshFlag) {
+                refreshSelectize();
+                refreshFlag = false;
+            }
         })
         .catch(err => {
             console.log(err);
@@ -701,7 +707,8 @@ function getSendOutDocuments() {
     const date_to = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
 
     const param = '?year=' + year + '&department=' + $('.department').text() +
-        "&limit=0&date_from=" + date_from + "&date_to=" + date_to;
+        '&limit=0&date_from=' + date_from + '&date_to=' + date_to +
+        '&name=' + $('.name').attr('id');
 
     fetch('/API/document/get_sendout' + param, { method: 'GET' })
         .then(res => res.json())
@@ -815,6 +822,8 @@ function receiveDocument(barcodes) {
             if (data.status == 'success') {
                 toastr.success("Documents received.");
                 $('#modal_receive').modal('hide');
+
+                refreshFlag = true;
                 document_selectize.trigger("change");
             }
         })
@@ -1023,6 +1032,8 @@ function updateDocLocation(body) {
                 // if (!date_from) date_from = moment().format('YYYY-MM-DD HH:mm:ss');
 
                 getSendOutDocuments();
+
+                $('#modal_add_release').prop('disabled', false);
             }
         })
         .catch(err => {
@@ -1102,18 +1113,20 @@ function insertLogs(body) {
             updateLocation: false
         };
 
-        console.log(body);
-        console.log(departments.length);
-
-        for (let i = 0; i < departments.length; i++) {
-            body['department'] = departments[i];
-
-            if (i == departments.length - 1) {
-                body['updateLocation'] = true;
-            }
-
-            console.log(body);
+        if (typeof $('#modal_dept').val() == 'string') {
+            body['department'] = $('#modal_dept').val();
+            body['updateLocation'] = true;
             fetchLogInsert(body);
+        } else {
+            for (let i = 0; i < departments.length; i++) {
+                body['department'] = departments[i];
+
+                if (i == departments.length - 1) {
+                    body['updateLocation'] = true;
+                }
+
+                fetchLogInsert(body);
+            }
         }
     } else {
         body['triggerReceive'] = true;
@@ -1133,7 +1146,7 @@ function fetchLogInsert(body) {
                 if (body.triggerReceive)
                     updateDocReceiveLog(body.barcodes);
                 else if (body.updateLocation) {
-                    if ($('#modal_dept').val().length > 1) {
+                    if (typeof $('#modal_dept').val() != 'string' && $('#modal_dept').val().length > 1) {
                         body['department'] = "Many";
                     }
 
@@ -1261,7 +1274,7 @@ function populate_table(data) {
             //         // + " </button>";
             // }
 
-            if (data[i].location == $(".department").text() && data[i].status == "Received") {
+            if ((data[i].location == $(".department").text() && data[i].status == "Received") || data[i].location == '') {
                 table_data += "<button class='item' data-toggle='tooltip' data-placement='top' title='Cycle End' onclick='endDocument(" + data[i].id + ")'>"
                     + "<i class='zmdi zmdi-refresh-sync-off'></i>"
                     + " </button>";

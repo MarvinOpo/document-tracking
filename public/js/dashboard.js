@@ -132,7 +132,9 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
     });
 
     $('#print_recent').click(function () {
-        $('#tblContainer').addClass('table table-data3');
+        $('#loader_container_dashboard').removeClass('d-none');
+
+        $('#tblContainerD').addClass('table table-data3');
 
         $('#recent_doc_tbody').html('');
         $('.table-load-more').show();
@@ -148,7 +150,9 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
     });
 
     $('#print_sendout').click(function () {
-        $('#tblContainer').removeClass('table table-data3');
+        $('#loader_container_dashboard').removeClass('d-none');
+
+        $('#tblContainerD').removeClass('table table-data3');
 
         $('.table-load-more-sendout').attr('id', 0);
         $('#sendout_doc_tbody').html('');
@@ -165,7 +169,10 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
     });
 
     $('#print_reports').click(function () {
-        $('#tblContainer').removeClass('table table-data3');
+        
+        $('#loader_container_dashboard').removeClass('d-none');
+
+        $('#tblContainerD').removeClass('table table-data3');
 
         $('.table-load-more-reports').attr('id', 0);
         $('#reports_tbody').html('');
@@ -466,7 +473,7 @@ function populateRecentDocs(data) {
     $('#recent_doc_tbody').html(table_data);
 
     if (should_print) {
-        $('#tblContainer').html($('#tblRecentDocs').html());
+        $('#tblContainerD').html($('#tblRecentDocs').html());
 
         printJS({
             printable: 'printable_div',
@@ -475,10 +482,12 @@ function populateRecentDocs(data) {
             targetStyles: ['*']
         })
 
-        $('#tblContainer').html('');
+        $('#tblContainerD').html('');
         $('#recent_doc_tbody').html('');
         $('.table-load-more').show();
         getRecentDocuments(0, 5);
+        
+        $('#loader_container_dashboard').addClass('d-none');
     }
 }
 
@@ -514,7 +523,7 @@ function populateSendOutDocs(data) {
 
     if (should_print) {
         showSendOutInfo();
-        $('#tblContainer').html($('#tblSendOut').html());
+        $('#tblContainerD').html($('#tblSendOut').html());
 
         printJS({
             printable: 'printable_div',
@@ -526,10 +535,12 @@ function populateSendOutDocs(data) {
         })
 
         $('.table-load-more-sendout').attr('id', 0);
-        $('#tblContainer').html('');
+        $('#tblContainerD').html('');
         $('#sendout_doc_tbody').html('');
         $('.table-load-more-sendout').show();
         getSendOutDocuments(0, 5);
+
+        $('#loader_container_dashboard').addClass('d-none');
     }
 }
 
@@ -618,7 +629,7 @@ function populateReports(data) {
     $('#reports_tbody').html(table_data);
 
     if (should_print) {
-        $('#tblContainer').html($('#tblReports').html());
+        $('#tblContainerD').html($('#tblReports').html());
 
         printJS({
             printable: 'printable_div',
@@ -630,10 +641,12 @@ function populateReports(data) {
         })
 
         $('.table-load-more-reports').attr('id', 0);
-        $('#tblContainer').html('');
+        $('#tblContainerD').html('');
         $('#reports_tbody').html('');
         $('.table-load-more-reports').show();
         getReports(0, 5);
+
+        $('#loader_container_dashboard').addClass('d-none');
     }
 }
 
@@ -657,6 +670,11 @@ function showSendOutInfo() {
 
     $('#tblSendOut th:nth-child(6)').show();
     $('#tblSendOut td:nth-child(6)').show();
+}
+
+function exportToExcel(){
+    sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#printable_div2').html()));  
+    return (sa);
 }
 
 function populatePendingGraph() {

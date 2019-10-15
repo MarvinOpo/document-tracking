@@ -14779,9 +14779,11 @@ td:not([name="duration"]), th {
     min-width: 300px;
 }
 
-#reports_tbody td {
-    border: 0.5px solid gray !important; 
-    border-collapse: collapse !important;
+#reports_tbody td, #reports_tbody th {
+    /* border: 0.5px solid gray !important;  */
+    border-bottom: 0.5px solid gray !important;
+    border-collapse: separate !important;
+    padding: 10px;
 }
 /* #tblSendOut td {
     padding-left: 5px;
@@ -14804,6 +14806,17 @@ td {
     max-width: 300px;
 }
 
+.tblContainerD {
+    border-collapse: collapse !important;  
+    border-spacing: unset !important;
+}
+
+#tblContainerD td {
+    text-overflow: unset;
+    white-space: unset;
+    /* padding: 0; */
+}
+
 #tblContainer {
     border-collapse: separate !important;  
     border-spacing: 10px 0px;
@@ -14811,13 +14824,13 @@ td {
 
 #tblContainer td {
     text-overflow: unset;
+    white-space: unset;
     /* padding: 0; */
 }
 
 #tblContainer td:first-child,
 #tblContainer td:nth-child(2),
 #tblContainer td:nth-child(3) {
-    white-space: unset;
     text-align: left !important;
 }
 
@@ -14831,6 +14844,7 @@ td {
     table-layout: fixed !important;
     border-collapse: separate !important;  
     border-spacing: 10px 0px;
+    max-height: unset !important;
 }
 
 #modalTblSendOut td {
@@ -14962,6 +14976,10 @@ table .match-parent {
 
 .mxh-500 {
     max-height: 500px;
+}
+
+.mxw-300 {
+    max-width: 300px !important;
 }
 
 .mxw-600 {
@@ -15140,6 +15158,21 @@ table .match-parent {
     margin-left: -80px;
 }
 
+#loader_container_dashboard{
+    position: fixed;
+    width: 100vw !important; 
+    height: 100vh !important; 
+    background: #D3D3D3EE;
+    z-index: 100;
+    text-align: center;
+}
+
+#loader_container_dashboard span {
+    position: absolute;
+    left: 45%;
+    top: 60%;
+    color: black;
+}
 /* img {
     object-fit: cover;
     width: 100%;
