@@ -745,7 +745,7 @@ function getDocCount() {
             '&type=' + $('#type_filter').val() + '&docno=' + $('#docno_filter').val() +
             '&department=' + $('.department').text() + '&user_id=' + $('.department').attr('id');
     } else {
-        param += '&general=' + $('#general_filter').val() + '&type=' + $('#type_filter').val() +
+        param += '&general=' + $('#general_filter').val().toLowerCase() + '&type=' + $('#type_filter').val() +
             '&department=' + $('.department').text() + '&user_id=' + $('.department').attr('id');
     }
 

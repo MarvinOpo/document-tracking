@@ -245,6 +245,17 @@ exports.get_releasable_bcodes = async function (req, res) {
     }
 };
 
+exports.get_types_count = async function (req, res) {
+    try {
+        const bcodes = await docAPI.get_types_count(req.query);
+        res.send(bcodes);
+    } catch (err) {
+        let result = {};
+        result['status'] = 'error';
+        res.send(result);
+    }
+};
+
 exports.update = async function (req, res) {
     let document = new Document();
     document.setId(req.body.id);

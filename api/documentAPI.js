@@ -26,42 +26,32 @@ exports.insert_document = function (document, year) {
 
 exports.get_documents = function (param) {
     return new Promise(function (resolve, reject) {
-        // let sql = "SELECT d.* FROM documents d WHERE (location = ? OR "
-        //    + "(SELECT u.department from users u WHERE id = d.created_by) = ? OR "
-        //    + "(SELECT count(*) from logs WHERE release_to = ? "
-        //    + "AND document_id = d.id) > 0) ";
-
-        // let sql = "SELECT d.* FROM documents d WHERE (location = ? AND status = 'Received') AND ( "
-        //    + "(SELECT u.department from users u WHERE id = d.created_by) = ? OR "
-        //    + "(SELECT count(*) from logs WHERE release_to = ? "
-        //    + "AND document_id = d.id) > 0) ";
-
         let sql = "";
         let values = [];
+
         if (param.general == 'pending') {
             sql = `SELECT d.*
-                    FROM logs_` + param.year + ` l RIGHT JOIN documents_` + param.year + ` d 
+                    FROM logs_` + param.year + ` l 
+                    RIGHT JOIN documents_` + param.year + ` d 
                         ON l.document_id = d.id
                         AND d.location <> 'Many' 
-                        AND d.status <> 'Cycle End'
-                    WHERE release_to = ?
-                        AND (receive_by IS NOT NULL 
-                                AND release_date IS NULL) `;
-
-            values = [param.department];
+                        AND d.status <> 'Cycle End' `;
 
             if (param.type) {
                 sql += "AND d.type = ? "
-                values[values.length] = param.type;
+                values.push(param.type);
             }
-        } else {
-            sql = "SELECT d.* from documents_" + param.year + " d "
-                + "WHERE ((created_by = ? OR (location = ? "
-                + "AND (status = 'Received' OR status = 'Cycle End'))) OR "
-                + "(SELECT count(*) from logs_" + param.year + " WHERE release_to = ? "
-                + "AND document_id = d.id AND (receive_by IS NOT NULL OR release_date IS NOT NULL)) > 0) "
 
-            values = [param.user_id, param.department, param.department];
+            sql += `WHERE release_to = ?
+                        AND (receive_by IS NOT NULL 
+                        AND release_date IS NULL)`
+
+            values.push(param.department);
+        } else {
+            sql = `SELECT d.*
+                    FROM logs_` + param.year + ` l 
+                    RIGHT JOIN documents_` + param.year + ` d 
+                        ON l.document_id = d.id `
 
             if (param.general) {
                 sql += `AND (
@@ -76,34 +66,36 @@ exports.get_documents = function (param) {
 
                 if (param.type) {
                     sql += "AND d.type = ? "
-                    values[values.length] = param.type;
+                    values.push(param.type);
                 }
             } else {
 
                 if (param.barcode) {
                     sql += "AND barcode = ? "
-                    values[values.length] = param.barcode;
+                    values.push(param.barcode);
 
                 }
 
                 if (param.type) {
                     sql += "AND type = ? "
-                    values[values.length] = param.type;
+                    values.push(param.type);
                 }
 
                 if (param.docno) {
                     sql += "AND document_no = ? "
-                    values[values.length] = param.docno;
+                    values.push(param.docno);
                 }
             }
+
+            sql += "WHERE l.release_to = ? ORDER BY id DESC "
+            values.push(param.department);
         }
 
-        sql += "ORDER BY id DESC "
 
         if (param.limit) {
-            sql += " LIMIT ? OFFSET ?";
-            values[values.length] = parseInt(param.limit);
-            values[values.length] = parseInt(param.offset);
+            sql += "LIMIT ? OFFSET ?";
+            values.push(parseInt(param.limit));
+            values.push(parseInt(param.offset));
         }
 
         conn.query(sql, values, function (err, result) {
@@ -326,15 +318,35 @@ exports.get_release_sendout = function (param) {
 
 exports.get_count = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT count(DISTINCT l.document_id) as count
+        let sql = '';
+        let values = [];
+            
+        if (param.general == 'pending') {
+            sql = `SELECT count(DISTINCT l.document_id) as count
+                    FROM logs_` + param.year + ` l 
+                    RIGHT JOIN documents_` + param.year + ` d 
+                        ON l.document_id = d.id
+                        AND d.location <> 'Many' 
+                        AND d.status <> 'Cycle End' `;
+
+            if (param.type) {
+                sql += "AND d.type = ? "
+                values.push(param.type);
+            }
+
+            sql += `WHERE release_to = ?
+                        AND (receive_by IS NOT NULL 
+                        AND release_date IS NULL)`
+
+            values.push(param.department);
+        } else {
+            sql = `SELECT count(DISTINCT l.document_id) as count
                     FROM logs_` + param.year + ` l 
                     INNER JOIN documents_` + param.year + ` d
                         ON d.id = l.document_id `;
 
-        let values = [];
-
-        if (param.general) {
-            sql += `AND (
+            if (param.general) {
+                sql += `AND (
                 INSTR(d.document_no, '`+ param.general + `') OR
                 INSTR(d.barcode, '`+ param.general + `') OR
                 INSTR(d.name, '`+ param.general + `') OR
@@ -344,33 +356,34 @@ exports.get_count = function (param) {
                 INSTR(d.type, '`+ param.general + `')) `;
 
 
-            if (param.type) {
-                sql += "AND d.type = ? ";
-                values.push(param.type);
-            }
-        } else {
-            if (param.barcode) {
-                sql += "AND barcode = ? ";
-                values.push(param.barcode);
+                if (param.type) {
+                    sql += "AND d.type = ? ";
+                    values.push(param.type);
+                }
+            } else {
+                if (param.barcode) {
+                    sql += "AND barcode = ? ";
+                    values.push(param.barcode);
 
+                }
+
+                if (param.type) {
+                    sql += "AND type = ? ";
+                    values.push(param.type);
+                }
+
+                if (param.docno) {
+                    sql += "AND document_no = ? ";
+                    values.push(param.docno);
+                }
             }
 
-            if (param.type) {
-                sql += "AND type = ? ";
-                values.push(param.type);
-            }
-
-            if (param.docno) {
-                sql += "AND document_no = ? ";
-                values.push(param.docno);
-            }
-        }
-
-        sql += `WHERE l.release_to = ?
+            sql += `WHERE l.release_to = ?
                 AND l.receive_by IS NOT NULL `;
 
-        values.push(param.department);
-
+            values.push(param.department);
+        }
+        
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET count document failed"));
 
@@ -479,7 +492,7 @@ exports.check_document = function (param) {
 
 exports.get_docno = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT DISTINCT d.document_no FROM documents_`+ param.year + ` d 
+        let sql = `SELECT DISTINCT d.document_no FROM documents_` + param.year + ` d 
                     RIGHT JOIN logs_`+ param.year + ` l
                             ON l.document_id = d.id 
                             AND l.release_to = ?
@@ -932,6 +945,30 @@ exports.get_releasable_bcodes = function (param) {
 
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET releasable barcodes failed"));
+
+            resolve(result);
+        });
+    })
+}
+
+exports.get_types_count = function (param) {
+    return new Promise(function (resolve, reject) {
+
+        let sql = `SELECT d.type, count(d.type) AS count 
+                    FROM documents_` + param.year + ` d 
+                    RIGHT JOIN logs_` + param.year + ` l
+                        ON d.id = l.document_id
+                        AND l.release_to = ? 
+                        AND l.receive_date >= ? 
+                        AND  l.receive_date <= ?
+                    WHERE d.type IS NOT NULL
+                    GROUP BY d.type
+                    ORDER BY d.type `
+
+        const values = [param.department, param.date_from, param.date_to];
+
+        conn.query(sql, values, function (err, result) {
+            if (err) reject(new Error("GET type count failed"));
 
             resolve(result);
         });

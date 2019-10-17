@@ -55,6 +55,9 @@ router.get('/document/get_receivable_bcodes', documentController.get_receivable_
 // Get releasable barcodes
 router.get('/document/get_releasable_bcodes', documentController.get_releasable_bcodes);
 
+// Get type count for report
+router.get('/document/get_types_count', documentController.get_types_count);
+
 // Update document
 router.post('/document/update', documentController.update);
 

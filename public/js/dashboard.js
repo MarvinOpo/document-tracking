@@ -1,10 +1,11 @@
 let recent_date_from, recent_date_to;
 let sendout_date_from, sendout_date_to;
 let reports_date_from, reports_date_to;
+let types_date_from, types_date_to;
 let should_print;
 let pending_count, receive_count, release_count;
 let mgensearch_selectize;
-let pendingChart, receiveChart, sendoutChart, totalChart;
+let pendingChart, receiveChart, sendoutChart, totalChart, typeChart;
 
 (function ($) {
     toastr.options = {
@@ -37,6 +38,9 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
     reports_date_from = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
     reports_date_to = recent_date_to;
 
+    types_date_from = reports_date_from;
+    types_date_to = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
+
     let options = '';
     for (let i = new Date().getFullYear() - 1; i > 2017; i--) {
         options += `<option value="` + i + `">` + i + `</option>`;
@@ -49,6 +53,7 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
             getReports(0, 5);
         }
     });
+
     $('#year_filter').append(options);
     $('#year_filter').selectize({
         onChange: function (value) {
@@ -60,12 +65,26 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
             receiveChart.destroy();
             sendoutChart.destroy();
             totalChart.destroy();
+            typeChart.destroy();
 
             loadData();
         }
     });
 
     loadData();
+
+    const $summary = $('#month_filter').selectize({
+        onChange: function (value) {
+            types_date_from = moment().month(value).startOf('month').format('YYYY-MM-DD HH:mm:ss');
+            types_date_to = moment().month(value).endOf('month').format('YYYY-MM-DD HH:mm:ss');
+
+            getTypeGraphData();
+        }
+    });
+
+    const month = moment().format('MMMM');
+    $summary[0].selectize.setValue(month);
+
 
     $('#load_more_btn').click(function () {
         getRecentDocuments($('#tblRecentDocs tr').length - 1, 5);
@@ -169,7 +188,7 @@ let pendingChart, receiveChart, sendoutChart, totalChart;
     });
 
     $('#print_reports').click(function () {
-        
+
         $('#loader_container_dashboard').removeClass('d-none');
 
         $('#tblContainerD').removeClass('table table-data3');
@@ -211,6 +230,7 @@ function loadData() {
     getPendingGraphData();
     getReceiveGraphData();
     getReleaseGraphData();
+    //getTypeGraphData();
 }
 
 function getRecentDocuments(offset, limit) {
@@ -415,6 +435,35 @@ function getReleaseGraphData() {
         });
 }
 
+function getTypeGraphData() {
+    let year = $('#year_filter').val();
+
+    if (!year) year = (new Date()).getFullYear();
+
+    const param = '?year=' + year + '&department=' + $('.department').text() +
+        "&date_from=" + types_date_from + "&date_to=" + types_date_to;;
+
+    fetch('/API/document/get_types_count' + param, { method: 'GET' })
+        .then(res => res.json())
+        .then(data => {
+
+            let types = [];
+            let counts = [];
+
+            if (data.status != 'error') {
+                for (let i = 0; i < data.length; i++) {
+                    types.push(data[i].type);
+                    counts.push(data[i].count);
+                }
+            }
+
+            populateTypeGraph(types, counts);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
 function calculateTotal() {
     if (receive_count && release_count) {
 
@@ -486,7 +535,7 @@ function populateRecentDocs(data) {
         $('#recent_doc_tbody').html('');
         $('.table-load-more').show();
         getRecentDocuments(0, 5);
-        
+
         $('#loader_container_dashboard').addClass('d-none');
     }
 }
@@ -672,8 +721,8 @@ function showSendOutInfo() {
     $('#tblSendOut td:nth-child(6)').show();
 }
 
-function exportToExcel(){
-    sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#printable_div2').html()));  
+function exportToExcel() {
+    sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#printable_div2').html()));
     return (sa);
 }
 
@@ -949,6 +998,51 @@ function populateTotalGraph(total) {
                         hitRadius: 10,
                         hoverRadius: 4
                     }
+                }
+            }
+        });
+    }
+}
+
+function populateTypeGraph(types, counts) {
+
+    let ctx = document.getElementById("type_chart").getContext('2d');
+
+    if (ctx) {
+        ctx.height = 300;
+        typeChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: types,
+                datasets: [
+                    {
+                        label: "Count",
+                        data: counts,
+                        borderColor: "transparent",
+                        borderWidth: "0",
+                        backgroundColor: '#00b5e9'
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        maxBarThickness: 30,
+                        ticks: {
+                            autoSkip: false
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
                 }
             }
         });
