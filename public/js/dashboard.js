@@ -598,73 +598,75 @@ function populateReports(data) {
     let ctr = $('#reports_tbody tr').length;
 
     for (let i = 0; i < data.length; i++) {
-        const receive_date = moment(data[i].receive_date).format('YYYY-MM-DD');
-        const receive_time = moment(data[i].receive_date).format('HH:mm:ss');
+        // const receive_date = moment(data[i].receive_date).format('YYYY-MM-DD');
+        // const receive_time = moment(data[i].receive_date).format('HH:mm:ss');
 
-        let release_date = '', release_time = '';
-        if (data[i].release_date) {
-            release_date = moment(data[i].release_date).format('YYYY-MM-DD');
-            release_time = moment(data[i].release_date).format('HH:mm:ss');
-        }
+        // // let release_date = '', release_time = '';
+        // // if (data[i].release_date) {
+        // const release_date = moment(data[i].release_date).format('YYYY-MM-DD');
+        // const release_time = moment(data[i].release_date).format('HH:mm:ss');
+        // // }
+
+        let startarr = data[i].receive_date.split('T');
+        let startdate = startarr[0] + " " + startarr[1].substring(0, 8);
+
+        let endarr = data[i].release_date.split('T');
+        let enddate = endarr[0] + " " + endarr[1].substring(0, 8);
 
         table_data += `<tr>
                             <td class='text-left'>` + (++ctr) + `. ` + data[i].document_no + `</td>
                             <td>` + data[i].name + `</td>
                             <td>
-                                <div class='row'>
-                                    <div class='col-md-12'>`
-            + receive_date +
-            `</div>
-                                    <div class='col-md-12'>`
-            + receive_time +
-            `</div>
-                                </div>
+                                `+ startarr[0] + `<br>` +
+            startarr[1].substring(0, 8) + `
                             </td>`;
 
-        let date_release;
-        if (release_date) {
-            table_data += `<td>
-                <div class='row'>
-                    <div class='col-md-12'>`
-                + release_date +
-                `</div>
-                    <div class='col-md-12'>`
-                + release_time +
-                `</div>
-                </div>
-            </td>`;
+        table_data += `<td>` + endarr[0] + `<br>` +
+            endarr[1].substring(0, 8) + `
+                         </td>`;
 
-            date_release = new Date(data[i].release_date);
-        } else {
-            table_data += `<td><span class='block-email'>Pending</span></td>`;
-            date_release = new Date();
-        }
+        // date_release = new Date(data[i].release_date);
 
-        const date_receive = new Date(data[i].receive_date);
+        // const date_receive = new Date(data[i].receive_date);
 
-        let date_diff = Math.abs(date_release - date_receive) / 1000;
+        // let date_diff = Math.abs(date_release - date_receive) / 1000;
 
-        const days = Math.floor(date_diff / 86400);
-        date_diff -= days * 86400;
+        // const days = Math.floor(date_diff / 86400);
+        // date_diff -= days * 86400;
 
-        const hours = Math.floor(date_diff / 3600) % 24;
-        date_diff -= hours * 3600;
+        // const hours = Math.floor(date_diff / 3600) % 24;
+        // date_diff -= hours * 3600;
 
-        const minutes = Math.floor(date_diff / 60) % 60;
-        date_diff -= minutes * 60;
+        // const minutes = Math.floor(date_diff / 60) % 60;
+        // date_diff -= minutes * 60;
 
-        const secs = Math.floor(date_diff / 1) % 60;
-        date_diff -= secs * 60;
+        // const secs = Math.floor(date_diff / 1) % 60;
+        // date_diff -= secs * 60;
 
         table_data += `<td>`;
 
-        if (days || hours || minutes) {
-            if (days) table_data += "<div class='col-md-12'>" + days + " day(s) </div>";
-            if (hours) table_data += "<div class='col-md-12'>" + hours + " hr(s) </div>";
-            if (minutes) table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
-        } else {
-            table_data += "<div class='col-md-12'>few seconds</div>";
-        }
+        let seconds = getDateDiff(startdate, enddate);
+
+        let days = Math.floor(seconds / (3600 * 24));
+        seconds -= days * 3600 * 24;
+        let hours = Math.floor(seconds / 3600);
+        seconds -= hours * 3600;
+        let minutes = Math.floor(seconds / 60);
+        seconds -= minutes * 60;
+
+        if (days) table_data += "<div class='col-md-12'>" + days + " day(s) </div>";
+        if (hours) table_data += "<div class='col-md-12'>" + hours + " hr(s) </div>";
+        if (minutes) table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
+        if (seconds) table_data += "<div class='col-md-12'>" + seconds + " secs </div>";
+
+        // if (days || hours || minutes) {
+        //     if (days) table_data += "<div class='col-md-12'>" + days + " day(s) </div>";
+        //     if (hours) table_data += "<div class='col-md-12'>" + hours + " hr(s) </div>";
+        //     if (minutes) table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
+        // } else {
+        //     table_data += "<div class='col-md-12'>few seconds</div>";
+        // }
+
         if (data[i].priority == 'Regular') {
             table_data += `</td><td>2 days</td>`;
         } else {

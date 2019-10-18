@@ -1222,45 +1222,71 @@ function populate_table(data) {
         }
 
         if (data[i].location == $(".department").text() && data[i].status == "Received") {
-            let now = new Date();
-            const lapse_date = new Date(data[i].lapse_at);
+            // let now = new Date();
+            // const lapse_date = new Date(data[i].lapse_at);
 
-            const hours_diff = Math.abs(now - lapse_date) / 36e5;
+            // const hours_diff = Math.abs(now - lapse_date) / 36e5;
 
-            if (hours_diff > priority_duration) {
+            // let startarr = data[i].lapse_at.split('T');
+            // let startdate = startarr[0] + " " + startarr[1].substring(0, 8)
+
+            // console.log(startdate);
+
+            let startdate = moment(data[i].lapse_at).format('YYYY-MM-DD HH:mm:ss');
+            let enddate = moment().format('YYYY-MM-DD HH:mm:ss');
+
+            let seconds = getDateDiff(startdate, enddate);
+
+            let days = Math.floor(seconds / (3600 * 24));
+            seconds -= days * 3600 * 24;
+            let hours = Math.floor(seconds / 3600);
+            seconds -= hours * 3600;
+            let minutes = Math.floor(seconds / 60);
+            seconds -= minutes * 60;
+
+            if (seconds > (priority_duration * 60 * 60)) {
                 if (data[i].status != "Cycle End") {
                     due_documents.push(data[i].barcode);
                 }
             }
 
-            let date_diff = Math.abs(now - lapse_date) / 1000;
+            let lapse_time = '';
 
-            const days = Math.floor(date_diff / 86400);
-            date_diff -= days * 86400;
+            if (days) lapse_time += days + " day(s) <br>";
+            if (hours) lapse_time += hours + " hr(s) <br>";
+            if (minutes) lapse_time += minutes + " min(s) <br>";
+            if (seconds) lapse_time += seconds + " secs <br>";
 
-            const hours = Math.floor(date_diff / 3600) % 24;
-            date_diff -= hours * 3600;
+            table_data += "<td name = 'duration'>" + lapse_time + "</td>";
 
-            const minutes = Math.floor(date_diff / 60) % 60;
-            date_diff -= minutes * 60;
+            // let date_diff = Math.abs(now - lapse_date) / 1000;
 
-            let remaining_time = "";
+            // const days = Math.floor(date_diff / 86400);
+            // date_diff -= days * 86400;
 
-            if (days || hours || minutes) {
-                if (days) remaining_time += days + " day(s)<br>";
-                if (hours) remaining_time += hours + " hr(s)<br>";
-                if (minutes) remaining_time += minutes + " min(s)";
-            } else {
-                remaining_time = 'Few seconds ago'
-            }
+            // const hours = Math.floor(date_diff / 3600) % 24;
+            // date_diff -= hours * 3600;
 
-            table_data += "<td name = 'duration'>" + remaining_time + "</td>";
+            // const minutes = Math.floor(date_diff / 60) % 60;
+            // date_diff -= minutes * 60;
+
+            // let remaining_time = "";
+
+            // if (days || hours || minutes) {
+            //     if (days) remaining_time += days + " day(s)<br>";
+            //     if (hours) remaining_time += hours + " hr(s)<br>";
+            //     if (minutes) remaining_time += minutes + " min(s)";
+            // } else {
+            //     remaining_time = 'Few seconds ago'
+            // }
+
+            // table_data += "<td name = 'duration'>" + remaining_time + "</td>";
         } else {
             table_data += "<td name = 'duration'>N/A</td>";
         }
 
 
-        table_data += "<td >" + data[i].remarks + "</td>"
+        table_data += "<td>" + data[i].remarks + "</td>"
             + "<td>"
             + "<div class='table-data-feature'>"
 
@@ -1476,24 +1502,40 @@ function populate_tracking(data, status) {
         table_data += "<td name = 'duration'><div class='row'>";
 
         if (data[i].receive_date && data[i].release_date) {
-            const date_release = new Date(data[i].release_date);
-            const date_receive = new Date(data[i].receive_date);
+            let startarr = data[i].receive_date.split('T');
+            let startdate = startarr[0] + " " + startarr[1].substring(0, 8)
 
-            let date_diff = Math.abs(date_release - date_receive) / 1000;
+            let endarr = data[i].release_date.split('T');
+            let enddate = endarr[0] + " " + endarr[1].substring(0, 8)
 
-            const days = Math.floor(date_diff / 86400);
-            date_diff -= days * 86400;
+            let seconds = getDateDiff(startdate, enddate);
 
-            const hours = Math.floor(date_diff / 3600) % 24;
-            date_diff -= hours * 3600;
-
-            const minutes = Math.floor(date_diff / 60) % 60;
-            date_diff -= minutes * 60;
+            let days = Math.floor(seconds / (3600 * 24));
+            seconds -= days * 3600 * 24;
+            let hours = Math.floor(seconds / 3600);
+            seconds -= hours * 3600;
+            let minutes = Math.floor(seconds / 60);
+            seconds -= minutes * 60;
 
             if (days) table_data += "<div class='col-md-12'>" + days + " day(s) </div>";
             if (hours) table_data += "<div class='col-md-12'>" + hours + " hr(s) </div>";
+            if (minutes) table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
+            if (seconds) table_data += "<div class='col-md-12'>" + seconds + " secs </div>";
 
-            table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
+            // const date_release = new Date(data[i].release_date);
+            // const date_receive = new Date(data[i].receive_date);
+
+            // let date_diff = Math.abs(date_release - date_receive) / 1000;
+
+            // const days = Math.floor(date_diff / 86400);
+            // date_diff -= days * 86400;
+
+            // const hours = Math.floor(date_diff / 3600) % 24;
+            // date_diff -= hours * 3600;
+
+            // const minutes = Math.floor(date_diff / 60) % 60;
+            // date_diff -= minutes * 60;
+
         }
         else table_data += "<span class='block-email'>Pending</span>";
 
@@ -1651,31 +1693,6 @@ function getThreeDigitFormat(num) {
     else if (num < 100) num = "0" + num
 
     return num;
-}
-
-function getDateDiff(startdate, enddate) {
-    const mstart = moment(startdate);
-    const mend = moment(enddate);
-
-    let totalHoursDiff = 0;
-    let totalMinsDiff = 0;
-    let totalSecsDiff = 0;
-    const mend_day = mend.format('D');
-
-    for (let i = mstart.format('D'); i <= mend_day; i++) {
-        const mstart_hour = mstart.format('H');
-        const mend_hour = mend.format('H');
-
-        if (i != mend_day) {
-            if (mstart_hour < 17) {
-                totalHoursDiff = totalHoursDiff + (17 - mstart_hour);
-            }
-        } else {
-
-        }
-
-        mstart_hour.add(1, 'days');
-    }
 }
 
 function editBarcodeSetting(code) {

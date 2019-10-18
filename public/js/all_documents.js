@@ -423,24 +423,44 @@ function populate_tracking(data, status) {
         table_data += "<td name = 'duration'><div class='row'>";
 
         if (data[i].receive_date && data[i].release_date) {
-            const date_release = new Date(data[i].release_date);
-            const date_receive = new Date(data[i].receive_date);
+            let startarr = data[i].receive_date.split('T');
+            let startdate = startarr[0] + " " + startarr[1].substring(0, 8)
 
-            let date_diff = Math.abs(date_release - date_receive) / 1000;
+            let endarr = data[i].release_date.split('T');
+            let enddate = endarr[0] + " " + endarr[1].substring(0, 8)
 
-            const days = Math.floor(date_diff / 86400);
-            date_diff -= days * 86400;
+            let seconds = getDateDiff(startdate, enddate);
 
-            const hours = Math.floor(date_diff / 3600) % 24;
-            date_diff -= hours * 3600;
-
-            const minutes = Math.floor(date_diff / 60) % 60;
-            date_diff -= minutes * 60;
+            let days = Math.floor(seconds / (3600 * 24));
+            seconds -= days * 3600 * 24;
+            let hours = Math.floor(seconds / 3600);
+            seconds -= hours * 3600;
+            let minutes = Math.floor(seconds / 60);
+            seconds -= minutes * 60;
 
             if (days) table_data += "<div class='col-md-12'>" + days + " day(s) </div>";
             if (hours) table_data += "<div class='col-md-12'>" + hours + " hr(s) </div>";
+            if (minutes) table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
+            if (seconds) table_data += "<div class='col-md-12'>" + seconds + " secs </div>";
+            
+            // const date_release = new Date(data[i].release_date);
+            // const date_receive = new Date(data[i].receive_date);
 
-            table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
+            // let date_diff = Math.abs(date_release - date_receive) / 1000;
+
+            // const days = Math.floor(date_diff / 86400);
+            // date_diff -= days * 86400;
+
+            // const hours = Math.floor(date_diff / 3600) % 24;
+            // date_diff -= hours * 3600;
+
+            // const minutes = Math.floor(date_diff / 60) % 60;
+            // date_diff -= minutes * 60;
+
+            // if (days) table_data += "<div class='col-md-12'>" + days + " day(s) </div>";
+            // if (hours) table_data += "<div class='col-md-12'>" + hours + " hr(s) </div>";
+
+            // table_data += "<div class='col-md-12'>" + minutes + " min(s) </div>";
         }
         else table_data += "<span class='block-email'>Pending</span>";
 

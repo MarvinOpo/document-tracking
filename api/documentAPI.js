@@ -17,6 +17,7 @@ exports.insert_document = function (document, year) {
         document.getLocation()];
 
         conn.query(sql, values, function (err, result) {
+            console.log(result);
             if (err) reject(new Error("Insert failed"));
 
             resolve();
@@ -342,7 +343,7 @@ exports.get_count = function (param) {
         } else {
             sql = `SELECT count(DISTINCT l.document_id) as count
                     FROM logs_` + param.year + ` l 
-                    INNER JOIN documents_` + param.year + ` d
+                    RIGHT JOIN documents_` + param.year + ` d
                         ON d.id = l.document_id `;
 
             if (param.general) {

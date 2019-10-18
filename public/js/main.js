@@ -415,3 +415,95 @@
   }
 
 })(jQuery);
+
+function getDateDiff(startdate, enddate) {
+  let mstart = moment(startdate);
+  const mend = moment(enddate);
+
+  let totalSecsDiff = 0;
+  let hend;
+
+  let hstart = moment(mstart.format('YYYY-MM-DD HH:mm:ss'));
+  hstart.set('hour', 8);
+  hstart.set('minute', 00);
+  hstart.set('second', 00);
+
+  if (mstart.isSame(mend, 'day')) {
+      totalSecsDiff = mend.diff(mstart, 'seconds');
+  } else {
+      while (!mstart.isAfter(mend)) {
+          if (mstart.isBefore(hstart)) {
+              mstart = moment(hstart.format('YYYY-MM-DD HH:mm:ss'));
+          }
+
+          hend = moment(mstart.format('YYYY-MM-DD HH:mm:ss'));
+          hend.set('hour', 17);
+          hend.set('minute', 00);
+          hend.set('second', 00);
+
+          if (mstart.isSame(mend, 'day')) {
+              if (mend.isBefore(hend)) {
+                  totalSecsDiff += mend.diff(mstart, 'seconds');
+              } else {
+                  totalSecsDiff += hend.diff(mstart, 'seconds');
+              }
+          } else {
+              let weekday = mstart.weekday();
+
+              if (weekday != 0 && weekday != 6) {
+                  if (mstart.isBefore(hend)) {
+                      totalSecsDiff += hend.diff(mstart, 'seconds');
+                  }
+              }
+          }
+
+          // console.log(mstart.format('YYYY-MM-DD HH:mm:ss') +
+          //     " ----- " + hend.format('YYYY-MM-DD HH:mm:ss') +
+          //     " ----- " + mend.format('YYYY-MM-DD HH:mm:ss'))
+          // console.log(totalSecsDiff);
+
+          mstart = mstart.add(1, 'day');
+          mstart.set('hour', 8);
+          mstart.set('minute', 00);
+          mstart.set('second', 00);
+      }
+  }
+
+  return totalSecsDiff;
+}
+
+// function getDateDiff(startdate, enddate) {
+//     let mstart = moment(startdate);
+//     const mend = moment(enddate);
+
+//     let totalSecsDiff = 0;
+//     let hend;
+
+//     if (mstart.isSame(mend, 'day')) {
+//         totalSecsDiff = mend.diff(mstart, 'seconds');
+//     } else {
+//         while (!mstart.isAfter(mend)) {
+//             if (mstart.isSame(mend, 'day')) {
+//                 totalSecsDiff += mend.diff(mstart, 'seconds');
+//             } else {
+//                 let weekday = mstart.weekday();
+
+//                 if (weekday != 0 && weekday != 6) {
+//                     hend = moment(mstart.format('YYYY-MM-DD HH:mm:ss'));
+//                     hend.set('hour', 17);
+//                     hend.set('minute', 00);
+//                     hend.set('second', 00);
+
+//                     totalSecsDiff += hend.diff(mstart, 'seconds');
+//                 }
+//             }
+            
+//             mstart = mstart.add(1, 'day');
+//             mstart.set('hour', 8);
+//             mstart.set('minute', 00);
+//             mstart.set('second', 00);
+//         }
+//     }
+
+//     return totalSecsDiff;
+// }

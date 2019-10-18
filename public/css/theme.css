@@ -14751,6 +14751,8 @@ td:not([name="duration"]), th {
 #track_data td:nth-last-child(2),
 #track_data th:nth-last-child(2) {
     min-width: 300px;
+    text-overflow: unset;
+    white-space: unset;
 }
 
 #track_data td:last-child span{
