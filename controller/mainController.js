@@ -94,6 +94,18 @@ exports.post_update = async function (req, res) {
     }
 }
 
+exports.update_pass = async function (req, res) {
+    let result = {};
+    try {
+        await mainAPI.update_pass(req.body, req.session.ID);
+        result['status'] = 'success';
+        res.send(result);
+    } catch (err) {
+        result['status'] = 'error';
+        res.send(result);
+    }
+}
+
 exports.logout = function (req, res) {
     if (req.session) {
         req.session.destroy(function (err) {

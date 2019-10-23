@@ -15175,6 +15175,10 @@ table .match-parent {
     top: 60%;
     color: black;
 }
+
+#change_pass:hover {
+    color: white;
+}
 /* img {
     object-fit: cover;
     width: 100%;

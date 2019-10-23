@@ -524,12 +524,6 @@ function insertDocument(body) {
         .then(res => res.json())
         .then(data => {
             if (data.status == "success") {
-                toastr.success("Successfully saved.");
-                $('#modal_document').modal('hide');
-
-                refreshFlag = true;
-                document_selectize.trigger("change");
-
                 const barcodes = [];
                 barcodes.push(body.barcode);
 
@@ -1143,9 +1137,15 @@ function fetchLogInsert(body) {
         .then(res => res.json())
         .then(data => {
             if (data.status == 'success') {
-                if (body.triggerReceive)
+                if (body.triggerReceive) {
+                    toastr.success("Successfully saved.");
+                    $('#modal_document').modal('hide');
+
+                    refreshFlag = true;
+                    document_selectize.trigger("change");
+                    
                     updateDocReceiveLog(body.barcodes);
-                else if (body.updateLocation) {
+                } else if (body.updateLocation) {
                     if (typeof $('#modal_dept').val() != 'string' && $('#modal_dept').val().length > 1) {
                         body['department'] = "Many";
                     }
@@ -1556,6 +1556,12 @@ function populate_tracking(data, status) {
                                 <td></td>
                                 <td></td>
                             </tr>`;
+            } else if (data[i].release_by) {
+                table_data += `<td>
+                                <span onClick="cancelRelease(` + data[i].document_id + `,'skip',` + data[i].id + `)">x</span>
+                            </td>
+                            </tr>
+                            <tr class='spacer'></tr>`;
             } else if (!data[i].receive_by && status != "Origin" && data[i - 1].release_by == $('.name').attr("id")) {
                 table_data += `<td>
                                 <span onClick="cancelRelease(` + data[i].document_id + `,` + data[i].id + `,` + data[i - 1].id + `)">x</span>
@@ -1726,7 +1732,6 @@ function printBarcode() {
     pwa.document.write(
         "<html>"
         + "<head>"
-
         + "<style>"
         + ".footer {"
         + "position: absolute;"

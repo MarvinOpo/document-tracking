@@ -137,7 +137,8 @@
                                 <div class="info clearfix">
                                     <div class="image">
                                         <a href="#">
-                                            <img id="<%= session.ACCESS %>" class="access-rights" src="images/user.jpg" alt="<%= session.NAME %>" />
+                                            <img id="<%= session.ACCESS %>" class="access-rights" src="images/user.jpg"
+                                                alt="<%= session.NAME %>" />
                                         </a>
                                     </div>
                                     <div class="content">
@@ -162,6 +163,8 @@
                                     </div>
                                 </div> -->
                                 <div class="account-dropdown__footer">
+                                    <a id="change_pass">
+                                        <i class="zmdi zmdi-lock-outline"></i>Change Password</a>
                                     <a href="/logout">
                                         <i class="zmdi zmdi-power"></i>Logout</a>
                                 </div>
@@ -173,4 +176,40 @@
         </div>
     </div>
 </header>
+
+<div id="modal_password" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content" style="width: 500px;">
+            <div class="modal-header">
+                <h4 class="modal-title">Change Password</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body p-5">
+
+                <div id="error_container"></div>
+
+                <div class="row">
+                    <span>Old Password <span class="color-red">*</span></span>
+                    <input id="old_password" type="password" class="form-control">
+
+                    <span class='mt-2'>New Password <span class="color-red">*</span></span> 
+                    <input id="new_password" type="password" class="form-control">
+
+                    <span class='mt-2'>Confirm Password <span class="color-red">*</span></span>
+                    <input id="confirm_password" type="password" class="form-control">
+                </div>
+            </div>
+
+            <div class="modal-footer" style="justify-content: center;">
+                <button id="modal_update_pass" type="button" class="au-btn au-btn-icon au-btn--green au-btn--small"
+                    style="width: 82.88px">Update</button>
+                <button id="modal_cancel" type="button" class="au-btn au-btn-icon au-btn--blue au-btn--small"
+                    data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- HEADER DESKTOP-->

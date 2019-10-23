@@ -333,13 +333,13 @@
                                 <h3 class="title-5 m-b-25">Monitoring Tool</h3>
 
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="ml-3 w-300">
                                         <span class="text-size-12">Date</span>
                                         <input type="text" id="reports_daterange"
                                             class="form-control text-size-12 h-36 w-300">
                                     </div>
 
-                                    <div class="col-md-2 ml--80">
+                                    <div class="ml-2 mr-2">
                                         <span class="text-size-12">Type</span>
                                         <div class="rs-select2--light au-input--full m-b-10" style="height: 45px;">
                                             <select id="reports_type_filter" class="demo-default w-100">
@@ -400,9 +400,15 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-1 mt-4">
+                                    <div class="ml-4 mt-4">
                                         <div id="print_reports" class="input-group-addon d-inline-block h-36">
                                             <i class="zmdi zmdi-print"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="ml-2 mt-4">
+                                        <div id="export_reports" class="input-group-addon d-inline-block h-36">
+                                            <img src="images/excel-icon.png" height="20px" width="20px">
                                         </div>
                                     </div>
                                 </div>
@@ -714,6 +720,9 @@
     <script src="js/datepicker.js"></script>
     <script src="js/print.min.js"></script>
     <script src="js/selectize.min.js"></script>
+    <script src="js/excel/jszip.js"></script>
+    <script src="js/excel/FileSaver.js"></script>
+    <script src="js/excel/excel-gen.js"></script>
     <script src="js/dashboard.js"></script>
 
 </body>

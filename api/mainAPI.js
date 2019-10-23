@@ -37,3 +37,18 @@ exports.update_user = function (body, id) {
         });
     });
 }
+
+exports.update_pass = function (body, id) {
+    return new Promise(function (resolve, reject) {
+        let sql = `UPDATE users SET password = MD5(?) 
+                    WHERE id = ? and password = MD5(?) `;
+
+        const values = [body.new_pass, id, body.old_pass];
+
+        conn.query(sql, values, function (err, result) {
+            if (err || result.affectedRows == 0) reject(new Error("Get user failed"));
+
+            resolve();
+        });
+    });
+}

@@ -31,7 +31,7 @@ exports.get_documents = function (param) {
         let values = [];
 
         if (param.general == 'pending') {
-            sql = `SELECT d.*
+            sql = `SELECT DISTINCT d.*
                     FROM logs_` + param.year + ` l 
                     RIGHT JOIN documents_` + param.year + ` d 
                         ON l.document_id = d.id
@@ -49,7 +49,7 @@ exports.get_documents = function (param) {
 
             values.push(param.department);
         } else {
-            sql = `SELECT d.*
+            sql = `SELECT DISTINCT d.*
                     FROM logs_` + param.year + ` l 
                     RIGHT JOIN documents_` + param.year + ` d 
                         ON l.document_id = d.id `

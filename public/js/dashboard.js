@@ -6,6 +6,7 @@ let should_print;
 let pending_count, receive_count, release_count;
 let mgensearch_selectize;
 let pendingChart, receiveChart, sendoutChart, totalChart, typeChart;
+let exportFlag = false;
 
 (function ($) {
     toastr.options = {
@@ -220,6 +221,10 @@ let pendingChart, receiveChart, sendoutChart, totalChart, typeChart;
         $('#nav_all_docs_mobile').remove();
     }
 
+    $('#export_reports').click(function () {
+        exportFlag = true;
+        $('#print_reports').click();
+    });
 })(jQuery);
 
 function loadData() {
@@ -617,11 +622,11 @@ function populateReports(data) {
                             <td class='text-left'>` + (++ctr) + `. ` + data[i].document_no + `</td>
                             <td>` + data[i].name + `</td>
                             <td>
-                                `+ startarr[0] + `<br>` +
+                                `+ startarr[0] + ` <br>` +
             startarr[1].substring(0, 8) + `
                             </td>`;
 
-        table_data += `<td>` + endarr[0] + `<br>` +
+        table_data += `<td>` + endarr[0] + ` <br>` +
             endarr[1].substring(0, 8) + `
                          </td>`;
 
@@ -682,14 +687,19 @@ function populateReports(data) {
     if (should_print) {
         $('#tblContainerD').html($('#tblReports').html());
 
-        printJS({
-            printable: 'printable_div',
-            type: 'html',
-            marginLeft: 0,
-            marginRight: 0,
-            honorColor: true,
-            targetStyles: ['*']
-        })
+        if (exportFlag) {
+            exportFlag = false;
+            exportToExcel();
+        } else {
+            printJS({
+                printable: 'printable_div',
+                type: 'html',
+                marginLeft: 0,
+                marginRight: 0,
+                honorColor: true,
+                targetStyles: ['*']
+            })
+        }
 
         $('.table-load-more-reports').attr('id', 0);
         $('#tblContainerD').html('');
@@ -724,8 +734,13 @@ function showSendOutInfo() {
 }
 
 function exportToExcel() {
-    sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#printable_div2').html()));
-    return (sa);
+    excel = new ExcelGen({
+        "src_id": "tblContainerD",
+        "show_header": true,
+        "file_name": "monitoring-tool.xlsx"
+    });
+
+    excel.generate();
 }
 
 function populatePendingGraph() {

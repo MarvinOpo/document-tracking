@@ -49,8 +49,8 @@ exports.get_logs = function (param) {
 
 exports.get_log_history = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT l.*, d.barcode FROM logs_`+ param.year +` l
-                        RIGHT JOIN documents_`+ param.year +` d
+        let sql = `SELECT l.*, d.barcode FROM logs_` + param.year + ` l
+                        RIGHT JOIN documents_`+ param.year + ` d
                         ON l.document_id = d.id
                     WHERE l.release_to = ?
                         AND l.created_at >= ?
@@ -84,7 +84,7 @@ exports.get_reports = function (param) {
 
         const values = [param.department, param.date_from, param.date_to];
 
-        if(param.type){
+        if (param.type) {
             sql += '&& type = ? '
             values.push(param.type);
         }
@@ -137,36 +137,60 @@ exports.update_release = function (param) {
 
 exports.delete = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "DELETE FROM logs_" + param.year + " WHERE id = ? "
+        if (param.did != 'skip') {
+            let sql = "DELETE FROM logs_" + param.year + " WHERE id = ? "
 
-        let values = [param.did];
+            let values = [param.did];
 
-        conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("Delete logs failed"));
+            conn.query(sql, values, function (err, result) {
+                if (err) reject(new Error("Delete logs failed"));
 
-            if (result) {
-                sql = "UPDATE logs_" + param.year + " SET release_by = null, "
-                    + "release_date = null WHERE id = ? "
+                if (result) {
+                    sql = "UPDATE logs_" + param.year + " SET release_by = null, "
+                        + "release_date = null WHERE id = ? "
 
-                values = [param.uid];
+                    values = [param.uid];
 
-                conn.query(sql, values, function (err, result) {
-                    if (err) reject(new Error("Delete logs failed"));
-        
-                    if (result) {
-                        sql = "UPDATE documents_" + param.year + " SET location = ?, "
-                            + "status = 'Received' WHERE id = ? "
-        
-                        values = [param.department, param.document_id];
-        
-                        conn.query(sql, values, function (err, result) {
-                            if (err) reject(new Error("Delete logs failed"));
-                
-                            resolve();
-                        });
-                    }
-                });
-            }
-        });
+                    conn.query(sql, values, function (err, result) {
+                        if (err) reject(new Error("Delete logs failed"));
+
+                        if (result) {
+                            sql = "UPDATE documents_" + param.year + " SET location = ?, "
+                                + "status = 'Received' WHERE id = ? "
+
+                            values = [param.department, param.document_id];
+
+                            conn.query(sql, values, function (err, result) {
+                                if (err) reject(new Error("Delete logs failed"));
+
+                                resolve();
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            sql = "UPDATE logs_" + param.year + " SET release_by = null, "
+                + "release_date = null WHERE id = ? "
+
+            values = [param.uid];
+
+            conn.query(sql, values, function (err, result) {
+                if (err) reject(new Error("Delete logs failed"));
+
+                if (result) {
+                    sql = "UPDATE documents_" + param.year + " SET location = ?, "
+                        + "status = 'Received' WHERE id = ? "
+
+                    values = [param.department, param.document_id];
+
+                    conn.query(sql, values, function (err, result) {
+                        if (err) reject(new Error("Delete logs failed"));
+
+                        resolve();
+                    });
+                }
+            });
+        }
     });
 }

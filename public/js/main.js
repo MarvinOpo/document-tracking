@@ -23,7 +23,72 @@
     }
   });
 
+  toastr.options = {
+    "closeButton": false,
+    "debug": false,
+    "newestOnTop": false,
+    "progressBar": false,
+    "positionClass": "toast-bottom-right",
+    "preventDuplicates": false,
+    "onclick": null,
+    "showDuration": "300",
+    "hideDuration": "1000",
+    "timeOut": "2000",
+    "extendedTimeOut": "1000",
+    "showEasing": "swing",
+    "hideEasing": "linear",
+    "showMethod": "fadeIn",
+    "hideMethod": "fadeOut"
+  };
 
+
+  $('#change_pass').click(function () {
+    $('#modal_password').modal('show');
+  })
+
+  $('#modal_update_pass').click(function () {
+    if (!$('#old_password').val() || !$('#new_password').val() ||
+      !$('#confirm_password').val()) {
+
+      const text_error = "<div class='input-error'>"
+        + "<span class='error-text'>"
+        + "Please fill all required fields (*)"
+        + "</span>"
+        + "</div>"
+
+      $('#error_container').html(text_error);
+
+      return;
+    }
+
+    if ($('#new_password').val().length < 4) {
+
+      const text_error = "<div class='input-error'>"
+        + "<span class='error-text'>"
+        + "New Password must have atleast 4-characters"
+        + "</span>"
+        + "</div>"
+
+      $('#error_container').html(text_error);
+
+      return;
+    }
+
+    if ($('#new_password').val() != $('#confirm_password').val()) {
+
+      const text_error = "<div class='input-error'>"
+        + "<span class='error-text'>"
+        + "New Password does not match"
+        + "</span>"
+        + "</div>"
+
+      $('#error_container').html(text_error);
+
+      return;
+    }
+
+    update_password();
+  })
 })(jQuery);
 
 (function ($) {
@@ -429,49 +494,81 @@ function getDateDiff(startdate, enddate) {
   hstart.set('second', 00);
 
   if (mstart.isSame(mend, 'day')) {
-      totalSecsDiff = mend.diff(mstart, 'seconds');
+    totalSecsDiff = mend.diff(mstart, 'seconds');
   } else {
-      while (!mstart.isAfter(mend)) {
-          if (mstart.isBefore(hstart)) {
-              mstart = moment(hstart.format('YYYY-MM-DD HH:mm:ss'));
-          }
-
-          hend = moment(mstart.format('YYYY-MM-DD HH:mm:ss'));
-          hend.set('hour', 17);
-          hend.set('minute', 00);
-          hend.set('second', 00);
-
-          if (mstart.isSame(mend, 'day')) {
-              if (mend.isBefore(hend)) {
-                  totalSecsDiff += mend.diff(mstart, 'seconds');
-              } else {
-                  totalSecsDiff += hend.diff(mstart, 'seconds');
-              }
-          } else {
-              let weekday = mstart.weekday();
-
-              if (weekday != 0 && weekday != 6) {
-                  if (mstart.isBefore(hend)) {
-                      totalSecsDiff += hend.diff(mstart, 'seconds');
-                  }
-              }
-          }
-
-          // console.log(mstart.format('YYYY-MM-DD HH:mm:ss') +
-          //     " ----- " + hend.format('YYYY-MM-DD HH:mm:ss') +
-          //     " ----- " + mend.format('YYYY-MM-DD HH:mm:ss'))
-          // console.log(totalSecsDiff);
-
-          mstart = mstart.add(1, 'day');
-          mstart.set('hour', 8);
-          mstart.set('minute', 00);
-          mstart.set('second', 00);
+    while (!mstart.isAfter(mend)) {
+      if (mstart.isBefore(hstart)) {
+        mstart = moment(hstart.format('YYYY-MM-DD HH:mm:ss'));
       }
+
+      hend = moment(mstart.format('YYYY-MM-DD HH:mm:ss'));
+      hend.set('hour', 17);
+      hend.set('minute', 00);
+      hend.set('second', 00);
+
+      if (mstart.isSame(mend, 'day')) {
+        if (mend.isBefore(hend)) {
+          totalSecsDiff += mend.diff(mstart, 'seconds');
+        } else {
+          totalSecsDiff += hend.diff(mstart, 'seconds');
+        }
+      } else {
+        let weekday = mstart.weekday();
+
+        if (weekday != 0 && weekday != 6) {
+          if (mstart.isBefore(hend)) {
+            totalSecsDiff += hend.diff(mstart, 'seconds');
+          }
+        }
+      }
+
+      // console.log(mstart.format('YYYY-MM-DD HH:mm:ss') +
+      //     " ----- " + hend.format('YYYY-MM-DD HH:mm:ss') +
+      //     " ----- " + mend.format('YYYY-MM-DD HH:mm:ss'))
+      // console.log(totalSecsDiff);
+
+      mstart = mstart.add(1, 'day');
+      mstart.set('hour', 8);
+      mstart.set('minute', 00);
+      mstart.set('second', 00);
+    }
   }
 
   return totalSecsDiff;
 }
 
+function update_password() {
+  const body = {
+    old_pass: $('#old_password').val(),
+    new_pass: $('#new_password').val()
+  };
+
+  fetch('/update_pass', {
+    method: 'POST',
+    credentials: "include",
+    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status == "success") {
+        toastr.success("Successfully updated.<br>Please try it out.");
+        $('#modal_password').modal('hide');
+      } else {
+        const text_error = "<div class='input-error'>"
+          + "<span class='error-text'>"
+          + "Failed to update.<br>Please try again."
+          + "</span>"
+          + "</div>"
+
+        $('#error_container').html(text_error);
+        $('#old_password').val('');
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+}
 // function getDateDiff(startdate, enddate) {
 //     let mstart = moment(startdate);
 //     const mend = moment(enddate);
@@ -497,7 +594,7 @@ function getDateDiff(startdate, enddate) {
 //                     totalSecsDiff += hend.diff(mstart, 'seconds');
 //                 }
 //             }
-            
+
 //             mstart = mstart.add(1, 'day');
 //             mstart.set('hour', 8);
 //             mstart.set('minute', 00);

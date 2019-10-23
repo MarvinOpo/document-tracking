@@ -18,6 +18,9 @@ router.get('/update_info', mainController.update_info);
 // Update info
 router.post('/update_info', mainController.post_update);
 
+// Update password
+router.post('/update_pass', mainController.update_pass);
+
 // Perform Logout
 router.get('/logout', mainController.logout);
 
