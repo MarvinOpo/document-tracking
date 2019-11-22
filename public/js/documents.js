@@ -174,7 +174,15 @@ let refreshFlag = true;
         $('#modal_sendout_header').show();
         $('#modal_sendout_tbody').html('');
         $('#modal_no_sendout_container').removeClass('d-none');
-        date_from = moment().format('YYYY-MM-DD HH:mm:ss');
+        
+        fetch('/get_server_time', { method: 'GET' })
+            .then(res => res.json())
+            .then(data => {
+                date_from = moment(data.date).format('YYYY-MM-DD HH:mm:ss');
+            })
+            .catch(err => {
+                console.log(err);
+            });
 
         // getSendOutDocuments();
         const deptRoute = '/API/user/get_departments';
@@ -1143,7 +1151,7 @@ function fetchLogInsert(body) {
 
                     refreshFlag = true;
                     document_selectize.trigger("change");
-                    
+
                     updateDocReceiveLog(body.barcodes);
                 } else if (body.updateLocation) {
                     if (typeof $('#modal_dept').val() != 'string' && $('#modal_dept').val().length > 1) {

@@ -36,4 +36,7 @@ router.get('/all_documents', mainController.all_documents);
 // Show Admin Page
 router.get('/admin_access', mainController.admin_access);
 
+// Get Server time
+router.get('/get_server_time', mainController.get_server_time);
+
 module.exports = router;

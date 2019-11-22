@@ -150,3 +150,13 @@ exports.admin_access = function (req, res) {
         res.redirect('/login');
     }
 }
+
+exports.get_server_time = function (req, res) {
+    const offset = 8;
+    const dateTime = new Date(new Date().getTime() + offset * 3600 * 1000).toUTCString().replace(/ GMT$/, "");
+    const result = {
+        date: dateTime
+    }
+
+    res.send(result);
+}
