@@ -296,6 +296,7 @@ function selectizeFilter(filter) {
     $('#year_filter').append(options);
     $year = $('#year_filter').selectize({
         onChange: function (value) {
+            refreshFlag = true;
             getDocCount();
         }
     });
@@ -553,8 +554,9 @@ function insertDocument(body) {
         });
 }
 
-function trackDocument(id, status) {
-    $('.modal-title').html('Document Tracking');
+function trackDocument(id, status, barcode) {
+    $('#modal_track .modal-title').html('Document Tracking');
+    $('#modal_track .modal-title').attr('id', barcode);
 
     let year = $('#year_filter').val();
 
@@ -835,9 +837,7 @@ function receiveDocument(barcodes) {
 }
 
 function cancelRelease(document_id, did, uid) {
-    let year = $('#year_filter').val();
-
-    if (!year) year = (new Date()).getFullYear();
+    let year = $('#modal_track .modal-title').attr('id').substring(0,4);
 
     const param = '?year=' + year + '&document_id=' + document_id +
         '&department=' + $('.department').text() + '&did=' + did + "&uid=" + uid;
@@ -1194,7 +1194,7 @@ function populate_table(data) {
     for (let i = 0; i < data.length; i++) {
         table_data += "<tr id='" + data[i].barcode + "' class='tr-shadow'>"
             + "<td> "
-            + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + " )'> Track </button>";
+            + "<button class='btn btn-outline-success' onclick='trackDocument(" + data[i].id + "," + JSON.stringify(data[i].status) + "," + JSON.stringify(data[i].barcode) + " )'> Track </button>";
 
         if (data[i].status != "Cycle End") {
             if (data[i].created_by == $(".department").attr('id')) {

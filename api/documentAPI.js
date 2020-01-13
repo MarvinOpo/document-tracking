@@ -240,7 +240,40 @@ exports.get_sendout = function (param) {
         conn.query(sql, values, function (err, result) {
             if (err) reject(new Error("GET sendout failed"));
 
-            resolve(result);
+            if (!result.length) {
+                sql = `SELECT l.release_to, l.document_id, d.barcode, d.name, d.type, l.created_at 
+                    FROM logs_` + (parseInt(param.year) - 1) + ` l 
+                    RIGHT JOIN documents_` + (parseInt(param.year) - 1) + ` d
+                            ON l.document_id = d.id
+                    WHERE l.release_from = ?
+                            AND l.created_at >= ?
+                            AND l.created_at <= ? `
+
+                if (param.name) {
+                    sql += `AND (SELECT lg.release_by 
+                                        FROM logs_` + (parseInt(param.year) - 1) + ` lg
+                                        WHERE lg.document_id = l.document_id 
+                                        AND lg.release_by IS NOT NULL
+                                        ORDER BY id DESC LIMIT 1) = ? `;
+                    values.push(param.name);
+                }
+
+                sql += `ORDER BY l.release_to, l.created_at `;
+
+                if (parseInt(param.limit)) {
+                    sql += `LIMIT ? OFFSET ?`
+                    values.push(parseInt(param.limit));
+                    values.push(parseInt(param.offset));
+                }
+
+                conn.query(sql, values, function (err, result) {
+                    if (err) reject(new Error("GET sendout failed"));
+                    resolve(result);
+                });
+            }
+            else {
+                resolve(result);
+            }
         });
     });
 }

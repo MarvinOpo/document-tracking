@@ -69,6 +69,7 @@ let exportFlag = false;
             typeChart.destroy();
 
             loadData();
+            getTypeGraphData();
         }
     });
 
@@ -445,6 +446,9 @@ function getTypeGraphData() {
 
     if (!year) year = (new Date()).getFullYear();
 
+    types_date_from = year + types_date_from.substring(4);
+    types_date_to = year + types_date_to.substring(4);
+    
     const param = '?year=' + year + '&department=' + $('.department').text() +
         "&date_from=" + types_date_from + "&date_to=" + types_date_to;;
 
@@ -1027,6 +1031,8 @@ function populateTypeGraph(types, counts) {
 
     if (ctx) {
         ctx.height = 300;
+
+        if(typeChart) typeChart.destroy(); 
         typeChart = new Chart(ctx, {
             type: 'bar',
             data: {

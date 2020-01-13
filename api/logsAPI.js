@@ -156,7 +156,7 @@ exports.delete = function (param) {
 
                         if (result) {
                             sql = "UPDATE documents_" + param.year + " SET location = ?, "
-                                + "status = 'Received' WHERE id = ? "
+                                + "status = 'RECEIVED' WHERE id = ? "
 
                             values = [param.department, param.document_id];
 

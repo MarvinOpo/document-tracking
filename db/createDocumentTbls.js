@@ -1,4 +1,4 @@
-const year = '2018';
+const year = '2020';
 
 const mysql = require('mysql');
 const conn = mysql.createConnection({
@@ -90,7 +90,7 @@ function createLogsTbl() {
         receive_date datetime,
         release_by varchar(100),
         release_date datetime,
-        remarks varchar(255)
+        remarks varchar(255),
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`;
 
