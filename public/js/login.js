@@ -17,9 +17,9 @@
         "hideMethod": "fadeOut"
     };
 
-    // if (!$('.input-error').html()) {
-    //     $('#modal_notification').modal('show');
-    // }
+    if (!$('.input-error').html()) {
+        $('#modal_notification').modal('show');
+    }
     // $('#login_btn').click(function () {
     //     if (!$('#username').val() || !$('#password').val()) {
 

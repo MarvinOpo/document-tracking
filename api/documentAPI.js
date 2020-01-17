@@ -9,8 +9,8 @@ const conn = mysql.createConnection({
 
 exports.insert_document = function (document, year) {
     return new Promise(function (resolve, reject) {
-        let sql = "INSERT INTO documents_" + year + "(document_no, barcode, name, description, remarks, type, priority, created_by, updated_by, created_at, updated_at, location, status) "
-            + "values(?,?,?,?,?,?,?,?,?,NOW(),NOW(),?,'Pending')";
+        let sql = `INSERT INTO documents_` + year + `(document_no, barcode, name, description, remarks, type, priority, created_by, updated_by, created_at, updated_at, location, status) `
+            + `values(?,?,?,?,?,?,?,?,?,NOW(),NOW(),?,'Pending')`;
 
         const values = [document.getDocNo(), document.getBarcode(), document.getName(), document.getDescription(),
         document.getRemarks(), document.getType(), document.getPriority(), document.getCreateBy(), document.getUpdateBy(),
@@ -18,7 +18,7 @@ exports.insert_document = function (document, year) {
 
         conn.query(sql, values, function (err, result) {
             console.log(result);
-            if (err) reject(new Error("Insert failed"));
+            if (err) reject(new Error(`Insert failed`));
 
             resolve();
         });
@@ -27,7 +27,7 @@ exports.insert_document = function (document, year) {
 
 exports.get_documents = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "";
+        let sql = ``;
         let values = [];
 
         if (param.general == 'pending') {
@@ -39,7 +39,7 @@ exports.get_documents = function (param) {
                         AND d.status <> 'Cycle End' `;
 
             if (param.type) {
-                sql += "AND d.type = ? "
+                sql += `AND d.type = ? `
                 values.push(param.type);
             }
 
@@ -66,41 +66,41 @@ exports.get_documents = function (param) {
 
 
                 if (param.type) {
-                    sql += "AND d.type = ? "
+                    sql += `AND d.type = ? `
                     values.push(param.type);
                 }
             } else {
 
                 if (param.barcode) {
-                    sql += "AND barcode = ? "
+                    sql += `AND barcode = ? `
                     values.push(param.barcode);
 
                 }
 
                 if (param.type) {
-                    sql += "AND type = ? "
+                    sql += `AND type = ? `
                     values.push(param.type);
                 }
 
                 if (param.docno) {
-                    sql += "AND document_no = ? "
+                    sql += `AND document_no = ? `
                     values.push(param.docno);
                 }
             }
 
-            sql += "WHERE l.release_to = ? ORDER BY id DESC "
+            sql += `WHERE l.release_to = ? ORDER BY id DESC `
             values.push(param.department);
         }
 
 
         if (param.limit) {
-            sql += "LIMIT ? OFFSET ?";
+            sql += `LIMIT ? OFFSET ?`;
             values.push(parseInt(param.limit));
             values.push(parseInt(param.offset));
         }
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET document failed"));
+            if (err) reject(new Error(`GET document failed`));
 
             resolve(result);
         });
@@ -109,7 +109,7 @@ exports.get_documents = function (param) {
 
 exports.get_all_documents = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT d.* from documents_" + param.year + " d WHERE barcode IS NOT NULL "
+        let sql = `SELECT d.* from documents_` + param.year + ` d WHERE barcode IS NOT NULL `
         let values = [];
 
         if (param.general) {
@@ -124,39 +124,39 @@ exports.get_all_documents = function (param) {
 
 
             if (param.type) {
-                sql += "AND d.type = ? "
+                sql += `AND d.type = ? `
                 values[values.length] = param.type;
             }
         } else {
 
             if (param.barcode) {
-                sql += "AND barcode = ? "
+                sql += `AND barcode = ? `
                 values[values.length] = param.barcode;
 
             }
 
             if (param.type) {
-                sql += "AND type = ? "
+                sql += `AND type = ? `
                 values[values.length] = param.type;
             }
 
             if (param.docno) {
-                sql += "AND document_no = ? "
+                sql += `AND document_no = ? `
                 values[values.length] = param.docno;
             }
         }
 
 
-        sql += "ORDER BY id DESC "
+        sql += `ORDER BY id DESC `
 
         if (param.limit) {
-            sql += " LIMIT ? OFFSET ?";
+            sql += ` LIMIT ? OFFSET ?`;
             values[values.length] = parseInt(param.limit);
             values[values.length] = parseInt(param.offset);
         }
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET all document failed"));
+            if (err) reject(new Error(`GET all document failed`));
 
             resolve(result);
         });
@@ -186,22 +186,22 @@ exports.get_pending_documents = function (param) {
                 INSTR(d.type, '`+ param.general + `')) `;
 
             if (param.type) {
-                sql += "AND d.type = ? "
+                sql += `AND d.type = ? `
                 values[values.length] = param.type;
             }
         }
 
-        sql += "ORDER BY d.ID DESC "
+        sql += `ORDER BY d.ID DESC `
 
         if (param.limit) {
-            sql += " LIMIT ? OFFSET ?";
+            sql += ` LIMIT ? OFFSET ?`;
 
             values.push(param.limit);
             values.push(param.offset);
         }
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET pending documents failed"));
+            if (err) reject(new Error(`GET pending documents failed`));
 
             resolve(result);
         });
@@ -210,7 +210,7 @@ exports.get_pending_documents = function (param) {
 
 exports.get_sendout = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = `SELECT l.release_to, l.document_id, d.barcode, d.name, d.type, l.created_at 
+        let sql = `(SELECT l.release_to, l.document_id, d.barcode, d.name, d.type, l.created_at 
                     FROM logs_` + param.year + ` l 
                     RIGHT JOIN documents_` + param.year + ` d
                             ON l.document_id = d.id
@@ -229,51 +229,50 @@ exports.get_sendout = function (param) {
             values.push(param.name);
         }
 
-        sql += `ORDER BY l.release_to, l.created_at `;
-
         if (parseInt(param.limit)) {
-            sql += `LIMIT ? OFFSET ?`
+            sql += `LIMIT ? OFFSET ? `
             values.push(parseInt(param.limit));
             values.push(parseInt(param.offset));
         }
 
+        sql += `) UNION 
+        
+                (SELECT l2.release_to, l2.document_id, d2.barcode, d2.name, d2.type, l2.created_at 
+                    FROM logs_` + (param.year - 1) + ` l2 
+                    RIGHT JOIN documents_` + (param.year - 1) + ` d2
+                            ON l2.document_id = d2.id
+                    WHERE l2.release_from = ?
+                            AND l2.created_at >= ?
+                            AND l2.created_at <= ? `;
+
+        values.push(param.department);
+        values.push(param.date_from);
+        values.push(param.date_to);
+
+        if (param.name) {
+            sql += `AND (SELECT lg2.release_by 
+                        FROM logs_` + (param.year - 1) + ` lg2
+                        WHERE lg2.document_id = l2.document_id 
+                        AND lg2.release_by IS NOT NULL
+                        ORDER BY id DESC LIMIT 1) = ? `;
+            values.push(param.name);
+        }
+
+        if (parseInt(param.limit)) {
+            sql += `LIMIT ? OFFSET ?) `
+            values.push(parseInt(param.limit));
+            values.push(parseInt(param.offset));
+        } else {
+            sql += `) `
+        }
+
+        sql += `ORDER BY release_to, created_at `;
+
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET sendout failed"));
+            console.log(err);
+            if (err) reject(new Error(`GET sendout failed`));
 
-            if (!result.length) {
-                sql = `SELECT l.release_to, l.document_id, d.barcode, d.name, d.type, l.created_at 
-                    FROM logs_` + (parseInt(param.year) - 1) + ` l 
-                    RIGHT JOIN documents_` + (parseInt(param.year) - 1) + ` d
-                            ON l.document_id = d.id
-                    WHERE l.release_from = ?
-                            AND l.created_at >= ?
-                            AND l.created_at <= ? `
-
-                if (param.name) {
-                    sql += `AND (SELECT lg.release_by 
-                                        FROM logs_` + (parseInt(param.year) - 1) + ` lg
-                                        WHERE lg.document_id = l.document_id 
-                                        AND lg.release_by IS NOT NULL
-                                        ORDER BY id DESC LIMIT 1) = ? `;
-                    values.push(param.name);
-                }
-
-                sql += `ORDER BY l.release_to, l.created_at `;
-
-                if (parseInt(param.limit)) {
-                    sql += `LIMIT ? OFFSET ?`
-                    values.push(parseInt(param.limit));
-                    values.push(parseInt(param.offset));
-                }
-
-                conn.query(sql, values, function (err, result) {
-                    if (err) reject(new Error("GET sendout failed"));
-                    resolve(result);
-                });
-            }
-            else {
-                resolve(result);
-            }
+            resolve(result);
         });
     });
 }
@@ -299,7 +298,7 @@ exports.get_sendout = function (param) {
 //         }
 
 //         conn.query(sql, values, function (err, result) {
-//             if (err) reject(new Error("GET sendout failed"));
+//             if (err) reject(new Error(`GET sendout failed`));
 
 //             resolve(result);
 //         });
@@ -327,7 +326,7 @@ exports.get_sendout = function (param) {
 //         }
 
 //         conn.query(sql, values, function (err, result) {
-//             if (err) reject(new Error("GET sendout failed"));
+//             if (err) reject(new Error(`GET sendout failed`));
 
 //             resolve(result);
 //         });
@@ -343,7 +342,7 @@ exports.get_release_sendout = function (param) {
         let values = [param.barcodes];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET sendout failed"));
+            if (err) reject(new Error(`GET sendout failed`));
 
             resolve(result);
         });
@@ -354,7 +353,7 @@ exports.get_count = function (param) {
     return new Promise(function (resolve, reject) {
         let sql = '';
         let values = [];
-            
+
         if (param.general == 'pending') {
             sql = `SELECT count(DISTINCT l.document_id) as count
                     FROM logs_` + param.year + ` l 
@@ -364,7 +363,7 @@ exports.get_count = function (param) {
                         AND d.status <> 'Cycle End' `;
 
             if (param.type) {
-                sql += "AND d.type = ? "
+                sql += `AND d.type = ? `
                 values.push(param.type);
             }
 
@@ -391,23 +390,23 @@ exports.get_count = function (param) {
 
 
                 if (param.type) {
-                    sql += "AND d.type = ? ";
+                    sql += `AND d.type = ? `;
                     values.push(param.type);
                 }
             } else {
                 if (param.barcode) {
-                    sql += "AND barcode = ? ";
+                    sql += `AND barcode = ? `;
                     values.push(param.barcode);
 
                 }
 
                 if (param.type) {
-                    sql += "AND type = ? ";
+                    sql += `AND type = ? `;
                     values.push(param.type);
                 }
 
                 if (param.docno) {
-                    sql += "AND document_no = ? ";
+                    sql += `AND document_no = ? `;
                     values.push(param.docno);
                 }
             }
@@ -417,9 +416,9 @@ exports.get_count = function (param) {
 
             values.push(param.department);
         }
-        
+
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET count document failed"));
+            if (err) reject(new Error(`GET count document failed`));
 
             resolve(result);
         });
@@ -428,7 +427,7 @@ exports.get_count = function (param) {
 
 exports.get_all_count = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT count(id) AS count from documents_" + param.year + " d WHERE barcode IS NOT NULL "
+        let sql = `SELECT count(id) AS count from documents_` + param.year + ` d WHERE barcode IS NOT NULL `
         let values = [];
 
         if (param.general) {
@@ -443,29 +442,29 @@ exports.get_all_count = function (param) {
 
 
             if (param.type) {
-                sql += "AND d.type = ? "
+                sql += `AND d.type = ? `
                 values[values.length] = param.type;
             }
         } else {
             if (param.barcode) {
-                sql += "AND barcode = ? "
+                sql += `AND barcode = ? `
                 values[values.length] = param.barcode;
 
             }
 
             if (param.type) {
-                sql += "AND type = ? "
+                sql += `AND type = ? `
                 values[values.length] = param.type;
             }
 
             if (param.docno) {
-                sql += "AND document_no = ? "
+                sql += `AND document_no = ? `
                 values[values.length] = param.docno;
             }
         }
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET count all document failed"));
+            if (err) reject(new Error(`GET count all document failed`));
 
             resolve(result);
         });
@@ -496,13 +495,13 @@ exports.get_pending_count = function (param) {
                 INSTR(d.type, '`+ param.general + `')) `;
 
             if (param.type) {
-                sql += "AND d.type = ? "
+                sql += `AND d.type = ? `
                 values[values.length] = param.type;
             }
         }
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET pending document count failed"));
+            if (err) reject(new Error(`GET pending document count failed`));
 
             resolve(result);
         });
@@ -511,13 +510,19 @@ exports.get_pending_count = function (param) {
 
 exports.check_document = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT name, description from documents_" + param.year + " "
-            + "WHERE barcode = ?"
+        let sql = `SELECT d.name, d.description from documents_` + param.year + ` d
+                    WHERE d.barcode = ? 
+                    
+                    UNION 
+                    
+                    SELECT d2.name, d2.description from documents_` + (param.year - 1) + ` d2
+                    WHERE d2.barcode = ? `
 
-        const values = [param.barcode];
+
+        let values = [param.barcode, param.barcode];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET document failed"));
+            if (err) reject(new Error(`GET document failed`));
 
             resolve(result);
         });
@@ -536,20 +541,20 @@ exports.get_docno = function (param) {
         let values = [param.department];
 
         if (param.barcode) {
-            sql += "AND d.barcode = ? "
+            sql += `AND d.barcode = ? `
             values.push(param.barcode);
 
         }
 
         if (param.type) {
-            sql += "AND d.type = ? "
+            sql += `AND d.type = ? `
             values.push(param.type);
         }
 
-        sql += "ORDER BY d.ID "
+        sql += `ORDER BY d.ID `
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET filters document failed"));
+            if (err) reject(new Error(`GET filters document failed`));
 
             resolve(result);
         });
@@ -564,20 +569,20 @@ exports.get_all_docno = function (param) {
         let values = [];
 
         if (param.barcode) {
-            sql += "AND barcode = ? "
+            sql += `AND barcode = ? `
             values.push(param.barcode);
 
         }
 
         if (param.type) {
-            sql += "AND type = ? "
+            sql += `AND type = ? `
             values.push(param.type);
         }
 
-        sql += "ORDER BY ID "
+        sql += `ORDER BY ID `
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET filters document failed"));
+            if (err) reject(new Error(`GET filters document failed`));
 
             resolve(result);
         });
@@ -596,19 +601,19 @@ exports.get_barcodes = function (param) {
         let values = [param.department];
 
         if (param.type) {
-            sql += "AND d.type = ? "
+            sql += `AND d.type = ? `
             values[values.length] = param.type;
         }
 
         if (param.docno) {
-            sql += "AND d.document_no = ? "
+            sql += `AND d.document_no = ? `
             values[values.length] = param.docno;
         }
 
-        sql += "ORDER BY d.ID "
+        sql += `ORDER BY d.ID `
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET document barcodes failed"));
+            if (err) reject(new Error(`GET document barcodes failed`));
 
             resolve(result);
         });
@@ -617,24 +622,24 @@ exports.get_barcodes = function (param) {
 
 exports.get_all_barcodes = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT barcode from documents_" + param.year + " WHERE barcode IS NOT NULL "
+        let sql = `SELECT barcode from documents_` + param.year + ` WHERE barcode IS NOT NULL `
         let values = [];
 
         if (param.type) {
-            sql += "AND type = ? "
+            sql += `AND type = ? `
             values.push(param.type);
         }
 
         if (param.docno) {
-            sql += "AND document_no = ? "
+            sql += `AND document_no = ? `
             values.push(param.docno);
 
         }
 
-        sql += "ORDER BY ID "
+        sql += `ORDER BY ID `
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET all document barcodes failed"));
+            if (err) reject(new Error(`GET all document barcodes failed`));
 
             resolve(result);
         });
@@ -653,20 +658,20 @@ exports.get_types = function (param) {
         let values = [param.department];
 
         if (param.barcode) {
-            sql += "AND d.barcode = ? "
+            sql += `AND d.barcode = ? `
             values[values.length] = param.barcode;
 
         }
 
         if (param.docno) {
-            sql += "AND d.document_no = ? "
+            sql += `AND d.document_no = ? `
             values[values.length] = param.docno;
         }
 
-        sql += "ORDER BY d.ID "
+        sql += `ORDER BY d.ID `
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET document types failed"));
+            if (err) reject(new Error(`GET document types failed`));
 
             resolve(result);
         });
@@ -675,24 +680,24 @@ exports.get_types = function (param) {
 
 exports.get_all_types = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "SELECT type from documents_" + param.year + " WHERE type IS NOT NULL "
+        let sql = `SELECT type from documents_` + param.year + ` WHERE type IS NOT NULL `
 
         let values = [];
 
         if (param.barcode) {
-            sql += "AND barcode = ? "
+            sql += `AND barcode = ? `
             values.push(param.barcode);
 
         }
 
         if (param.docno) {
-            sql += "AND document_no = ? "
+            sql += `AND document_no = ? `
             values.push(param.docno);
         }
 
-        sql += "ORDER BY ID "
+        sql += `ORDER BY ID `
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET all document types failed"));
+            if (err) reject(new Error(`GET all document types failed`));
 
             resolve(result);
         });
@@ -715,7 +720,7 @@ exports.get_pending_graph_data = function (param) {
         let pnd_arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET pending document failed"));
+            if (err) reject(new Error(`GET pending document failed`));
 
             if (!result.length) {
                 let data = {
@@ -728,40 +733,40 @@ exports.get_pending_graph_data = function (param) {
 
             for (let i = 0; i < result.length; i++) {
                 switch (result[i].month) {
-                    case "January":
+                    case `January`:
                         pnd_arr.splice(0, 1, result[i].count);
                         break;
-                    case "February":
+                    case `February`:
                         pnd_arr.splice(1, 1, result[i].count);
                         break;
-                    case "March":
+                    case `March`:
                         pnd_arr.splice(2, 1, result[i].count);
                         break;
-                    case "April":
+                    case `April`:
                         pnd_arr.splice(3, 1, result[i].count);
                         break;
-                    case "May":
+                    case `May`:
                         pnd_arr.splice(4, 1, result[i].count);
                         break;
-                    case "June":
+                    case `June`:
                         pnd_arr.splice(5, 1, result[i].count);
                         break;
-                    case "July":
+                    case `July`:
                         pnd_arr.splice(6, 1, result[i].count);
                         break;
-                    case "August":
+                    case `August`:
                         pnd_arr.splice(7, 1, result[i].count);
                         break;
-                    case "September":
+                    case `September`:
                         pnd_arr.splice(8, 1, result[i].count);
                         break;
-                    case "October":
+                    case `October`:
                         pnd_arr.splice(9, 1, result[i].count);
                         break;
-                    case "November":
+                    case `November`:
                         pnd_arr.splice(10, 1, result[i].count);
                         break;
-                    case "December":
+                    case `December`:
                         pnd_arr.splice(11, 1, result[i].count);
                         break;
                 }
@@ -777,7 +782,7 @@ exports.get_pending_graph_data = function (param) {
 
             }
 
-            reject(new Error("No contents"));
+            reject(new Error(`No contents`));
 
         });
     });
@@ -796,7 +801,7 @@ exports.get_receive_graph_data = function (param) {
         let rcv_arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET document types failed"));
+            if (err) reject(new Error(`GET document types failed`));
 
             if (!result.length) {
                 let data = {
@@ -809,40 +814,40 @@ exports.get_receive_graph_data = function (param) {
 
             for (let i = 0; i < result.length; i++) {
                 switch (result[i].month) {
-                    case "January":
+                    case `January`:
                         rcv_arr.splice(0, 1, result[i].count);
                         break;
-                    case "February":
+                    case `February`:
                         rcv_arr.splice(1, 1, result[i].count);
                         break;
-                    case "March":
+                    case `March`:
                         rcv_arr.splice(2, 1, result[i].count);
                         break;
-                    case "April":
+                    case `April`:
                         rcv_arr.splice(3, 1, result[i].count);
                         break;
-                    case "May":
+                    case `May`:
                         rcv_arr.splice(4, 1, result[i].count);
                         break;
-                    case "June":
+                    case `June`:
                         rcv_arr.splice(5, 1, result[i].count);
                         break;
-                    case "July":
+                    case `July`:
                         rcv_arr.splice(6, 1, result[i].count);
                         break;
-                    case "August":
+                    case `August`:
                         rcv_arr.splice(7, 1, result[i].count);
                         break;
-                    case "September":
+                    case `September`:
                         rcv_arr.splice(8, 1, result[i].count);
                         break;
-                    case "October":
+                    case `October`:
                         rcv_arr.splice(9, 1, result[i].count);
                         break;
-                    case "November":
+                    case `November`:
                         rcv_arr.splice(10, 1, result[i].count);
                         break;
-                    case "December":
+                    case `December`:
                         rcv_arr.splice(11, 1, result[i].count);
                         break;
                 }
@@ -858,7 +863,7 @@ exports.get_receive_graph_data = function (param) {
 
             }
 
-            reject(new Error("No contents"));
+            reject(new Error(`No contents`));
         });
     });
 }
@@ -875,7 +880,7 @@ exports.get_release_graph_data = function (param) {
         let rls_arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET document types failed"));
+            if (err) reject(new Error(`GET document types failed`));
 
             if (!result.length) {
                 let data = {
@@ -888,40 +893,40 @@ exports.get_release_graph_data = function (param) {
 
             for (let i = 0; i < result.length; i++) {
                 switch (result[i].month) {
-                    case "January":
+                    case `January`:
                         rls_arr.splice(0, 1, result[i].count);
                         break;
-                    case "February":
+                    case `February`:
                         rls_arr.splice(1, 1, result[i].count);
                         break;
-                    case "March":
+                    case `March`:
                         rls_arr.splice(2, 1, result[i].count);
                         break;
-                    case "April":
+                    case `April`:
                         rls_arr.splice(3, 1, result[i].count);
                         break;
-                    case "May":
+                    case `May`:
                         rls_arr.splice(4, 1, result[i].count);
                         break;
-                    case "June":
+                    case `June`:
                         rls_arr.splice(5, 1, result[i].count);
                         break;
-                    case "July":
+                    case `July`:
                         rls_arr.splice(6, 1, result[i].count);
                         break;
-                    case "August":
+                    case `August`:
                         rls_arr.splice(7, 1, result[i].count);
                         break;
-                    case "September":
+                    case `September`:
                         rls_arr.splice(8, 1, result[i].count);
                         break;
-                    case "October":
+                    case `October`:
                         rls_arr.splice(9, 1, result[i].count);
                         break;
-                    case "November":
+                    case `November`:
                         rls_arr.splice(10, 1, result[i].count);
                         break;
-                    case "December":
+                    case `December`:
                         rls_arr.splice(11, 1, result[i].count);
                         break;
                 }
@@ -937,7 +942,7 @@ exports.get_release_graph_data = function (param) {
 
             }
 
-            reject(new Error("No contents"));
+            reject(new Error(`No contents`));
         });
     });
 }
@@ -949,12 +954,22 @@ exports.get_receivable_bcodes = function (param) {
                             ON l.document_id = d.id 
                             AND l.release_to = ?
                             AND l.receive_date IS NULL
-                    WHERE d.barcode IS NOT NULL `
+                    WHERE d.barcode IS NOT NULL 
+                    
+                    UNION 
+                    
+                    SELECT d2.barcode FROM documents_` + (param.year - 1) + ` d2 
+                    RIGHT JOIN logs_`+ (param.year - 1) + ` l2
+                            ON l2.document_id = d2.id 
+                            AND l2.release_to = ?
+                            AND l2.receive_date IS NULL
+                    WHERE d2.barcode IS NOT NULL `
 
-        const values = [param.department];
+        const values = [param.department, param.department];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET receivable barcodes failed"));
+            console.log(err);
+            if (err) reject(new Error(`GET receivable barcodes failed`));
 
             resolve(result);
         });
@@ -963,9 +978,9 @@ exports.get_receivable_bcodes = function (param) {
 
 exports.get_releasable_bcodes = function (param) {
     return new Promise(function (resolve, reject) {
-        // let sql = "SELECT barcode FROM documents_" + param.year + " "
-        //     + "WHERE (location = ? AND status = 'Received') OR "
-        //     + "(location = '' AND created_by = ?) ";
+        // let sql = `SELECT barcode FROM documents_` + param.year + ` `
+        //     + `WHERE (location = ? AND status = 'Received') OR `
+        //     + `(location = '' AND created_by = ?) `;
 
         let sql = `SELECT d.barcode FROM documents_` + param.year + ` d 
                     RIGHT JOIN logs_`+ param.year + ` l
@@ -973,12 +988,22 @@ exports.get_releasable_bcodes = function (param) {
                             AND l.release_to = ?
                             AND l.receive_date IS NOT NULL
                             AND l.release_date IS NULL
-                    WHERE d.barcode IS NOT NULL`
+                    WHERE d.barcode IS NOT NULL 
+                    
+                    UNION 
+                    
+                    SELECT d2.barcode FROM documents_` + (param.year - 1) + ` d2 
+                    RIGHT JOIN logs_`+ (param.year - 1) + ` l2
+                            ON l2.document_id = d2.id 
+                            AND l2.release_to = ?
+                            AND l2.receive_date IS NOT NULL
+                            AND l2.release_date IS NULL
+                    WHERE d2.barcode IS NOT NULL `
 
-        const values = [param.department];
+        const values = [param.department, param.department];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET releasable barcodes failed"));
+            if (err) reject(new Error(`GET releasable barcodes failed`));
 
             resolve(result);
         });
@@ -1002,7 +1027,7 @@ exports.get_types_count = function (param) {
         const values = [param.department, param.date_from, param.date_to];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("GET type count failed"));
+            if (err) reject(new Error(`GET type count failed`));
 
             resolve(result);
         });
@@ -1011,73 +1036,98 @@ exports.get_types_count = function (param) {
 
 exports.update_document = function (document, year) {
     return new Promise(function (resolve, reject) {
-        let sql = "UPDATE documents_" + year + " SET document_no = ?, name = ?, description = ?, remarks = ?, type = ?, priority = ?,  updated_by = ?, updated_at = NOW() "
-            + "WHERE id = ?";
+        let sql = `UPDATE documents_` + year + ` SET document_no = ?, name = ?, description = ?, remarks = ?, type = ?, priority = ?,  updated_by = ?, updated_at = NOW() `
+            + `WHERE id = ?`;
 
         const values = [document.getDocNo(), document.getName(), document.getDescription(), document.getRemarks(),
         document.getType(), document.getPriority(), document.getUpdateBy(), document.getId()];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("Update failed"));
+            if (err) reject(new Error(`Update failed`));
 
             resolve();
         });
     })
 }
 
-exports.receive_document = function (param) {
+exports.receive_document = function (body) {
     return new Promise(function (resolve, reject) {
-        let sql = "UPDATE documents_" + param.year + " SET status = 'Received', lapse_at = NOW() "
-            + "WHERE barcode IN (?)";
+        let sql = `UPDATE documents_` + body.year + ` 
+                    SET status = 'Received', lapse_at = NOW() 
+                    WHERE barcode IN (?)`;
 
-        const values = [param.barcodes];
+        const values = [body.barcodes];
 
         conn.query(sql, values, function (err, result) {
-            if (err || result.affectedRows == 0) reject(new Error("Receive failed"));
+            if (err || result.affectedRows == 0) reject(new Error(`Receive failed`));
 
-            resolve();
+            if (body.mix) {
+                sql = `UPDATE documents_` + (body.year - 1) + ` 
+                    SET status = 'Received', lapse_at = NOW() 
+                    WHERE barcode IN (?)`;
+
+                conn.query(sql, values, function (err, result) {
+                    if (err || result.affectedRows == 0) reject(new Error(`Receive failed`));
+
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
         });
     })
 }
 
 exports.end_cycle_document = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "UPDATE documents_" + param.year + " SET updated_by = ?, updated_at = NOW(), "
-            + "status = ? WHERE id = ? ";
+        let sql = `UPDATE documents_` + param.year + ` SET updated_by = ?, updated_at = NOW(), `
+            + `status = ? WHERE id = ? `;
 
         const values = [param.user_id, param.status, param.id];
 
         conn.query(sql, values, function (err, result) {
-            if (err || result.affectedRows == 0) reject(new Error("Cycle failed"));
+            if (err || result.affectedRows == 0) reject(new Error(`Cycle failed`));
 
             resolve();
         });
     })
 }
 
-exports.update_location = function (param) {
+exports.update_location = function (body) {
     return new Promise(function (resolve, reject) {
-        let sql = "UPDATE documents_" + param.year + " SET location = ?, status = 'Pending' "
-            + "WHERE barcode IN (?)";
+        let sql = `UPDATE documents_` + body.year + ` 
+                    SET location = ?, status = 'Pending' 
+                    WHERE barcode IN (?)`;
 
-        const values = [param.department, param.barcodes];
+        const values = [body.department, body.barcodes];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("Update location failed"));
+            if (err) reject(new Error(`Update location failed`));
 
-            resolve();
+            if (body.mix) {
+                sql = `UPDATE documents_` + (body.year - 1) + ` 
+                    SET location = ?, status = 'Pending' 
+                    WHERE barcode IN (?)`;
+
+                conn.query(sql, values, function (err, result) {
+                    if (err) reject(new Error(`Update location failed`));
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
         });
     })
 }
 
 exports.delete_document = function (param) {
     return new Promise(function (resolve, reject) {
-        let sql = "DELETE FROM documents_" + param.year + " WHERE id = ?";
+        let sql = `DELETE FROM documents_` + param.year + ` WHERE id = ?`;
 
         const values = [parseInt(param.id)];
 
         conn.query(sql, values, function (err, result) {
-            if (err) reject(new Error("Delete failed"));
+            if (err) reject(new Error(`Delete failed`));
 
             resolve();
         });
@@ -1103,7 +1153,7 @@ exports.delete_document = function (param) {
 //         for(let i = 0; i < result.recordset.length; i++){
 //             const employee = result.recordset[i];
 //             const fname = employee.FirstName;
-//             const minit = employee.MiddleInitial + ".";
+//             const minit = employee.MiddleInitial + `.`;
 //             const lname = employee.LastName;
 //             let designation = employee.Position;
 //             // const username = fname.split(/\s/)[0].substring(0,2) + lname;
@@ -1111,8 +1161,8 @@ exports.delete_document = function (param) {
 
 //             if(!designation) designation = 'nd';
 
-//             let sql = "INSERT INTO users(username, password, fname, mname, lname, designation, department) "
-//                     + "values(?, '123', ?, ?, ?, ?, 'nd')";
+//             let sql = `INSERT INTO users(username, password, fname, mname, lname, designation, department) `
+//                     + `values(?, '123', ?, ?, ?, ?, 'nd')`;
 
 //             // let sql = `UPDATE users SET designation = ? WHERE username = ?`
 

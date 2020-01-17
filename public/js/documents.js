@@ -141,9 +141,7 @@ let refreshFlag = true;
         mbcode_release_selectize.clearOptions();
         $('.modal-title').text('Release Document To');
 
-        let year = $('#year_filter').val();
-
-        if (!year) year = (new Date()).getFullYear();
+        let year = (new Date()).getFullYear();
 
         const param = '?year=' + year + '&id=' + $('.department').attr('id') + '&department=' + $('.department').text();
 
@@ -157,8 +155,7 @@ let refreshFlag = true;
         mbcode_receive_selectize.clearOptions();
         $('.modal-title').text('Receive Document');
 
-        let year = $('#year_filter').val();
-        if (!year) year = (new Date()).getFullYear();
+        let year = (new Date()).getFullYear();
 
         const param = '?year=' + year + '&id=' + $('.department').attr('id') + '&department=' + $('.department').text();
 
@@ -174,7 +171,7 @@ let refreshFlag = true;
         $('#modal_sendout_header').show();
         $('#modal_sendout_tbody').html('');
         $('#modal_no_sendout_container').removeClass('d-none');
-        
+
         fetch('/get_server_time', { method: 'GET' })
             .then(res => res.json())
             .then(data => {
@@ -416,7 +413,7 @@ function selectizeModal() {
 
     $mbcodeReceive = $('#modal_receive_barcode').selectize({
         // create: true,
-        maxOptions: 1,
+        maxOptions: 2,
         maxItems: 100,
         valueField: 'barcode',
         labelField: 'barcode',
@@ -438,7 +435,7 @@ function selectizeModal() {
     $('#modal_release_doc_info').hide();
     $mbcodeRelease = $('#modal_release_barcode').selectize({
         // create: true,
-        maxOptions: 1,
+        maxOptions: 2,
         maxItems: 100,
         valueField: 'barcode',
         labelField: 'barcode',
@@ -575,9 +572,7 @@ function trackDocument(id, status, barcode) {
 }
 
 function checkDocForReceive(barcode) {
-    let year = $('#year_filter').val();
-
-    if (!year) year = (new Date()).getFullYear();
+    let year = (new Date()).getFullYear();
 
     const param = '?year=' + year + '&barcode=' + barcode;
 
@@ -606,11 +601,9 @@ function checkDocForReceive(barcode) {
 }
 
 function checkDocForRelease(barcode) {
-    let year = $('#year_filter').val();
+    let year = (new Date()).getFullYear();
 
-    if (!year) year = (new Date()).getFullYear();
-
-    const param = '?year=' + year + '&barcode=' + barcode;
+    let param = '?year=' + year + '&barcode=' + barcode;
 
     fetch('/API/document/check_document' + param, { method: 'GET' })
         .then(res => res.json())
@@ -717,6 +710,7 @@ function getSendOutDocuments() {
     fetch('/API/document/get_sendout' + param, { method: 'GET' })
         .then(res => res.json())
         .then(data => {
+            console.log(data);
             if (!data.length) {
                 $('#modalTblSendOut').addClass('d-none');
                 $('#modal_no_sendout_container').removeClass('d-none');
@@ -807,13 +801,20 @@ function updateDocument(body) {
 }
 
 function receiveDocument(barcodes) {
-    let year = $('#year_filter').val();
+    let year = barcodes[0].substring(0, 4);
+    let mix = false;
 
-    if (!year) year = (new Date()).getFullYear();
+    const currYear = (new Date()).getFullYear();
+
+    if(JSON.stringify(barcodes).includes(currYear + '-') && 
+        JSON.stringify(barcodes).includes((currYear - 1) + '-')) mix = true;
+
+    if (mix || !year) year = (new Date()).getFullYear();
 
     const body = {
         year: year,
-        barcodes: barcodes
+        barcodes: barcodes,
+        mix: mix
     };
 
     fetch('/API/document/receive', {
@@ -837,7 +838,7 @@ function receiveDocument(barcodes) {
 }
 
 function cancelRelease(document_id, did, uid) {
-    let year = $('#modal_track .modal-title').attr('id').substring(0,4);
+    let year = $('#modal_track .modal-title').attr('id').substring(0, 4);
 
     const param = '?year=' + year + '&document_id=' + document_id +
         '&department=' + $('.department').text() + '&did=' + did + "&uid=" + uid;
@@ -963,15 +964,22 @@ function recycleDocument(id) {
 }
 
 function updateDocReceiveLog(barcodes) {
-    let year = $('#year_filter').val();
+    let year = barcodes[0].substring(0, 4);
+    let mix = false;
 
-    if (!year) year = (new Date()).getFullYear();
+    const currYear = (new Date()).getFullYear();
+
+    if(JSON.stringify(barcodes).includes(currYear + '-') && 
+        JSON.stringify(barcodes).includes((currYear - 1) + '-')) mix = true;
+
+    if (mix || !year) year = (new Date()).getFullYear();
 
     const body = {
         year: year,
         barcodes: barcodes,
         receive_by: $('.name').attr('id'),
-        department: $('.department').text()
+        department: $('.department').text(),
+        mix: mix
     };
 
     fetch('/API/logs/update_receive', {
@@ -991,14 +999,16 @@ function updateDocReceiveLog(barcodes) {
 }
 
 function updateDocReleaseLog() {
-    let year = $('#year_filter').val();
+    let year = $('#modal_release_barcode').val()[0].substring(0,4);
+    const mix = checkSelectedBcodes(mbcode_release_selectize);                
 
-    if (!year) year = (new Date()).getFullYear();
+    if (mix || !year) year = (new Date()).getFullYear();
 
     const body = {
         year: year,
         release_by: $('.name').attr('id'),
-        barcodes: $('#modal_release_barcode').val()
+        barcodes: $('#modal_release_barcode').val(),
+        mix: mix
     };
 
     fetch('/API/logs/update_release', {
@@ -1102,9 +1112,10 @@ function insertLogs(body) {
     if (!body) {
         let departments = $('#modal_dept').val();
 
-        let year = $('#year_filter').val();
+        let year = $('#modal_release_barcode').val()[0].substring(0,4);
+        const mix = checkSelectedBcodes(mbcode_release_selectize);
 
-        if (!year) year = (new Date()).getFullYear();
+        if (mix || !year) year = (new Date()).getFullYear();
 
         body = {
             year: year,
@@ -1112,7 +1123,8 @@ function insertLogs(body) {
             barcodes: $('#modal_release_barcode').val(),
             remarks: $('#modal_release_remarks').val(),
             triggerReceive: false,
-            updateLocation: false
+            updateLocation: false,
+            mix: mix
         };
 
         if (typeof $('#modal_dept').val() == 'string') {
@@ -1672,6 +1684,17 @@ function populateModalSendout(data) {
 
 //     $('#modal_sendout_tbody').html(table_data);
 // }
+
+function checkSelectedBcodes(selectize) {
+    const bcodes = selectize.$input[0].innerText;
+    const year = (new Date()).getFullYear();
+
+    if (bcodes.includes(year + '-') && bcodes.includes((year - 1) + '-')) {
+        return true;
+    }
+
+    return false;
+}
 
 function print_sendout() {
     $('#printed_by').html("Printed By: " + $('.department').text());
